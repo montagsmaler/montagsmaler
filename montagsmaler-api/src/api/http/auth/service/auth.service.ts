@@ -4,7 +4,7 @@ import { AuthCredentialsDto } from '../models/auth-credentials.dto';
 import { AuthRegisterDto } from '../models/auth-register.dto';
 import * as Axios from 'axios';
 import * as jwt from 'jsonwebtoken';
-import jwkToPem from 'jwk-to-pem';
+import * as jwkToPem from 'jwk-to-pem';
 import { PublicKeys, PublicKeyMeta, ClaimVerifyResult, Claim, TokenHeader } from '../models/aws-token';
 import { ConfigService } from '@nestjs/config';
 
@@ -15,9 +15,7 @@ export class AuthService implements OnApplicationBootstrap {
   private readonly logger = new Logger(this.constructor.name, true);
   private cognitoIssuerUrl: string;
 
-	constructor(@Inject('aws_cognito_user_pool') private readonly cognitoUserPool: CognitoUserPool, private readonly configService: ConfigService) { 
-    console.log('is started!!');
-  }
+	constructor(@Inject('aws_cognito_user_pool') private readonly cognitoUserPool: CognitoUserPool, private readonly configService: ConfigService) { }
   
   public async onApplicationBootstrap(): Promise<void> {
     try {
@@ -30,10 +28,11 @@ export class AuthService implements OnApplicationBootstrap {
   }
 
 	public login(userCredentials: AuthCredentialsDto): Promise<CognitoUserSession> {
+
 		const authenticationDetails = new AuthenticationDetails({
       Username: userCredentials.name,
       Password: userCredentials.password,
-		});
+    });
 		
     const userData = {
       Username: userCredentials.name,
@@ -43,11 +42,13 @@ export class AuthService implements OnApplicationBootstrap {
 		const user = new CognitoUser(userData);
 		
     return new Promise((resolve, reject) => {
-      return user.authenticateUser(authenticationDetails, {
+      user.authenticateUser(authenticationDetails, {
         onSuccess: (result) => {
+          console.log('Login successful!');
           resolve(result);
         },
         onFailure: (err) => {
+          console.log('Login fail!');
           reject(err);
         },
       });
@@ -55,15 +56,15 @@ export class AuthService implements OnApplicationBootstrap {
 	}
 	
 	public register(authRegisterRequest: AuthRegisterDto): Promise<CognitoUser> {
-    return new Promise((resolve, reject) => {
-      return this.cognitoUserPool.signUp(authRegisterRequest.name, authRegisterRequest.password, [new CognitoUserAttribute({ Name: 'email', Value: authRegisterRequest.email})], null, (err, result) => {
+    return new Promise(((resolve, reject) => {
+      this.cognitoUserPool.signUp(authRegisterRequest.name, authRegisterRequest.password, [new CognitoUserAttribute({ Name: 'email', Value: authRegisterRequest.email })], null, (err, result) => {
         if (!result) {
           reject(err);
         } else {
           resolve(result.user);
         }
       });
-		});
+    }));
   }
 
   public async verifyToken(token: string): Promise<ClaimVerifyResult> {

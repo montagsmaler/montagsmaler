@@ -9,7 +9,8 @@ export class AuthCognitoStrategy extends PassportStrategy(Strategy) {
   
 	constructor(private readonly authService: AuthService) {
 		super({
-		jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+			secretOrKey: 'secret',
 		});
 	}
 

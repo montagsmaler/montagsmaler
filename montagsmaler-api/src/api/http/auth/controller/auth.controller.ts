@@ -1,7 +1,8 @@
 import { Controller, UseGuards, Post, Request, Body, Get, InternalServerErrorException } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from '../service/auth.service';
 import { AuthCognitoStrategy } from '../middleware/auth.strategy';
+import { AuthRegisterDto } from '../models/auth-register.dto';
+import { AuthCredentialsDto } from '../models/auth-credentials.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -9,7 +10,7 @@ export class AuthController {
 	constructor(private readonly authService: AuthService) { }
 	
   @Post('login')
-  async login(@Request() req: any, @Body() body: any) {
+  async login(@Request() req: any, @Body() body: AuthCredentialsDto) {
 		try {
 			return await this.authService.login(body);
 		} catch (err) {
@@ -18,9 +19,10 @@ export class AuthController {
 	}
 
   @Post('register')
-  async register(@Request() req: any, @Body() body: any) {
+  async register(@Request() req: any, @Body() body: AuthRegisterDto) {
 		try {
-			return await this.authService.register(body);
+			const cognitoUser = await this.authService.register(body);
+			return cognitoUser;
 		} catch (err) {
 			throw new InternalServerErrorException(err);
 		}
