@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Post, Body, Get, InternalServerErrorException } from '@nestjs/common';
+import { Controller, UseGuards, Post, Body, Get, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { AuthCognitoGuard } from '../middleware/auth.guard';
 import { AuthRegisterDto } from '../models/auth-register.dto';
@@ -6,7 +6,8 @@ import { AuthCredentialsDto } from '../models/auth-credentials.dto';
 import { AuthVerifyRegisterDto } from '../models/auth-verify.dto';
 import { VerifiedCognitoUser } from '../middleware/auth.cognito.user.decorator';
 import { ClaimVerfiedCognitoUser } from '../models/aws-token';
-import { CognitoAccessToken, CognitoUser } from 'amazon-cognito-identity-js';
+import { CognitoAccessToken } from 'amazon-cognito-identity-js';
+import { ICognitoUser } from '../models/cognito-user';
 
 @Controller('auth')
 export class AuthController {
@@ -18,16 +19,17 @@ export class AuthController {
 		try {
 			return await this.authService.login(body);
 		} catch (err) {
-			throw new InternalServerErrorException(err);
+			console.log(err);
+			throw new UnauthorizedException(err);
 		}
 	}
 
 	@Post('register')
-	async register(@Body() body: AuthRegisterDto): Promise<CognitoUser> {
+	async register(@Body() body: AuthRegisterDto): Promise<ICognitoUser> {
 		try {
 			return await this.authService.register(body);
 		} catch (err) {
-			throw new InternalServerErrorException(err);
+			throw new UnauthorizedException(err);
 		}
 	}
 
@@ -36,16 +38,16 @@ export class AuthController {
 		try {
 			return await this.authService.verifyRegister(body);
 		} catch (err) {
-			throw new InternalServerErrorException(err);
+			throw new UnauthorizedException(err);
 		}
 	}
 
 
 	@UseGuards(AuthCognitoGuard)
 	@Get('cognitoUser')
-	async getCognitoUser(@VerifiedCognitoUser() user: ClaimVerfiedCognitoUser): Promise<ClaimVerfiedCognitoUser> {
+	async getCognitoUser(@VerifiedCognitoUser() user: ClaimVerfiedCognitoUser): Promise<ICognitoUser> {
 		try {
-			return user;
+			return {userName: user.userName};
 		} catch (err) {
 			throw new InternalServerErrorException(err);
 		}

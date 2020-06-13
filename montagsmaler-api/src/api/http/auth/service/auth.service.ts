@@ -9,6 +9,7 @@ import * as jwkToPem from 'jwk-to-pem';
 import { PublicKeys, PublicKeyMeta, ClaimVerfiedCognitoUser, Claim, TokenHeader } from '../models/aws-token';
 import { ConfigService } from '@nestjs/config';
 import { AuthVerifyRegisterDto } from '../models/auth-verify.dto';
+import { ICognitoUser } from '../models/cognito-user';
 
 @Injectable()
 export class AuthService implements OnApplicationBootstrap {
@@ -57,13 +58,13 @@ export class AuthService implements OnApplicationBootstrap {
 		});
 	}
 
-	public register(authRegisterRequest: AuthRegisterDto): Promise<CognitoUser> {
+	public register(authRegisterRequest: AuthRegisterDto): Promise<ICognitoUser> {
 		return new Promise(((resolve, reject) => {
 			this.cognitoUserPool.signUp(authRegisterRequest.name, authRegisterRequest.password, [new CognitoUserAttribute({ Name: 'email', Value: authRegisterRequest.email })], null, (err, result) => {
 				if (err) {
 					reject(err);
 				} else {
-					resolve(result.user);
+					resolve({userName: result.user.getUsername()});
 				}
 			});
 		}));

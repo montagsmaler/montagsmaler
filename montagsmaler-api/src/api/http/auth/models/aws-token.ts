@@ -1,3 +1,5 @@
+import { ICognitoUser } from "./cognito-user";
+
 export interface PublicKey {
 	alg: string;
 	e: string;
