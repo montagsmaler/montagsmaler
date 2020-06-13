@@ -12,9 +12,9 @@ import { CognitoAccessToken, CognitoUser } from 'amazon-cognito-identity-js';
 export class AuthController {
 
 	constructor(private readonly authService: AuthService) { }
-	
-  @Post('login')
-  async login(@Body() body: AuthCredentialsDto): Promise<CognitoAccessToken> {
+
+	@Post('login')
+	async login(@Body() body: AuthCredentialsDto): Promise<CognitoAccessToken> {
 		try {
 			return await this.authService.login(body);
 		} catch (err) {
@@ -22,8 +22,8 @@ export class AuthController {
 		}
 	}
 
-  @Post('register')
-  async register(@Body() body: AuthRegisterDto): Promise<CognitoUser> {
+	@Post('register')
+	async register(@Body() body: AuthRegisterDto): Promise<CognitoUser> {
 		try {
 			return await this.authService.register(body);
 		} catch (err) {
@@ -40,14 +40,14 @@ export class AuthController {
 		}
 	}
 
-	
+
 	@UseGuards(AuthCognitoGuard)
-  @Get('cognitoUser')
-  async getCognitoUser(@VerifiedCognitoUser() user: ClaimVerfiedCognitoUser): Promise<ClaimVerfiedCognitoUser> {
+	@Get('cognitoUser')
+	async getCognitoUser(@VerifiedCognitoUser() user: ClaimVerfiedCognitoUser): Promise<ClaimVerfiedCognitoUser> {
 		try {
 			return user;
 		} catch (err) {
 			throw new InternalServerErrorException(err);
 		}
-  }
+	}
 }

@@ -13,70 +13,70 @@ import { AuthVerifyRegisterDto } from '../models/auth-verify.dto';
 @Injectable()
 export class AuthService implements OnApplicationBootstrap {
 
-  private publicKeys: Map<string, PublicKeyMeta>;
+	private publicKeys: Map<string, PublicKeyMeta>;
 	private readonly logger = new Logger(this.constructor.name, true);
 	private cognitoIssuerUrl: string;
-  private cognitoIssuerKeysUrl: string;
+	private cognitoIssuerKeysUrl: string;
 
 	constructor(@Inject('aws_cognito_user_pool') private readonly cognitoUserPool: CognitoUserPool, private readonly configService: ConfigService) { }
-  
-  public async onApplicationBootstrap(): Promise<void> {
-    try {
+
+	public async onApplicationBootstrap(): Promise<void> {
+		try {
 			this.cognitoIssuerUrl = `https://cognito-idp.${this.configService.get('AWS_REGION')}.amazonaws.com/${this.configService.get('USER_POOL_ID')}`
 			this.cognitoIssuerKeysUrl = this.cognitoIssuerUrl + '/.well-known/jwks.json';
-      await this.loadPublicKeys();
-      this.logger.log(`Successfully loaded ${this.publicKeys.size} public keys.`);
-    } catch (err) {
-      this.logger.error('Failed to load cognito public keys.', err.stack);
-    }
-  }
+			await this.loadPublicKeys();
+			this.logger.log(`Successfully loaded ${this.publicKeys.size} public keys.`);
+		} catch (err) {
+			this.logger.error('Failed to load cognito public keys.', err.stack);
+		}
+	}
 
 	public login(userCredentials: AuthCredentialsDto): Promise<CognitoAccessToken> {
 
 		const authenticationDetails = new AuthenticationDetails({
-      Username: userCredentials.name,
-      Password: userCredentials.password,
-    });
-		
-    const userData = {
-      Username: userCredentials.name,
-      Pool: this.cognitoUserPool,
+			Username: userCredentials.name,
+			Password: userCredentials.password,
+		});
+
+		const userData = {
+			Username: userCredentials.name,
+			Pool: this.cognitoUserPool,
 		};
-		
+
 		const user = new CognitoUser(userData);
-		
-    return new Promise((resolve, reject) => {
-      user.authenticateUser(authenticationDetails, {
-        onSuccess: (result) => {
-          resolve(result.getAccessToken());
-        },
-        onFailure: (err) => {
-          reject(err);
-        },
-      });
-    });
+
+		return new Promise((resolve, reject) => {
+			user.authenticateUser(authenticationDetails, {
+				onSuccess: (result) => {
+					resolve(result.getAccessToken());
+				},
+				onFailure: (err) => {
+					reject(err);
+				},
+			});
+		});
 	}
-	
+
 	public register(authRegisterRequest: AuthRegisterDto): Promise<CognitoUser> {
-    return new Promise(((resolve, reject) => {
-      this.cognitoUserPool.signUp(authRegisterRequest.name, authRegisterRequest.password, [new CognitoUserAttribute({ Name: 'email', Value: authRegisterRequest.email })], null, (err, result) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result.user);
-        }
-      });
-    }));
+		return new Promise(((resolve, reject) => {
+			this.cognitoUserPool.signUp(authRegisterRequest.name, authRegisterRequest.password, [new CognitoUserAttribute({ Name: 'email', Value: authRegisterRequest.email })], null, (err, result) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(result.user);
+				}
+			});
+		}));
 	}
-	
+
 	public verifyRegister(verifyRegisterRequest: AuthVerifyRegisterDto): Promise<string> {
 		const userData = {
 			Username: verifyRegisterRequest.name,
 			Pool: this.cognitoUserPool,
 		};
-	 
+
 		const user: CognitoUser = new CognitoUser(userData);
-		
+
 		return new Promise((resolve, reject) => {
 			user.confirmRegistration(verifyRegisterRequest.confirmationCode, true, (err, result) => {
 				if (err) {
@@ -88,64 +88,64 @@ export class AuthService implements OnApplicationBootstrap {
 		});
 	}
 
-  public async verifyToken(token: string): Promise<ClaimVerfiedCognitoUser> {
-    try {
-      const tokenSections = (token || '').split('.');
-      if (tokenSections.length < 2) {
-        throw new Error('Requested token is invalid.');
-      }
-      const headerJSON = Buffer.from(tokenSections[0], 'base64').toString('utf8');
-      const header = JSON.parse(headerJSON) as TokenHeader;
-      const key = this.publicKeys.get(header.kid);
-      if (!key) {
-        throw new Error('Claim made for unknown kid.');
+	public async verifyToken(token: string): Promise<ClaimVerfiedCognitoUser> {
+		try {
+			const tokenSections = (token || '').split('.');
+			if (tokenSections.length < 2) {
+				throw new Error('Requested token is invalid.');
+			}
+			const headerJSON = Buffer.from(tokenSections[0], 'base64').toString('utf8');
+			const header = JSON.parse(headerJSON) as TokenHeader;
+			const key = this.publicKeys.get(header.kid);
+			if (!key) {
+				throw new Error('Claim made for unknown kid.');
 			}
 			return await new Promise<ClaimVerfiedCognitoUser>((resolve, reject) => {
-        jwt.verify(token, key.pem, {algorithms: ['RS256']}, (err: any, claim: Claim) => {
-          if (err) {
-            reject(err);
-          }
-          const currentSeconds = Math.floor(new Date().getTime() / 1000);
-          if (currentSeconds > claim.exp || currentSeconds < claim.auth_time) {
-            reject(new Error('Claim is expired or invalid.'));
-          }
-          if (claim.iss !== this.cognitoIssuerUrl) {
-            reject(new Error('Claim issuer is invalid.'));
-          }
-          if (claim.token_use !== 'access') {
-            reject(new Error('Claim use is not access.'));
-          }
-          resolve({userName: claim.username, clientId: claim.client_id});
-        });
-      });
-    } catch (err) {
-      throw new Error(err.message || 'Token could not be verified!');
-    }
-  }
+				jwt.verify(token, key.pem, { algorithms: ['RS256'] }, (err: any, claim: Claim) => {
+					if (err) {
+						reject(err);
+					}
+					const currentSeconds = Math.floor(new Date().getTime() / 1000);
+					if (currentSeconds > claim.exp || currentSeconds < claim.auth_time) {
+						reject(new Error('Claim is expired or invalid.'));
+					}
+					if (claim.iss !== this.cognitoIssuerUrl) {
+						reject(new Error('Claim issuer is invalid.'));
+					}
+					if (claim.token_use !== 'access') {
+						reject(new Error('Claim use is not access.'));
+					}
+					resolve({ userName: claim.username, clientId: claim.client_id });
+				});
+			});
+		} catch (err) {
+			throw new Error(err.message || 'Token could not be verified!');
+		}
+	}
 
-  private async loadPublicKeys(): Promise<void> {
-    try {
-      const publicKeys = await this.fetchPubliyKeys();
+	private async loadPublicKeys(): Promise<void> {
+		try {
+			const publicKeys = await this.fetchPubliyKeys();
 
-      if (!publicKeys.keys || publicKeys.keys.length <= 0) {
-        throw new Error('No public cognito keys could be fetched.');
-      }
+			if (!publicKeys.keys || publicKeys.keys.length <= 0) {
+				throw new Error('No public cognito keys could be fetched.');
+			}
 
-      this.publicKeys = publicKeys.keys.reduce((agg, current) => {
-        const pem = jwkToPem(current);
-        agg.set(current.kid, {instance: current, pem});
-        return agg;
-      }, new Map<string, PublicKeyMeta>());
-    } catch (err) {
-      throw err;
-    }
-  }
-  
-  private async fetchPubliyKeys(): Promise<PublicKeys> {
-    try {
-      return (await Axios.default.get<PublicKeys>(this.cognitoIssuerKeysUrl)).data;
-    } catch (err) {
-      throw err;
-    }
-  }
+			this.publicKeys = publicKeys.keys.reduce((agg, current) => {
+				const pem = jwkToPem(current);
+				agg.set(current.kid, { instance: current, pem });
+				return agg;
+			}, new Map<string, PublicKeyMeta>());
+		} catch (err) {
+			throw err;
+		}
+	}
+
+	private async fetchPubliyKeys(): Promise<PublicKeys> {
+		try {
+			return (await Axios.default.get<PublicKeys>(this.cognitoIssuerKeysUrl)).data;
+		} catch (err) {
+			throw err;
+		}
+	}
 }
