@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 
-export class AuthCredentialsDto {
+export class AuthVerifyRegisterDto {
 	
 	@IsString()
   @IsNotEmpty()
@@ -8,5 +8,5 @@ export class AuthCredentialsDto {
 
 	@IsString()
   @IsNotEmpty()
-	password: string;
+	confirmationCode: string;
 }

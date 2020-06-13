@@ -2,7 +2,7 @@ import { IsString, IsNotEmpty, IsEmail, Length, Matches } from 'class-validator'
 
 export class AuthRegisterDto {
 	@IsString()
-  	@IsNotEmpty()
+  @IsNotEmpty()
 	name: string;
 
 	@IsString()
@@ -16,5 +16,6 @@ export class AuthRegisterDto {
 	@Matches(/[a-z]/)
 	@Matches(/[A-Z]/)
 	@Matches(/[0-9]/)
+	@Matches(/[$-/:-?{-~!"^_`\[\]]/)
 	password: string;
 }

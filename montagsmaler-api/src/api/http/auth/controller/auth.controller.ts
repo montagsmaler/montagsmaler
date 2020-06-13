@@ -1,8 +1,12 @@
-import { Controller, UseGuards, Post, Request, Body, Get, InternalServerErrorException } from '@nestjs/common';
+import { Controller, UseGuards, Post, Body, Get, InternalServerErrorException } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
-import { AuthCognitoStrategy } from '../middleware/auth.strategy';
+import { AuthCognitoGuard } from '../middleware/auth.guard';
 import { AuthRegisterDto } from '../models/auth-register.dto';
 import { AuthCredentialsDto } from '../models/auth-credentials.dto';
+import { AuthVerifyRegisterDto } from '../models/auth-verify.dto';
+import { VerifiedCognitoUser } from '../middleware/auth.cognito.user.decorator';
+import { ClaimVerfiedCognitoUser } from '../models/aws-token';
+import { CognitoAccessToken, CognitoUser } from 'amazon-cognito-identity-js';
 
 @Controller('auth')
 export class AuthController {
@@ -10,7 +14,7 @@ export class AuthController {
 	constructor(private readonly authService: AuthService) { }
 	
   @Post('login')
-  async login(@Request() req: any, @Body() body: AuthCredentialsDto) {
+  async login(@Body() body: AuthCredentialsDto): Promise<CognitoAccessToken> {
 		try {
 			return await this.authService.login(body);
 		} catch (err) {
@@ -19,21 +23,29 @@ export class AuthController {
 	}
 
   @Post('register')
-  async register(@Request() req: any, @Body() body: AuthRegisterDto) {
+  async register(@Body() body: AuthRegisterDto): Promise<CognitoUser> {
 		try {
-			const cognitoUser = await this.authService.register(body);
-			return cognitoUser;
+			return await this.authService.register(body);
 		} catch (err) {
 			throw new InternalServerErrorException(err);
 		}
 	}
-	
-	@UseGuards(AuthCognitoStrategy)
-  @Get('test')
-  async test(@Request() req: any) {
+
+	@Post('verifyRegister')
+	async verify(@Body() body: AuthVerifyRegisterDto): Promise<string> {
 		try {
-			console.log(req);
-			return req.user;
+			return await this.authService.verifyRegister(body);
+		} catch (err) {
+			throw new InternalServerErrorException(err);
+		}
+	}
+
+	
+	@UseGuards(AuthCognitoGuard)
+  @Get('cognitoUser')
+  async getCognitoUser(@VerifiedCognitoUser() user: ClaimVerfiedCognitoUser): Promise<ClaimVerfiedCognitoUser> {
+		try {
+			return user;
 		} catch (err) {
 			throw new InternalServerErrorException(err);
 		}

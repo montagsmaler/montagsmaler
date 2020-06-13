@@ -16,27 +16,23 @@ export interface PublicKeyMeta {
   pem: string;
 }
 
-export interface ClaimVerifyRequest {
-  readonly token?: string;
-}
-
-export interface ClaimVerifyResult {
+export interface ClaimVerfiedCognitoUser {
   readonly userName: string;
   readonly clientId: string;
 }
 
 export interface Claim {
-	sub?: string;
-	aud?: string;
-	email_verified?: boolean;
+	sub: string;
+	event_id: string;
 	token_use: string;
+	scope: string;
 	auth_time: number;
 	iss: string;
 	username: string;
 	exp: number;
 	client_id: string;
 	given_name?: string,
-	iat?: number;
+	iat: number;
 	email?: string;
 }
 

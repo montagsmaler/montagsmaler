@@ -2,13 +2,12 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './controller/auth.controller';
 import { AuthService } from './service/auth.service';
 import { awsProvider } from './service/aws-cognito.provider';
-import { AuthCognitoStrategy } from './middleware/auth.strategy';
-import { PassportModule } from '@nestjs/passport';
+import { AuthCognitoGuard } from './middleware/auth.guard';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-	imports: [PassportModule, ConfigModule],
+	imports: [ConfigModule],
 	controllers: [AuthController],
-	providers: [...awsProvider, AuthService, AuthCognitoStrategy],
+	providers: [...awsProvider, AuthService, AuthCognitoGuard],
 })
 export class AuthModule {}

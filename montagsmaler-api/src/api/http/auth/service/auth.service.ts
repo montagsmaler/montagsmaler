@@ -1,25 +1,29 @@
 import { Injectable, Inject, OnApplicationBootstrap, Logger } from '@nestjs/common';
-import { CognitoUserPool, AuthenticationDetails, CognitoUser, CognitoUserSession, CognitoUserAttribute } from 'amazon-cognito-identity-js';
+import 'cross-fetch/polyfill';
+import { CognitoUserPool, AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoAccessToken } from 'amazon-cognito-identity-js';
 import { AuthCredentialsDto } from '../models/auth-credentials.dto';
 import { AuthRegisterDto } from '../models/auth-register.dto';
 import * as Axios from 'axios';
 import * as jwt from 'jsonwebtoken';
 import * as jwkToPem from 'jwk-to-pem';
-import { PublicKeys, PublicKeyMeta, ClaimVerifyResult, Claim, TokenHeader } from '../models/aws-token';
+import { PublicKeys, PublicKeyMeta, ClaimVerfiedCognitoUser, Claim, TokenHeader } from '../models/aws-token';
 import { ConfigService } from '@nestjs/config';
+import { AuthVerifyRegisterDto } from '../models/auth-verify.dto';
 
 @Injectable()
 export class AuthService implements OnApplicationBootstrap {
 
   private publicKeys: Map<string, PublicKeyMeta>;
-  private readonly logger = new Logger(this.constructor.name, true);
-  private cognitoIssuerUrl: string;
+	private readonly logger = new Logger(this.constructor.name, true);
+	private cognitoIssuerUrl: string;
+  private cognitoIssuerKeysUrl: string;
 
 	constructor(@Inject('aws_cognito_user_pool') private readonly cognitoUserPool: CognitoUserPool, private readonly configService: ConfigService) { }
   
   public async onApplicationBootstrap(): Promise<void> {
     try {
-      this.cognitoIssuerUrl = `https://cognito-idp.${this.configService.get('AWS_REGION')}.amazonaws.com/${this.configService.get('USER_POOL_ID')}/.well-known/jwks.json`;
+			this.cognitoIssuerUrl = `https://cognito-idp.${this.configService.get('AWS_REGION')}.amazonaws.com/${this.configService.get('USER_POOL_ID')}`
+			this.cognitoIssuerKeysUrl = this.cognitoIssuerUrl + '/.well-known/jwks.json';
       await this.loadPublicKeys();
       this.logger.log(`Successfully loaded ${this.publicKeys.size} public keys.`);
     } catch (err) {
@@ -27,7 +31,7 @@ export class AuthService implements OnApplicationBootstrap {
     }
   }
 
-	public login(userCredentials: AuthCredentialsDto): Promise<CognitoUserSession> {
+	public login(userCredentials: AuthCredentialsDto): Promise<CognitoAccessToken> {
 
 		const authenticationDetails = new AuthenticationDetails({
       Username: userCredentials.name,
@@ -44,11 +48,9 @@ export class AuthService implements OnApplicationBootstrap {
     return new Promise((resolve, reject) => {
       user.authenticateUser(authenticationDetails, {
         onSuccess: (result) => {
-          console.log('Login successful!');
-          resolve(result);
+          resolve(result.getAccessToken());
         },
         onFailure: (err) => {
-          console.log('Login fail!');
           reject(err);
         },
       });
@@ -58,16 +60,35 @@ export class AuthService implements OnApplicationBootstrap {
 	public register(authRegisterRequest: AuthRegisterDto): Promise<CognitoUser> {
     return new Promise(((resolve, reject) => {
       this.cognitoUserPool.signUp(authRegisterRequest.name, authRegisterRequest.password, [new CognitoUserAttribute({ Name: 'email', Value: authRegisterRequest.email })], null, (err, result) => {
-        if (!result) {
+        if (err) {
           reject(err);
         } else {
           resolve(result.user);
         }
       });
     }));
-  }
+	}
+	
+	public verifyRegister(verifyRegisterRequest: AuthVerifyRegisterDto): Promise<string> {
+		const userData = {
+			Username: verifyRegisterRequest.name,
+			Pool: this.cognitoUserPool,
+		};
+	 
+		const user: CognitoUser = new CognitoUser(userData);
+		
+		return new Promise((resolve, reject) => {
+			user.confirmRegistration(verifyRegisterRequest.confirmationCode, true, (err, result) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(result);
+				}
+			});
+		});
+	}
 
-  public async verifyToken(token: string): Promise<ClaimVerifyResult> {
+  public async verifyToken(token: string): Promise<ClaimVerfiedCognitoUser> {
     try {
       const tokenSections = (token || '').split('.');
       if (tokenSections.length < 2) {
@@ -78,8 +99,8 @@ export class AuthService implements OnApplicationBootstrap {
       const key = this.publicKeys.get(header.kid);
       if (!key) {
         throw new Error('Claim made for unknown kid.');
-      }
-      return await new Promise<ClaimVerifyResult>((resolve, reject) => {
+			}
+			return await new Promise<ClaimVerfiedCognitoUser>((resolve, reject) => {
         jwt.verify(token, key.pem, {algorithms: ['RS256']}, (err: any, claim: Claim) => {
           if (err) {
             reject(err);
@@ -98,7 +119,7 @@ export class AuthService implements OnApplicationBootstrap {
         });
       });
     } catch (err) {
-      throw new Error('Token could not be verified!');
+      throw new Error(err.message || 'Token could not be verified!');
     }
   }
 
@@ -122,7 +143,7 @@ export class AuthService implements OnApplicationBootstrap {
   
   private async fetchPubliyKeys(): Promise<PublicKeys> {
     try {
-      return (await Axios.default.get<PublicKeys>(this.cognitoIssuerUrl)).data;
+      return (await Axios.default.get<PublicKeys>(this.cognitoIssuerKeysUrl)).data;
     } catch (err) {
       throw err;
     }
