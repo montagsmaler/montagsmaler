@@ -1,10 +1,10 @@
-import { getClientWebsocketForAppAndNamespace } from './ws-client.helper';
+import { getClientWebsocketForAppAndNamespace } from '../ws-client.helper';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { AppModule } from '../src/app.module';
-import { GameGateway } from '../src/api/ws/game/game-gateway';
-import { Namespace } from '../src/api/ws/namespaces';
-import { GameEvent } from '../src/api/ws/game/game-events';
+import { AppModule } from '../../src/app.module';
+import { GameGateway } from '../../src/api/ws/game/game-gateway';
+import { Namespace } from '../../src/api/ws/namespaces';
+import { GameEvent } from '../../src/api/ws/game/game-events';
 
 describe('GameGateway e2e', () => {
   let app: INestApplication;

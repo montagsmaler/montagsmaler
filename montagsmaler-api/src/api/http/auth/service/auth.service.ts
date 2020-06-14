@@ -1,4 +1,4 @@
-import { Injectable, Inject, OnApplicationBootstrap, Logger } from '@nestjs/common';
+import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
 import 'cross-fetch/polyfill';
 import { CognitoUserPool, AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoAccessToken } from 'amazon-cognito-identity-js';
 import { AuthCredentialsDto } from '../models/auth-credentials.dto';
@@ -7,24 +7,24 @@ import * as Axios from 'axios';
 import * as jwt from 'jsonwebtoken';
 import * as jwkToPem from 'jwk-to-pem';
 import { PublicKeys, PublicKeyMeta, ClaimVerfiedCognitoUser, Claim, TokenHeader } from '../models/aws-token';
-import { ConfigService } from '@nestjs/config';
 import { AuthVerifyRegisterDto } from '../models/auth-verify.dto';
 import { ICognitoUser } from '../models/cognito-user';
+import { AuthVerifyRegisterSuccess } from '../models/auth-verify.success';
 
 @Injectable()
-export class AuthService implements OnApplicationBootstrap {
+export class AuthService implements OnModuleInit {
 
-	private publicKeys: Map<string, PublicKeyMeta>;
+	private publicKeys: Map<string, PublicKeyMeta> = new Map<string, PublicKeyMeta>();
 	private readonly logger = new Logger(this.constructor.name, true);
-	private cognitoIssuerUrl: string;
-	private cognitoIssuerKeysUrl: string;
+	private readonly cognitoIssuerKeysUrl: string = this.cognitoIssuerUrl + '/.well-known/jwks.json';
 
-	constructor(@Inject('aws_cognito_user_pool') private readonly cognitoUserPool: CognitoUserPool, private readonly configService: ConfigService) { }
+	constructor(
+		@Inject('aws_cognito_user_pool') private readonly cognitoUserPool: CognitoUserPool,
+		@Inject('aws_cognito_issuer_url') private readonly cognitoIssuerUrl: string,
+	) { }
 
-	public async onApplicationBootstrap(): Promise<void> {
+	public async onModuleInit(): Promise<void> {
 		try {
-			this.cognitoIssuerUrl = `https://cognito-idp.${this.configService.get('AWS_REGION')}.amazonaws.com/${this.configService.get('USER_POOL_ID')}`
-			this.cognitoIssuerKeysUrl = this.cognitoIssuerUrl + '/.well-known/jwks.json';
 			await this.loadPublicKeys();
 			this.logger.log(`Successfully loaded ${this.publicKeys.size} public keys.`);
 		} catch (err) {
@@ -70,7 +70,7 @@ export class AuthService implements OnApplicationBootstrap {
 		}));
 	}
 
-	public verifyRegister(verifyRegisterRequest: AuthVerifyRegisterDto): Promise<string> {
+	public verifyRegister(verifyRegisterRequest: AuthVerifyRegisterDto): Promise<AuthVerifyRegisterSuccess> {
 		const userData = {
 			Username: verifyRegisterRequest.name,
 			Pool: this.cognitoUserPool,
@@ -83,7 +83,7 @@ export class AuthService implements OnApplicationBootstrap {
 				if (err) {
 					reject(err);
 				} else {
-					resolve(result);
+					resolve({SUCCESS: true});
 				}
 			});
 		});

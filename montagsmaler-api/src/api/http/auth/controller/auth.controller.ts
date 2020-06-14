@@ -1,4 +1,5 @@
-import { Controller, UseGuards, Post, Body, Get, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { Controller, UseGuards, Post, Body, Get, InternalServerErrorException, UnauthorizedException, BadRequestException, UsePipes } from '@nestjs/common';
+import { ValidationPipe } from '../../../../shared/validation/validation.pipe';
 import { AuthService } from '../service/auth.service';
 import { AuthCognitoGuard } from '../middleware/auth.guard';
 import { AuthRegisterDto } from '../models/auth-register.dto';
@@ -8,7 +9,9 @@ import { VerifiedCognitoUser } from '../middleware/auth.cognito.user.decorator';
 import { ClaimVerfiedCognitoUser } from '../models/aws-token';
 import { CognitoAccessToken } from 'amazon-cognito-identity-js';
 import { ICognitoUser } from '../models/cognito-user';
+import { AuthVerifyRegisterSuccess } from '../models/auth-verify.success';
 
+@UsePipes(ValidationPipe)
 @Controller('auth')
 export class AuthController {
 
@@ -19,8 +22,7 @@ export class AuthController {
 		try {
 			return await this.authService.login(body);
 		} catch (err) {
-			console.log(err);
-			throw new UnauthorizedException(err);
+			throw new UnauthorizedException(err.message);
 		}
 	}
 
@@ -29,16 +31,16 @@ export class AuthController {
 		try {
 			return await this.authService.register(body);
 		} catch (err) {
-			throw new UnauthorizedException(err);
+			throw new BadRequestException(err.message);
 		}
 	}
 
 	@Post('verifyRegister')
-	async verify(@Body() body: AuthVerifyRegisterDto): Promise<string> {
+	async verify(@Body() body: AuthVerifyRegisterDto): Promise<AuthVerifyRegisterSuccess> {
 		try {
 			return await this.authService.verifyRegister(body);
 		} catch (err) {
-			throw new UnauthorizedException(err);
+			throw new BadRequestException(err.message);
 		}
 	}
 
@@ -49,7 +51,7 @@ export class AuthController {
 		try {
 			return {userName: user.userName};
 		} catch (err) {
-			throw new InternalServerErrorException(err);
+			throw new InternalServerErrorException(err.message);
 		}
 	}
 }

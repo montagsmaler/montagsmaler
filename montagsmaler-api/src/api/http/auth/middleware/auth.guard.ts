@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  CanActivate,
-  ExecutionContext,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException, CanActivate, ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { ClaimVerfiedCognitoUser } from '../models/aws-token';
 
@@ -26,15 +20,11 @@ export class AuthCognitoGuard implements CanActivate {
       }
 
       try {
-        const verifyResult: ClaimVerfiedCognitoUser = await this.authService.verifyToken(
-          token,
-        );
+        const verifyResult: ClaimVerfiedCognitoUser = await this.authService.verifyToken(token);
         request.cognitoUser = verifyResult;
         return true;
       } catch (err) {
-        throw new UnauthorizedException(
-          err.message || 'Token could not be validated.',
-        );
+        throw new UnauthorizedException(err.message || 'Token could not be verified.');
       }
     } catch (err) {
       if (err instanceof UnauthorizedException) {
@@ -45,7 +35,7 @@ export class AuthCognitoGuard implements CanActivate {
     }
   }
 
-  private extractBearerToken(authHeader: string): string {
+  private extractBearerToken(authHeader: string): string | undefined {
     let token: string;
     const authHeaderArr = authHeader.split(' ');
     if (
