@@ -25,7 +25,7 @@ export class AuthService implements OnModuleInit {
 
 	public async onModuleInit(): Promise<void> {
 		try {
-			await this.loadPublicKeys();
+			this.publicKeys = await this.getPublicKeys();
 			this.logger.log(`Successfully loaded ${this.publicKeys.size} public keys.`);
 		} catch (err) {
 			this.logger.error('Failed to load cognito public keys.', err.stack);
@@ -64,7 +64,7 @@ export class AuthService implements OnModuleInit {
 				if (err) {
 					reject(err);
 				} else {
-					resolve({userName: result.user.getUsername()});
+					resolve({ userName: result.user.getUsername() });
 				}
 			});
 		}));
@@ -83,7 +83,7 @@ export class AuthService implements OnModuleInit {
 				if (err) {
 					reject(err);
 				} else {
-					resolve({SUCCESS: true});
+					resolve({ SUCCESS: true });
 				}
 			});
 		});
@@ -95,8 +95,7 @@ export class AuthService implements OnModuleInit {
 			if (tokenSections.length < 2) {
 				throw new Error('Requested token is invalid.');
 			}
-			const headerJSON = Buffer.from(tokenSections[0], 'base64').toString('utf8');
-			const header = JSON.parse(headerJSON) as TokenHeader;
+			const header = JSON.parse(Buffer.from(tokenSections[0], 'base64').toString('utf8')) as TokenHeader;
 			const key = this.publicKeys.get(header.kid);
 			if (!key) {
 				throw new Error('Claim made for unknown kid.');
@@ -106,8 +105,8 @@ export class AuthService implements OnModuleInit {
 					if (err) {
 						reject(err);
 					}
-					const currentSeconds = Math.floor(new Date().getTime() / 1000);
-					if (currentSeconds > claim.exp || currentSeconds < claim.auth_time) {
+					const currentSeconds = this.getCurrentSeconds();
+					if (currentSeconds > claim.exp) {
 						reject(new Error('Claim is expired or invalid.'));
 					}
 					if (claim.iss !== this.cognitoIssuerUrl) {
@@ -124,15 +123,15 @@ export class AuthService implements OnModuleInit {
 		}
 	}
 
-	private async loadPublicKeys(): Promise<void> {
+	private async getPublicKeys(): Promise<Map<string, PublicKeyMeta>> {
 		try {
-			const publicKeys = await this.fetchPubliyKeys();
+			const publicKeys = await this.fetchPublicKeys();
 
 			if (!publicKeys.keys || publicKeys.keys.length <= 0) {
 				throw new Error('No public cognito keys could be fetched.');
 			}
 
-			this.publicKeys = publicKeys.keys.reduce((agg, current) => {
+			return publicKeys.keys.reduce((agg, current) => {
 				const pem = jwkToPem(current);
 				agg.set(current.kid, { instance: current, pem });
 				return agg;
@@ -142,11 +141,15 @@ export class AuthService implements OnModuleInit {
 		}
 	}
 
-	private async fetchPubliyKeys(): Promise<PublicKeys> {
+	private async fetchPublicKeys(): Promise<PublicKeys> {
 		try {
 			return (await Axios.default.get<PublicKeys>(this.cognitoIssuerKeysUrl)).data;
 		} catch (err) {
 			throw err;
 		}
+	}
+
+	private getCurrentSeconds(): number {
+		return Math.floor(new Date().getTime() / 1000);
 	}
 }
