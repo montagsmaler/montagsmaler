@@ -33,8 +33,6 @@ jobs:
         working-directory: ./montagsmaler-api
         run: npm test
 
-  # Push image to GitHub Packages.
-  # See also https://docs.docker.com/docker-hub/builds/
   push:
     # Ensure test job passes before pushing image.
     needs: test
