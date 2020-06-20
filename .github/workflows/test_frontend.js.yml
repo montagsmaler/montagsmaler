@@ -28,5 +28,4 @@ jobs:
         run: npm install
       - name: Run tests
         working-directory: ./montagsmaler-frontend
-        uses: ahmedrizwan/angular-karma-test-action
-        # run: npm test
+        run: npm test
