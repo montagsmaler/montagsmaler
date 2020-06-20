@@ -18,12 +18,17 @@ jobs:
         node-version: [12.x, 14.x]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@master
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: cd montagsmaler-api
-      - run: npm ci
-      - run: npm run build --if-present
-      - run: npm test
+      - name: Install dependencies
+        working-directory: ./montagsmaler-api
+        run: npm install
+      - name: Run tests
+        working-directory: ./montagsmaler-api
+        run: npm test
+      # - run: npm ci
+      # - run: npm run build --if-present
+      # - run: npm test
