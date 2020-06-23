@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { KeyValueService } from './keyvalue.service';
 import { Cat } from '../../../../../test/shared/cat.model';
-import { RedisKeyValueMock } from '../../../../../test/shared/redis.keyvalue.mock';
+import * as RedisMock from 'ioredis-mock';
 const spyOn = jest.spyOn;
 
 describe('KeyvalueService', () => {
 	let service: KeyValueService;
-	const redisKeyValueMock = new RedisKeyValueMock();
+	const redisKeyValueMock = new RedisMock();
 	const testValue = new Cat('Thomas', 8, 'black');
 
 	beforeEach(async () => {

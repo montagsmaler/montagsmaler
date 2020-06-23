@@ -32,9 +32,4 @@ export const redisConfigProvider: Provider[] = [
 		useFactory: redisClientFactory,
 		inject: ['redis_config'],
 	},
-	{
-		provide: 'redis_set',
-		useFactory: redisClientFactory,
-		inject: ['redis_config'],
-	},
 ];
