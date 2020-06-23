@@ -38,7 +38,7 @@ export class PubSubService implements OnModuleInit {
 		);
 		this.redisSub.subscribe(channel, (error, count) => {
 			if (error) {
-				this.redisSubSubject.next({ channel, error });
+				setTimeout(() => this.redisSubSubject.next({ channel, error }));
 			}
 		});
 		return subForChannel;
