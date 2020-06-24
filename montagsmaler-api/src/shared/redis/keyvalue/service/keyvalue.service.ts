@@ -58,6 +58,25 @@ export class KeyValueService {
 		}
 	}
 
+	public async getInt(key: string): Promise<number> {
+		try {
+			return parseInt(await this.redisKeyValue.get(key), 10);
+		} catch (err) {
+			throw new Error(`No intvalue found for key "${key}".`);
+		}
+	}
+
+	public async setInt(key: string, int: number): Promise<void> {
+		try {
+			const result = await this.redisKeyValue.set(key, int);
+			if (result !== 'OK') {
+				throw new Error();
+			}
+		} catch (err) {
+			throw new Error(`Could not set intvalue for key "${key}".`);
+		}
+	}
+
 	public async increment(key: string): Promise<number> {
 		return await this.redisKeyValue.incr(key);
 	}

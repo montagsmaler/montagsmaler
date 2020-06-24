@@ -65,4 +65,69 @@ describe('KeyvalueService', () => {
 		expect(await service.getSet('cat_set')).toEqual([]);
 		done();
 	});
+
+	it('should throw an error while adding key value pair', async (done) => {
+		spyOn(service['redisKeyValue'], 'set').mockImplementationOnce(async () => {throw new Error()});
+		try {
+			await service.set('cat', testValue);
+		} catch (err) {
+			expect(err).toEqual(new Error('Could not set value for key "cat".'));
+			done();
+		}
+	});
+
+	it('should throw an error while adding key value pair', async (done) => {
+		spyOn(service['redisKeyValue'], 'set').mockImplementationOnce(async () => 'NOT_OK');
+		try {
+			await service.set('cat', testValue);
+		} catch (err) {
+			expect(err).toEqual(new Error('Could not set value for key "cat".'));
+			done();
+		}
+	});
+
+	it('should throw an error while adding to set', async (done) => {
+		spyOn(service['redisKeyValue'], 'zadd').mockImplementationOnce(async () => {throw new Error()});
+		try {
+			await service.addToSet('cat_set', testValue);
+		} catch (err) {
+			expect(err).toEqual(new Error('Could not add value to set "cat_set"'));
+			done();
+		}
+	});
+
+	it('should retrieve slice set from set', async (done) => {
+		const testValues = [1, 2, 3, 4, 5, 6];
+		for (const value of testValues) {
+			await service.addToSet('test_value_set', value);
+		}
+		expect(await service.getSet('test_value_set')).toEqual(testValues);
+		expect(await service.getSet('test_value_set', 2, 3)).toEqual(testValues.slice(2, 4));
+		expect(await service.getSet('test_value_set', 1, 5)).toEqual(testValues.slice(1, 6));
+		expect(await service.getSet('test_value_set', 4)).toEqual(testValues.slice(4));
+		expect(await service.getSet('test_value_set', 3, 3)).toEqual(testValues.slice(3, 4));
+		done();
+	});
+
+	it('should increment key', async (done) => {
+		await service.increment('inc_key');
+		expect(await service.getInt('inc_key')).toEqual(1);
+		done();
+	});
+
+	it('should decrement key', async (done) => {
+		await service.decrement('inc_key');
+		expect(await service.getInt('inc_key')).toEqual(0);
+		done();
+	});
+
+	it('set int and increment three times and decrement once', async (done) => {
+		await service.setInt('inc_key', 5);
+		await service.increment('inc_key');
+		await service.decrement('inc_key');
+		await service.increment('inc_key');
+		await service.increment('inc_key');
+		expect(await service.getInt('inc_key')).toEqual(7);
+		done();
+	});
 });

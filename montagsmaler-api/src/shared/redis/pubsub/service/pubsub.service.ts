@@ -64,12 +64,4 @@ export class PubSubService implements OnModuleInit {
 	public async deleteChannelHistory(channel: string): Promise<void> {
 		await this.keyValueService.delete(this.SET + channel);
 	}
-
-	private async incrementChannelSubscriber(channel: string): Promise<number> {
-		return await this.keyValueService.increment(this.SUBSCRIBERS_COUNT + channel);
-	}
-
-	private async decrementChannelSubscriber(channel: string): Promise<number> {
-		return await this.keyValueService.decrement(this.SUBSCRIBERS_COUNT + channel);
-	}
 }
