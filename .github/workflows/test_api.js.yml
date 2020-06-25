@@ -29,9 +29,12 @@ jobs:
       - name: Install dependencies
         working-directory: ./montagsmaler-api
         run: npm install
-      - name: Run tests
+      - name: Run unit tests
         working-directory: ./montagsmaler-api
-        run: npm test
+        run: npm run test
+      - name: Run e2e tests
+        working-directory: ./montagsmaler-api
+        run: npm run test:e2e
 
   push:
     # Ensure test job passes before pushing image.
