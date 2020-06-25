@@ -9,8 +9,7 @@ import { getValueFromWrappedStringMessage, valueToWrappedStringMessage } from '.
 @Injectable()
 export class PubSubService implements OnModuleInit {
 
-	private readonly redisSubSubject = new Subject<RedisOnResult>();
-	private readonly SUBSCRIBERS_COUNT = 'SUBSCRIBERS_COUNT_';
+	private readonly redisSubSubject = new Subject<RedisOnResult>();  
 	private readonly SET = 'SET_';
 
 	constructor(
