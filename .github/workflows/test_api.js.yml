@@ -35,6 +35,10 @@ jobs:
       - name: Run e2e tests
         working-directory: ./montagsmaler-api
         run: npm run test:e2e
+        env:
+          USER_POOL_ID: us-east-1_LKnyH8xyK
+          CLIENT_ID: imrcgq4gedp29idmtvaq97mtw
+          AWS_REGION: us-east-1
 
   push:
     # Ensure test job passes before pushing image.
