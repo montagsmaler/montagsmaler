@@ -39,6 +39,7 @@ jobs:
           USER_POOL_ID: us-east-1_LKnyH8xyK
           CLIENT_ID: imrcgq4gedp29idmtvaq97mtw
           AWS_REGION: us-east-1
+          USE_FILE: false
 
   push:
     # Ensure test job passes before pushing image.
