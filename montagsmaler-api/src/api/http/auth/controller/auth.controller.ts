@@ -1,5 +1,4 @@
 import { Controller, UseGuards, Post, Body, Get, InternalServerErrorException, UnauthorizedException, BadRequestException, UsePipes } from '@nestjs/common';
-import { ValidationPipe } from '../../../../shared/validation/validation.pipe';
 import { AuthService } from '../service/auth.service';
 import { AuthCognitoGuard } from '../middleware/auth.guard';
 import { AuthRegisterDto } from '../models/auth-register.dto';
@@ -10,6 +9,7 @@ import { ClaimVerfiedCognitoUser } from '../models/aws-token';
 import { CognitoAccessToken } from 'amazon-cognito-identity-js';
 import { ICognitoUser } from '../models/cognito-user';
 import { AuthVerifyRegisterSuccess } from '../models/auth-verify.success';
+import { ValidationPipe } from '../../../../shared/validation/validation.pipe';
 
 @UsePipes(ValidationPipe)
 @Controller('auth')

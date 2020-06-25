@@ -1,33 +1,24 @@
-import { Injectable } from '@nestjs/common';
-import  *  as AWS from 'aws-sdk'
-import { S3Para } from '../model/S3Para.dto';
-import { S3Object } from '../model/S3Object';
-import { DetectLabelsRequest } from '../model/DetectLabelsRequest';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, Inject } from '@nestjs/common';
+import { Rekognition } from 'aws-sdk';
+import { DetectLabelsResponse } from 'aws-sdk/clients/rekognition';
+import { S3ParameterDto } from '../model/S3Para.dto';
 
 @Injectable()
 export class RecognitionService {
 
-    constructor(
-        private configService: ConfigService
-    ){}
+	constructor(
+		@Inject('rekognition_provider') private readonly rekognition: Rekognition,
+	) { }
 
-    public rekognition(S3Para: S3Para): Promise<AWS.Rekognition.DetectLabelsResponse> {
-        
-        const rekognition = new AWS.Rekognition()
-
-        const params = new DetectLabelsRequest(S3Para.Bucket, S3Para.Name)
-        
+	public recognize(s3Params: S3ParameterDto): Promise<DetectLabelsResponse> {
 		return new Promise((resolve, reject) => {
-            
-            rekognition.detectLabels(params, (err, data)=> {
-                if (err) {
-                    reject(err)
-                }
-                else {
-                    resolve(data)
-                }
-            })
-        });
-    }
+			this.rekognition.detectLabels({ Image: { S3Object: s3Params } }, (err, data) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(data);
+				}
+			})
+		});
+	}
 }
