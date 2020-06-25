@@ -146,7 +146,8 @@ describe('auth', () => {
 			.expect({ statusCode: HttpStatus.UNAUTHORIZED, message: 'Token could not be verified!', error: 'Unauthorized' });
 	});
 
-	afterAll(async () => {
+	afterAll(async (done) => {
 		await app.close();
+		done();
 	});
 });
