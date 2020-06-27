@@ -50,7 +50,7 @@ describe('auth', () => {
 			.set('Accept', 'application/json')
 			.expect('Content-Type', /json/)
 			.expect(HttpStatus.BAD_REQUEST)
-			.expect({ statusCode: HttpStatus.BAD_REQUEST, message: 'Validation failed', error: 'Bad Request' });
+			.expect(res => expect(res.body).toMatchObject({ statusCode: HttpStatus.BAD_REQUEST, message: 'Validation failed', error: 'Bad Request' }))
 	});
 
 	it(`should /POST login fail unauthorized`, async () => {
@@ -83,7 +83,7 @@ describe('auth', () => {
 			.set('Accept', 'application/json')
 			.expect('Content-Type', /json/)
 			.expect(HttpStatus.BAD_REQUEST)
-			.expect({ statusCode: HttpStatus.BAD_REQUEST, message: 'Validation failed', error: 'Bad Request' });
+			.expect(res => expect(res.body).toMatchObject({ statusCode: HttpStatus.BAD_REQUEST, message: 'Validation failed', error: 'Bad Request' }))
 	});
 
 	it(`should /POST register fail username already exist`, async () => {
@@ -116,7 +116,7 @@ describe('auth', () => {
 			.set('Accept', 'application/json')
 			.expect('Content-Type', /json/)
 			.expect(HttpStatus.BAD_REQUEST)
-			.expect({ statusCode: HttpStatus.BAD_REQUEST, message: 'Validation failed', error: 'Bad Request' });
+			.expect(res => expect(res.body).toMatchObject({ statusCode: HttpStatus.BAD_REQUEST, message: 'Validation failed', error: 'Bad Request' }))
 	});
 
 	it(`should /POST verifyRegister fail bad code`, async () => {
