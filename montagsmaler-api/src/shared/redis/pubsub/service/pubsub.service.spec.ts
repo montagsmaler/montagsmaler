@@ -1,24 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PubSubService } from './pubsub.service';
 import { first, skip } from 'rxjs/internal/operators';
+import * as RedisMock from 'ioredis-mock';
 import { Cat, Dog } from '../../../../../test/shared/cat.model';
-import { RedisKeyValueMock } from '../../../../../test/shared/redis.keyvalue.mock';
-import { RedisSetMock, RedisSubMock, RedisPubMock } from '../../../../../test/shared/redis.pubsub.mock';
 import { KeyValueService } from '../../keyvalue/service/keyvalue.service';
 const spyOn = jest.spyOn;
 
 describe('PubsubService', () => {
 	let service: PubSubService;
-	const redisKeyValueMock = new RedisKeyValueMock();
-	const redisSetMock = new RedisSetMock();
-	const redisSubMock = new RedisSubMock();
-	const redisPubMock = new RedisPubMock(redisSubMock, redisSetMock);
+
+	const redisKeyValueMock = new RedisMock();
+	const redisSubMock = new RedisMock();
+	const redisPubMock = redisSubMock.createConnectedClient();
+
 	const testCat = new Cat('Thomas', 8, 'black');
 	const testCat2 = new Cat('Garfield', 10, 'white');
 	const testDog = new Dog('Doggo', 12, 'Golden Retriever');
 	const testDog2 = new Dog('Marla', 7, 'Beagle');
-	const dogChannel = 'dogs31';
-	const catChannel = 'cats31';
+	const dogChannel = 'dogs101';
+	const catChannel = 'cats101';
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -27,7 +27,6 @@ describe('PubsubService', () => {
 				KeyValueService,
 				{ provide: 'redis_pub', useValue: redisPubMock },
 				{ provide: 'redis_sub', useValue: redisSubMock },
-				{ provide: 'redis_set', useValue: redisSetMock },
 				PubSubService,
 			],
 		})
@@ -76,9 +75,33 @@ describe('PubsubService', () => {
 		done();
 	});
 
-	it('should remove dogs array', async () => {
-		spyOn(service['keyValueService'], 'delete').mockImplementationOnce(async channel => { redisSetMock['messagesByChannel'].delete(channel) });
+	it('should remove dogs array', async (done) => {
 		await service.deleteChannelHistory(dogChannel);
 		expect(await service.getChannelHistory(dogChannel)).toEqual([]);
+		done();
+	});
+
+	it('should fail to publish to channel', async (done) => {
+		try {
+			spyOn(service['keyValueService'], 'addToSet').mockImplementationOnce(async () => {throw new Error()});
+			await service.pubToChannel('chickens', testDog);
+		} catch (err) {
+			expect(err).toEqual(new Error('Failed to publish value to channel "chickens".'));
+			done();
+		}
+	});
+
+	it('should get error on pub', async (done) => {
+		spyOn(service['redisSub'] as any, 'subscribe').mockImplementationOnce((channel, cb: any) => {
+			cb(new Error('Subscribe fail!'), null);
+		});
+		
+		service.onChannelPub(catChannel).subscribe(
+			res => res,
+			err => {
+				expect(err).toEqual(new Error(`Could not subscribe to channel "${catChannel}".`));
+				done();
+			}
+		);
 	});
 });
