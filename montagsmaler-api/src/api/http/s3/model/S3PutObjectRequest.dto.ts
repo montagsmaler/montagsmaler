@@ -11,5 +11,9 @@ export class S3PutObjectRequestDto {
     Key: string;
     
     @IsNotEmpty()
-    Body: any;
+	Body: any;
+	
+	ContentEncoding: string;
+
+	ContentType: string;
 }

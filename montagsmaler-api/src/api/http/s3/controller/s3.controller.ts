@@ -15,4 +15,5 @@ export class S3Controller {
 		} catch (err) {
 			throw new BadRequestException(err.message);
 		}
+	}
 }
