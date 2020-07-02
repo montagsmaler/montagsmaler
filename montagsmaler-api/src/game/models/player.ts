@@ -1,3 +1,6 @@
+import { JSONSerializable } from '../../shared/serializable';
+
+@JSONSerializable()
 export class Player {
 	private score = 0;
 

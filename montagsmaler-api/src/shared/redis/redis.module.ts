@@ -7,6 +7,6 @@ import { redisConfigProvider } from './redis.config.provider';
 @Module({
 	imports: [ConfigModule, KeyValueModule, PubSubModule],
 	providers: [...redisConfigProvider],
-	exports: [...redisConfigProvider],
+	exports: [...redisConfigProvider, KeyValueModule, PubSubModule],
 })
 export class RedisModule {}

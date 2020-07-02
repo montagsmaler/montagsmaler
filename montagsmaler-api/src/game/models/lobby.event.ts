@@ -1,7 +1,6 @@
-export enum LobbyEvents {
-	PLAYER_JOINED = 'PLAYER_JOINED',
-}
+import { Player } from './player';
 
-export class LobbyEvent {
-	constructor(public readonly event: LobbyEvents) { }
+export interface LobbyEvent {
+	getTrigger(): 'SYSTEM' | Player;
+	getMessage(): string;
 }

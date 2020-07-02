@@ -1,14 +1,12 @@
-import { Player } from "./player";
+import { Player } from './player';
+import { JSONSerializable } from '../../shared/serializable';
 
 export const LOBBY_MAX_SIZE = 5;
 
+@JSONSerializable()
 export class Lobby {
 	
 	constructor(public readonly id: string, public readonly createdAt: number, private members: Player[]) { }
-
-	public static fromObject(lobby: Lobby): Lobby {
-		return new Lobby(lobby.id, lobby.createdAt, lobby.members);
-	}
 
 	public addPlayer(player: Player): void {
 		if (this.playerCount() > LOBBY_MAX_SIZE) throw new Error(`Can not add player "${player.id}" to lobby since it is already full. Maximum players per lobby ${LOBBY_MAX_SIZE}.`);

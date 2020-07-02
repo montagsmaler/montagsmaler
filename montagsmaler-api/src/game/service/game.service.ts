@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PubSubService } from '../../shared/redis/pubsub/service/pubsub.service';
 import { KeyValueService } from '../../shared/redis/keyvalue/service/keyvalue.service';
-import { Player, Lobby, LobbyEvent, LOBBY_MAX_SIZE } from '../models';
+import { Player, Lobby, LobbyEvent, LOBBY_MAX_SIZE, LobbyPlayerJoinedEvent } from '../models';
 import { v4 as uuidv4 } from 'uuid';
 import { Observable } from 'rxjs';
 
@@ -30,7 +30,7 @@ export class GameService {
 		let lobby: Lobby;
 		let lobbyCount = Number.MAX_SAFE_INTEGER;
 		try {
-			lobby = Lobby.fromObject(await this.keyValueService.get<Lobby>(id));
+			lobby = await this.keyValueService.get<Lobby>(id);
 		} catch (err) {
 			throw new Error('Lobby not found.')
 		}
@@ -39,7 +39,7 @@ export class GameService {
 			if (lobbyCount > LOBBY_MAX_SIZE) throw new Error(`Can not add player "${player.id}" to lobby since it is already full. Maximum players per lobby ${LOBBY_MAX_SIZE}.`);
 			try {
 				lobby.addPlayer(player);
-				await this.keyValueService.set<Lobby>(id, lobby);
+				await Promise.all([this.keyValueService.set<Lobby>(id, lobby), this.pubSubService.pubToChannel<LobbyEvent>(id, new LobbyPlayerJoinedEvent(player))]);
 				return [lobby, this.pubSubService.onChannelPub<LobbyEvent>(id)];
 			} catch (err) {
 				throw new Error('Failed to join Lobby.');
