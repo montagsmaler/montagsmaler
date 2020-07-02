@@ -12,6 +12,7 @@ const configModuleOptionsFactory = (): ConfigModuleOptions => {
   } else {
     return {
       envFilePath:  `${NODE_ENV || 'development'}.env`,
+      isGlobal: true
     };
   }
 };
