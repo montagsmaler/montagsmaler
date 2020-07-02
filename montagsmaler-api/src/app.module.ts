@@ -3,6 +3,7 @@ import { ApiModule } from './api/api.module';
 import { ConfigModule } from '@nestjs/config';
 import { ConfigModuleOptions } from '@nestjs/config/dist/interfaces';
 import { RedisModule } from './shared/redis/redis.module';
+import { GameModule } from './game/game.module';
 
 const configModuleOptionsFactory = (): ConfigModuleOptions => {
 	const NODE_ENV = process.env.NODE_ENV;
@@ -21,6 +22,7 @@ const configModuleOptionsFactory = (): ConfigModuleOptions => {
     ConfigModule.forRoot(configModuleOptionsFactory()), 
 		ApiModule,
 		RedisModule,
+		GameModule,
   ],
   controllers: [],
   providers: [],

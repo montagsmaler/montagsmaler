@@ -9,10 +9,10 @@ export class KeyValueService {
 		@Inject('redis_keyvalue') private readonly redisKeyValue: Redis,
 	) { }
 
-	public async set<T>(key: string, value: T): Promise<void> {
+	public async set<T>(key: string, value: T, expireInSeconds?: number): Promise<void> {
 		try {
 			const wrappedMsgAsString = valueToWrappedStringMessage<T>(value);
-			const result = await this.redisKeyValue.set(key, wrappedMsgAsString);
+			const result = (expireInSeconds) ? await this.redisKeyValue.set(key, wrappedMsgAsString, 'ex', expireInSeconds) : await this.redisKeyValue.set(key, wrappedMsgAsString);
 			if (result !== 'OK') {
 				throw new Error(`Could not set value for key "${key}".`);
 			}
