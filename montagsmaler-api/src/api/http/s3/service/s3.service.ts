@@ -11,7 +11,6 @@ export class S3Service {
 	) { }
 
 	public upload(S3PutObjectRequest: S3PutObjectRequestDto): Promise<ManagedUpload.SendData> {
-		S3PutObjectRequest.Body = Buffer.from(S3PutObjectRequest.Body.replace(/^data:image\/\w+;base64,/, ""),'base64')
 		return new Promise((resolve, reject) => {
 			this.s3.upload(S3PutObjectRequest, (err, data) => {
 				if (err) {
