@@ -1,12 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { valueToWrappedStringMessage, getValueFromWrappedStringMessage } from '../../redis.helper';
+import { RedisClient } from '../../redisconfig/redis-client.enum';
 
 @Injectable()
 export class KeyValueService {
 
 	constructor(
-		@Inject('redis_keyvalue') private readonly redisKeyValue: Redis,
+		@Inject(RedisClient.KEY_VALUE) private readonly redisKeyValue: Redis,
 	) { }
 
 	public async set<T>(key: string, value: T, expireInSeconds?: number): Promise<void> {

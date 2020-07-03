@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { GameService } from './service/game.service';
-import { RedisModule } from '../shared/redis/redis.module';
+import { LobbyModule } from './lobby/lobby.module';
 
 @Module({
-	imports: [RedisModule],
+	imports: [LobbyModule],
 	providers: [GameService],
 	exports: [GameService],
 })

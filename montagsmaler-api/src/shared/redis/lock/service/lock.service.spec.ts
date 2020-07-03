@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as RedisMock from 'ioredis-mock';
 import { LockService } from './lock.service';
+import { RedisClient } from '../../redisconfig/redis-client.enum';
 
 describe('LockService', () => {
 	let service: LockService;
@@ -9,7 +10,7 @@ describe('LockService', () => {
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			providers: [
-				{ provide: 'redis_lock', useValue: {} },
+				{ provide: RedisClient.LOCK, useValue: {} },
 				LockService,
 			],
 		}).compile();

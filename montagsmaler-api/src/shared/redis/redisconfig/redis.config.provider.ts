@@ -3,10 +3,13 @@ import { ConfigService } from '@nestjs/config';
 import { RedisOptions, Redis } from 'ioredis';
 import { redisClientFactory } from '../redis.helper';
 import * as Redlock from 'redlock';
+import { RedisClient } from './redis-client.enum';
+
+const REDIS_CONFIG = 'redis_config';
 
 export const redisConfigProvider: Provider[] = [
 	{
-		provide: 'redis_config',
+		provide: REDIS_CONFIG,
 		useFactory: (configService: ConfigService): RedisOptions => {
 			return {
 				port: configService.get('REDIS_PORT') || 6379,
@@ -19,22 +22,22 @@ export const redisConfigProvider: Provider[] = [
 		inject: [ConfigService],
 	},
 	{
-		provide: 'redis_keyvalue',
+		provide: RedisClient.KEY_VALUE,
 		useFactory: redisClientFactory,
-		inject: ['redis_config'],
+		inject: [REDIS_CONFIG],
 	},
 	{
-		provide: 'redis_sub',
+		provide: RedisClient.SUB,
 		useFactory: redisClientFactory,
-		inject: ['redis_config'],
+		inject: [REDIS_CONFIG],
 	},
 	{
-		provide: 'redis_pub',
+		provide: RedisClient.PUB,
 		useFactory: redisClientFactory,
-		inject: ['redis_config'],
+		inject: [REDIS_CONFIG],
 	},
 	{
-		provide: 'redis_lock',
+		provide: RedisClient.LOCK,
 		useFactory: (redisClient: Redis) => {
 			return new Redlock(
 				[redisClient],
@@ -57,6 +60,6 @@ export const redisConfigProvider: Provider[] = [
     		},
 			);
 		},
-		inject: ['redis_keyvalue'],
+		inject: [RedisClient.KEY_VALUE],
 	}
 ];

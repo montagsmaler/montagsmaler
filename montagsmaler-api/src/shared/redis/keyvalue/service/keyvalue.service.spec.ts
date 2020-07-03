@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { KeyValueService } from './keyvalue.service';
 import { Cat } from '../../../../../test/shared/cat.model';
 import * as RedisMock from 'ioredis-mock';
+import { RedisClient } from '../../redisconfig/redis-client.enum';
 const spyOn = jest.spyOn;
 
 describe('KeyvalueService', () => {
@@ -11,7 +12,7 @@ describe('KeyvalueService', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
-			providers: [{ provide: 'redis_keyvalue', useValue: redisKeyValueMock }, KeyValueService],
+			providers: [{ provide: RedisClient.KEY_VALUE, useValue: redisKeyValueMock }, KeyValueService],
 		})
 			.compile();
 

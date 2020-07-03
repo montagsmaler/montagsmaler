@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { GameService } from './game.service';
 import * as RedisMock from 'ioredis-mock';
-import { Player } from '../models';
-import { LobbyModule } from '../lobby/lobby.module';
-import { RedisClient } from '../../shared/redis/redisconfig/redis-client.enum';
+import { RedisClient } from '../../../shared/redis/redisconfig/redis-client.enum';
+import { LobbyService } from './lobby.service';
+import { RedisModule } from '../../../shared/redis/redis.module';
+import { Player } from '../../models';
 
-describe('GameService', () => {
-	let service: GameService;
+describe('LobbyService', () => {
+	let service: LobbyService;
 	const redisKeyValueMock = new RedisMock();
 	const redisSubMock = new RedisMock();
 	const redisPubMock = redisSubMock.createConnectedClient();
@@ -15,8 +15,8 @@ describe('GameService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-			imports: [LobbyModule],
-      providers: [GameService],
+			imports: [RedisModule],
+      providers: [LobbyService],
 		})
 			.overrideProvider(RedisClient.KEY_VALUE).useValue(redisKeyValueMock)
 			.overrideProvider(RedisClient.PUB).useValue(redisPubMock)
@@ -25,7 +25,7 @@ describe('GameService', () => {
 		
 		await module.init();
 
-    service = module.get<GameService>(GameService);
+    service = module.get<LobbyService>(LobbyService);
   });
 
   it('should be defined', () => {
@@ -44,5 +44,15 @@ describe('GameService', () => {
 		const [lobby, lobbyEvents] = await service.joinLobby(lobbyId, new Player('1234567', 'Markus'));
 		expect(lobby.playerCount()).toEqual(2);
 		done();
+	});
+	
+	it('player should join and leave lobby', async (done) => {
+		const player = new Player('12345678', 'Jonas');
+		const [lobby, lobbyEvents] = await service.joinLobby(lobbyId, player);
+		expect(lobby.playerCount()).toEqual(3);
+		await service.leaveLobby(lobbyId, player);
+		expect((await service.getLobby(lobbyId)).playerCount()).toEqual(2);
+		done();
   });
 });
+
