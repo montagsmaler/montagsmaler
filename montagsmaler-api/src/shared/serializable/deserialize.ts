@@ -14,7 +14,7 @@ const objectToClassInstancePrimitive = <T>(object: Record<string, any>, classToI
 	return newInstance;
 };
 
-const objectToClassInstanceRecursive = (object: Record<string, any>, skipErrors) => {
+const objectToClassInstanceRecursive = (object: Record<string, any>, skipErrors: boolean) => {
 	for (const key in object) {
 		if (typeof object[key] === 'object' && object[key] !== null) {
 			object[key] = objectToClassInstanceRecursive(object[key], skipErrors);
