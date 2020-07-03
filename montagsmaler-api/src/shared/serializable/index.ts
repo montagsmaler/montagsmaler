@@ -1,3 +1,4 @@
-export * from './class.type';
-export * from './deserialize';
-export * from './serializable.decorator';
+export * from './class-registry/class.type';
+export * from './deserialize/deserialize';
+export * from './decorator/serializable.decorator';
+export * from './class-registry/class-registry';
