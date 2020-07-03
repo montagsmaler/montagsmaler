@@ -1,7 +1,7 @@
 import { Class } from '../class-registry/class.type';
 import { GlobalClassRegistry, ClassRegistry } from '../class-registry/class-registry';
 
-interface ToClassInstanceOptions {
+export interface ToClassInstanceOptions {
 	useClass?: Class | string,
 	performDeep?: boolean;
 	ignoreErrors?: boolean;

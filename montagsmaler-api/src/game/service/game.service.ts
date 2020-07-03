@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PubSubService } from '../../shared/redis/pubsub/service/pubsub.service';
 import { KeyValueService } from '../../shared/redis/keyvalue/service/keyvalue.service';
-import { Player, Lobby, LobbyEvent, LOBBY_MAX_SIZE, LobbyPlayerJoinedEvent } from '../models';
+import { LockService } from '../../shared/redis/lock/service/lock.service';
+import { Player, Lobby, LobbyEvent, LobbyPlayerJoinedEvent } from '../models';
 import { v4 as uuidv4 } from 'uuid';
 import { Observable } from 'rxjs';
 
@@ -13,7 +14,11 @@ const isExpired = (LOBBY_EXPIRE: number, LOBBY_CREATE: number): boolean => {
 
 @Injectable()
 export class GameService {
-	constructor(private readonly pubSubService: PubSubService, private readonly keyValueService: KeyValueService) { }
+	constructor(
+		private readonly pubSubService: PubSubService, 
+		private readonly keyValueService: KeyValueService,
+		private readonly lockService: LockService,
+		) { }
 
 	public async initLobby(initPlayer: Player): Promise<[Lobby, Observable<LobbyEvent>]> {
 		try {
@@ -28,15 +33,13 @@ export class GameService {
 
 	public async joinLobby(id: string, player: Player): Promise<[Lobby, Observable<LobbyEvent>]> {
 		let lobby: Lobby;
-		let lobbyCount = Number.MAX_SAFE_INTEGER;
+		const lock = await this.lockService.lockRessource(id);
 		try {
-			lobby = await this.keyValueService.get<Lobby>(id);
-		} catch (err) {
-			throw new Error('Lobby not found.')
-		}
-		lobbyCount = await this.keyValueService.increment(id +  '_COUNT');
-		try {
-			if (lobbyCount > LOBBY_MAX_SIZE) throw new Error(`Can not add player "${player.id}" to lobby since it is already full. Maximum players per lobby ${LOBBY_MAX_SIZE}.`);
+			try {
+				lobby = await this.keyValueService.get<Lobby>(id);
+			} catch (err) {
+				throw new Error('Lobby not found.')
+			}
 			try {
 				lobby.addPlayer(player);
 				await Promise.all([this.keyValueService.set<Lobby>(id, lobby), this.pubSubService.pubToChannel<LobbyEvent>(id, new LobbyPlayerJoinedEvent(player))]);
@@ -45,8 +48,9 @@ export class GameService {
 				throw new Error('Failed to join Lobby.');
 			}
 		} catch (err) {
-			await this.keyValueService.decrement(id +  '_COUNT');
 			throw err;
+		} finally {
+			lock.unlock();
 		}
 	}
 }
