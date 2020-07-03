@@ -48,10 +48,18 @@ export const objectToClassInstance = <T>(object: Record<string, any>, options?: 
 		classForInstance = options.classForInstance;
 		skipErrors = (options.skipErrors === true);
 	}
-	if (!object || typeof object !== 'object') throw new Error('Input is not an object.');
-	if (!global[JSONSerializableClasses]) throw new Error('No global serializable classes defined.');
+	try {
+		if (!object || typeof object !== 'object') throw new Error('Input is not an object.');
+		if (!global[JSONSerializableClasses]) throw new Error('No global serializable classes defined.');
+	} catch (err) {
+		if (skipErrors) {
+			return object as T;
+		} else {
+			throw err;
+		}
+	}
 	if (perFormDeep) {
-		if (classForInstance) throw new Error('Can not apply costum class recursively. Set performDeep to false.');
+		if (classForInstance) throw new Error('Invalid config. Can not apply costum class recursively. Set performDeep to false.');
 		return objectToClassInstanceRecursive(object, skipErrors) as T;
 	} else {
 		try {
