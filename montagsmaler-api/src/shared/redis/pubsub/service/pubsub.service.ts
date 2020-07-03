@@ -6,11 +6,12 @@ import { filter, map } from 'rxjs/internal/operators';
 import { KeyValueService } from '../../keyvalue/service/keyvalue.service';
 import { getValueFromWrappedStringMessage, valueToWrappedStringMessage } from '../../redis.helper';
 
+const SET = 'set:'
+
 @Injectable()
 export class PubSubService implements OnModuleInit {
 
-	private readonly redisSubSubject = new Subject<RedisOnResult>();  
-	private readonly SET = 'SET_';
+	private readonly redisSubSubject = new Subject<RedisOnResult>();
 
 	constructor(
 		@Inject('redis_sub') private readonly redisSub: Redis,
@@ -45,7 +46,7 @@ export class PubSubService implements OnModuleInit {
 
 	public async getChannelHistory<T>(channel: string): Promise<T[]> {
 		try {
-			return await this.keyValueService.getSet<T>(this.SET + channel);
+			return await this.keyValueService.getSet<T>(SET + channel);
 		} catch (err) {
 			return [];
 		}
@@ -54,13 +55,13 @@ export class PubSubService implements OnModuleInit {
 	public async pubToChannel<T>(channel: string, value: T): Promise<void> {
 		try {
 			const wrappedMsgAsString = valueToWrappedStringMessage(value);
-			await Promise.all([this.redisPub.publish(channel, wrappedMsgAsString), this.keyValueService.addToSet<T>(this.SET + channel, value)]);
+			await Promise.all([this.redisPub.publish(channel, wrappedMsgAsString), this.keyValueService.addToSet<T>(SET + channel, value)]);
 		} catch (err) {
 			throw new Error(`Failed to publish value to channel "${channel}".`);
 		}
 	}
 
 	public async deleteChannelHistory(channel: string): Promise<void> {
-		await this.keyValueService.delete(this.SET + channel);
+		await this.keyValueService.delete(SET + channel);
 	}
 }

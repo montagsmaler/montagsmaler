@@ -50,7 +50,7 @@ export class GameService {
 		} catch (err) {
 			throw err;
 		} finally {
-			lock.unlock();
+			await lock.unlock();
 		}
 	}
 }

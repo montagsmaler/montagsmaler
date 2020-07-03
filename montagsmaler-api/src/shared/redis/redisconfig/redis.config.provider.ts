@@ -1,7 +1,7 @@
 import { Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RedisOptions, Redis } from 'ioredis';
-import { redisClientFactory } from './redis.helper';
+import { redisClientFactory } from '../redis.helper';
 import * as Redlock from 'redlock';
 
 export const redisConfigProvider: Provider[] = [

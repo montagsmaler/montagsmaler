@@ -1,10 +1,10 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { PubSubService } from './service/pubsub.service';
-import { RedisModule } from '../redis.module';
 import { KeyValueModule } from '../keyvalue/keyvalue.module';
+import { RedisconfigModule } from '../redisconfig/redisconfig.module';
 
 @Module({
-	imports: [forwardRef(() => RedisModule), KeyValueModule],
+	imports: [RedisconfigModule, KeyValueModule],
 	providers: [PubSubService],
 	exports: [PubSubService],
 })
