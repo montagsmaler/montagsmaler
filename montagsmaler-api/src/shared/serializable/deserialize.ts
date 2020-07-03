@@ -2,7 +2,7 @@ import { Class } from './class.type';
 import { JSONSerializableClasses } from './serializable.decorator';
 declare const global: Record<string, any>;
 
-interface ObjectToClassInstanceOptions {
+interface ToClassInstanceOptions {
 	classForInstance?: Class | string,
 	performDeep?: boolean;
 	skipErrors?: boolean;
@@ -39,7 +39,7 @@ const objectToClassInstanceRecursive = (object: Record<string, any>, skipErrors)
 	}
 };
 
-export const objectToClassInstance = <T>(object: Record<string, any>, options?: ObjectToClassInstanceOptions): T => {
+export const objectToClassInstance = <T>(object: Record<string, any>, options?: ToClassInstanceOptions): T => {
 	let perFormDeep = true;
 	let classForInstance: Class | string;
 	let skipErrors = false;
@@ -70,6 +70,6 @@ export const objectToClassInstance = <T>(object: Record<string, any>, options?: 
 	}
 };
 
-export const stringToClassInstance = <T>(stringifiedObject: string, classForInstance?: ObjectToClassInstanceOptions): T => {
+export const stringToClassInstance = <T>(stringifiedObject: string, classForInstance?: ToClassInstanceOptions): T => {
 	return objectToClassInstance<T>(JSON.parse(stringifiedObject), classForInstance);
 };

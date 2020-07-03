@@ -8,11 +8,10 @@ export const redisClientFactory = (redisConfig: RedisOptions): Redis.Redis => ne
 export const getValueFromWrappedStringMessage = <T>(message: string): T => {
 	let value = (JSON.parse(message) as RedisMessageWrapper).value;
 
-	if (typeof value === 'object' && value !== null) {
-		try {
-			value = objectToClassInstance(value);
-		} catch (err) { }
-	}
+	try {
+		value = objectToClassInstance(value, { skipErrors: true });
+	} catch (err) { }
+
 	return value as T;
 };
 
