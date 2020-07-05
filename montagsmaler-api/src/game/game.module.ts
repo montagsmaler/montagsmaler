@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { GameService } from './service/game.service';
 import { LobbyModule } from './lobby/lobby.module';
-import { GameModule } from './game/game.module';
 import { GameRoundModule } from './game-round/game-round.module';
+import { RedisModule } from '../shared/redis';
 
 @Module({
-	imports: [LobbyModule, GameModule, GameRoundModule],
+	imports: [RedisModule, LobbyModule, GameRoundModule],
 	providers: [GameService],
 	exports: [GameService],
 })

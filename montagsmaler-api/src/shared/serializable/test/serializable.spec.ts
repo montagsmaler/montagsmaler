@@ -1,7 +1,7 @@
 import { Dog, Animal, Human, Fish } from './testclasses';
-import { ClassRegistry, GlobalClassRegistry, AddClassConfig } from './class-registry/class-registry';
-import { stringToClassInstance } from './deserialize/deserialize';
-import { Class } from './class-registry/class.type';
+import { ClassRegistry, GlobalClassRegistry, AddClassConfig } from '../class-registry/class-registry';
+import { stringToClassInstance } from '../deserialize/deserialize';
+import { Class } from '../class-registry/class.type';
 
 describe('serializable', () => {
 	let genericAnimal: Animal;

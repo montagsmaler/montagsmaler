@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as RedisMock from 'ioredis-mock';
-import { RedisClient } from '../../../shared/redis/redisconfig/redis-client.enum';
+import { RedisClient, RedisModule } from '../../../shared/redis';
 import { LobbyService } from './lobby.service';
-import { RedisModule } from '../../../shared/redis/redis.module';
 import { Player } from '../../models';
 
 describe('LobbyService', () => {

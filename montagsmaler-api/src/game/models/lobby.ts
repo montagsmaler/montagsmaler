@@ -1,5 +1,4 @@
 import { Player } from './player';
-import { GameRound } from './game-round';
 import { JSONSerializable } from '../../shared/serializable';
 
 export const LOBBY_MAX_SIZE = 5;

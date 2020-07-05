@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PubSubService } from '../../../shared/redis/pubsub/service/pubsub.service';
-import { KeyValueService } from '../../../shared/redis/keyvalue/service/keyvalue.service';
-import { LockService } from '../../../shared/redis/lock/service/lock.service';
+import { PubSubService, KeyValueService, LockService } from '../../../shared/redis';
 import { Observable } from 'rxjs';
 import { Player, Lobby, LobbyEvent, LobbyPlayerJoinedEvent, LobbyPlayerLeftEvent } from '../../models';
 import { v4 as uuidv4 } from 'uuid';
+import { HOUR_IN_SECONDS } from '../../../shared/helper';
 
-const HOUR_IN_SECONDS = 3600;
 const ACTIVE_LOBBIES = 'ACTIVE_LOBBIES';
 const LOBBY = 'lobby:';
 
@@ -31,10 +29,9 @@ export class LobbyService {
 	}
 
 	public async joinLobby(id: string, player: Player): Promise<[Lobby, Observable<LobbyEvent>]> {
-		let lobby: Lobby;
 		const lock = await this.lockService.lockRessource(id);
 		try {
-			lobby = await this.getLobby(id);
+			const lobby = await this.getLobby(id);
 			lobby.addPlayer(player);
 			try {
 				await Promise.all([this.setLobby(id, lobby), this.pubLobbyEvent(id, new LobbyPlayerJoinedEvent(player))]);

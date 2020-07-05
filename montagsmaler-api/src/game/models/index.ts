@@ -3,7 +3,10 @@ export * from './player';
 export * from './lobby.event';
 export * from './lobby.playerjoined.event';
 export * from './lobby.playerleft.event';
-export * from './game-round';
+export * from './game';
 export * from './image';
-export * from './game-round.event';
-export * from './game-round.game-over.event';
+export * from './game.event';
+export * from './game.game-over.event';
+export * from './game.new-round.event';
+export * from './game.game-started.event';
+export * from './game.round-over.event'

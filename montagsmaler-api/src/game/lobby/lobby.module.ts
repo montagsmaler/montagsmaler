@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { LobbyService } from './service/lobby.service';
-import { RedisModule } from '../../shared/redis/redis.module';
+import { RedisModule } from '../../shared/redis';
 
 @Module({
 	imports: [RedisModule],

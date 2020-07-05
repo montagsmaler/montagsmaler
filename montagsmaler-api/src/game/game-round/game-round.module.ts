@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
-import { GameRoundService } from './game-round/game-round.service';
+import { GameRoundService } from './service/game-round.service';
+import { RedisModule } from '../../shared/redis';
+import { timeProvider } from './service/time.provider';
 
 @Module({
-  providers: [GameRoundService],
+	imports: [RedisModule],
+  providers: [...timeProvider, GameRoundService],
   exports: [GameRoundService],
 })
 export class GameRoundModule {}
