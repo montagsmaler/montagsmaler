@@ -2,7 +2,7 @@ import { Lobby } from './lobby';
 import { JSONSerializable } from '../../shared/serializable';
 
 @JSONSerializable()
-export class Game {
+export class GameRound {
   constructor(
     public readonly id: string,
     public readonly createdAt: number,
