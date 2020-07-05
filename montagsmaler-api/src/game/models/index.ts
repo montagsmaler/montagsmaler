@@ -5,3 +5,5 @@ export * from './lobby.playerjoined.event';
 export * from './lobby.playerleft.event';
 export * from './game-round';
 export * from './image';
+export * from './game-round.event';
+export * from './game-round.game-over.event';
