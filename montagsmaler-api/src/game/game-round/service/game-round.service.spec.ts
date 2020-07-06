@@ -7,15 +7,15 @@ import { timeProvider } from './time.provider';
 
 describe('GameRoundService', () => {
 	let service: GameRoundService;
-	
+
 	const redisKeyValueMock = new RedisMock();
 	const redisSubMock = new RedisMock();
 	const redisPubMock = redisSubMock.createConnectedClient();
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+	beforeEach(async () => {
+		const module: TestingModule = await Test.createTestingModule({
 			imports: [RedisModule],
-      providers: [...timeProvider, GameRoundService],
+			providers: [...timeProvider, GameRoundService],
 		})
 			.overrideProvider(RedisClient.KEY_VALUE).useValue(redisKeyValueMock)
 			.overrideProvider(RedisClient.PUB).useValue(redisPubMock)
@@ -25,13 +25,13 @@ describe('GameRoundService', () => {
 
 		await module.init();
 
-    service = module.get<GameRoundService>(GameRoundService);
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+		service = module.get<GameRoundService>(GameRoundService);
 	});
-	
+
+	it('should be defined', () => {
+		expect(service).toBeDefined();
+	});
+
 	it('should run game and gameloop', async (done) => {
 		const [game, events] = await service.initGame(new Lobby('1234', new Date().getTime(), []), 1, 3);
 		expect(game.duration).toEqual(3);
@@ -41,5 +41,5 @@ describe('GameRoundService', () => {
 				done();
 			}
 		});
-  });
+	});
 });

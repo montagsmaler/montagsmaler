@@ -21,7 +21,7 @@ export class LobbyService {
 		try {
 			const id = uuidv4();
 			const lobby = new Lobby(id, new Date().getTime(), [initPlayer]);
-			await Promise.all([this.setLobby(id, lobby), this.keyValueService.addToSet<string>(ACTIVE_LOBBIES, id)])
+			await this.setLobby(id, lobby);
 			return [lobby, this.pubSubService.onChannelPub<LobbyEvent>(id)];
 		} catch (err) {
 			throw new Error('Failed to init lobby.');
@@ -84,6 +84,14 @@ export class LobbyService {
 			return await this.keyValueService.get<Lobby>(LOBBY + id);
 		} catch (err) {
 			throw new Error('Lobby not found.');
+		}
+	}
+
+	public async consumeLobby(id: string): Promise<void> {
+		try {
+			await Promise.all([this.keyValueService.delete(LOBBY + id), this.pubSubService.deleteChannelHistory(id)]);
+		} catch (err) {
+			throw new Error('Could not delete Lobby.');
 		}
 	}
 }

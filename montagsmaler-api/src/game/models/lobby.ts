@@ -9,7 +9,11 @@ export class Lobby {
     public readonly id: string,
     public readonly createdAt: number,
     private members: Player[],
-  ) {}
+	) {}
+	
+	public getPlayers(): Player[] {
+		return this.members;
+	}
 
   public addPlayer(player: Player): void {
     if (this.playerCount() > LOBBY_MAX_SIZE)

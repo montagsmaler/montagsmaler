@@ -3,7 +3,8 @@ import { GameService } from './game.service';
 import * as RedisMock from 'ioredis-mock';
 import { Player } from '../models';
 import { LobbyModule } from '../lobby/lobby.module';
-import { RedisClient } from '../../shared/redis/redisconfig/redis-client.enum';
+import { RedisModule, RedisClient } from '../../shared/redis';
+import { GameRoundModule } from '../game-round/game-round.module';
 
 describe('GameService', () => {
 	let service: GameService;
@@ -15,7 +16,7 @@ describe('GameService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-			imports: [LobbyModule],
+			imports: [RedisModule, LobbyModule, GameRoundModule],
       providers: [GameService],
 		})
 			.overrideProvider(RedisClient.KEY_VALUE).useValue(redisKeyValueMock)

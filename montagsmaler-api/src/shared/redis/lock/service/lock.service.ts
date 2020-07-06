@@ -11,7 +11,7 @@ export class LockService {
 		@Inject(RedisClient.LOCK) private readonly redLockClient: Redlock,
 	) { }
 
-	public async lockRessource(key: string, ttl = 1000): Promise<Lock> {
+	public async lockRessource(key: string, ttl = 5_000): Promise<Lock> {
 		try {
 			return await this.redLockClient.lock(LOCK + key, ttl);
 		} catch (err) {

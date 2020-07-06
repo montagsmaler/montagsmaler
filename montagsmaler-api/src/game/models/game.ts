@@ -1,5 +1,5 @@
-import { Lobby } from './lobby';
 import { JSONSerializable } from '../../shared/serializable';
+import { Player } from '.';
 
 @JSONSerializable()
 export class Game {
@@ -8,7 +8,7 @@ export class Game {
 	constructor(
 		public readonly id: string,
 		public readonly createdAt: number,
-		public readonly lobby: Lobby,
+		public readonly players: Player[],
 		public readonly durationRound: number,
 		public readonly rounds: number,
 	) { }

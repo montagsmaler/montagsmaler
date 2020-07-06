@@ -3,7 +3,7 @@ import { Lobby, Game, GameEvent, NewGameRoundEvent, Image, GameStartedEvent, Gam
 import { v4 as uuidv4 } from 'uuid';
 import { sleepRange, HOUR_IN_SECONDS, sleep } from '../../../shared/helper';
 import { Observable } from 'rxjs';
-import { PubSubService, KeyValueService } from '../../../shared/redis';
+import { PubSubService, KeyValueService, LockService } from '../../../shared/redis';
 
 const ACTIVE_GAMES = 'ACTIVE_GAMES';
 const GAME = 'game:';
@@ -14,45 +14,33 @@ export class GameRoundService {
 	private readonly WAIT_TIME_TO_GAME_START = this.SECOND_IN_MILLISECONDS * 10;
 	private readonly WAIT_TIME_BETWEEN_ROUND = this.SECOND_IN_MILLISECONDS * 2;
 
-  constructor(
-    private readonly pubSubService: PubSubService,
+	constructor(
+		private readonly pubSubService: PubSubService,
 		private readonly keyValueService: KeyValueService,
+		private readonly lockService: LockService,
 		@Inject('SECOND_IN_MILLISECONDS') private readonly SECOND_IN_MILLISECONDS: number,
-  ) {}
+	) { }
 
-  public async initGame(
-    lobby: Lobby,
-    duration: number,
-    rounds: number,
-  ): Promise<[Game, Observable<GameEvent>]> {
-    const id = uuidv4();
-    try {
-      const game = new Game(
-        id,
-        new Date().getTime(),
-        lobby,
-        duration,
-        rounds,
-      );
-      await Promise.all([
-        this.setGame(id, game),
-        this.keyValueService.addToSet<string>(ACTIVE_GAMES, id),
-      ]);
+	public async initGame(lobby: Lobby, duration: number, rounds: number): Promise<[Game, Observable<GameEvent>]> {
+		const id = uuidv4();
+		try {
+			const game = new Game(id, new Date().getTime(), lobby.getPlayers(), duration, rounds);
+			await this.setGame(id, game);
 			this.startGameLoop(game);
-      return [game, this.pubSubService.onChannelPub<GameEvent>(id)];
-    } catch (err) {
+			return [game, this.pubSubService.onChannelPub<GameEvent>(id)];
+		} catch (err) {
 			console.log(err);
-      throw new Error('Failed to init Game');
-    }
+			throw new Error('Failed to init Game');
+		}
 	}
-	
-  private async startGameLoop(game: Game): Promise<void> {
-    try {
+
+	private async startGameLoop(game: Game): Promise<void> {
+		try {
 			await sleep(this.WAIT_TIME_TO_GAME_START);
 			await this.pubGameEvent(game.id, new GameStartedEvent(game));
 			await sleep(this.WAIT_TIME_BETWEEN_ROUND);
 			await this.pubGameEvent(game.id, new NewGameRoundEvent(game, 1));
-      for await (const roundIndex of sleepRange(1, game.rounds, game.durationRound)) {
+			for await (const roundIndex of sleepRange(1, game.rounds, game.durationRound)) {
 				await this.pubGameEvent(game.id, new GameRoundOverEvent(game, roundIndex, await this.getImages(game.id, roundIndex)));
 				await sleep(this.WAIT_TIME_BETWEEN_ROUND);
 				const newRoundIndex = roundIndex + 1;
@@ -61,39 +49,43 @@ export class GameRoundService {
 				}
 			}
 			await this.pubGameEvent(game.id, new GameOverEvent(game, game.decideWinner()));
-    } catch (err) {
-      throw new Error('Error in the gameloop.');
-    }
-  }
-
-  private async pubGameEvent(id: string, event: GameEvent): Promise<void> {
-    try {
-      await this.pubSubService.pubToChannel<GameEvent>(id, event);
-    } catch (err) {
-      throw new Error('Could not publish LobbyEvent.');
-    }
-  }
-
-  private async setGame(gameId: string, game: Game): Promise<void> {
-    try {
-      await this.keyValueService.set<Game>(
-        GAME + gameId,
-        game,
-        game.duration * 1000 + HOUR_IN_SECONDS,
-      );
-    } catch (err) {
-      throw new Error('Could not set Game.');
-    }
-  }
-
-  public async getGame(gameId: string): Promise<Game> {
-    try {
-      return await this.keyValueService.get<Game>(GAME + gameId);
-    } catch (err) {
-      throw new Error('Game not found.');
-    }
+		} catch (err) {
+			throw new Error('Error in the gameloop.');
+		}
 	}
-	
+
+	private async pubGameEvent(id: string, event: GameEvent): Promise<void> {
+		try {
+			await this.pubSubService.pubToChannel<GameEvent>(id, event);
+		} catch (err) {
+			throw new Error('Could not publish LobbyEvent.');
+		}
+	}
+
+	private async setGame(gameId: string, game: Game): Promise<void> {
+		try {
+			await this.keyValueService.set<Game>(GAME + gameId, game, game.duration * 1000 + HOUR_IN_SECONDS);
+		} catch (err) {
+			throw new Error('Could not set Game.');
+		}
+	}
+
+	public async getGameEvents(gameId: string): Promise<GameEvent[]> {
+		try {
+			return await this.pubSubService.getChannelHistory<GameEvent>(gameId);
+		} catch (err) {
+			throw new Error('Could not retrieve eventhistory for given id.');
+		}
+	}
+
+	public async getGame(gameId: string): Promise<Game> {
+		try {
+			return await this.keyValueService.get<Game>(GAME + gameId);
+		} catch (err) {
+			throw new Error('Game not found.');
+		}
+	}
+
 	private async addImage(gameId: string, image: Image): Promise<void> {
 		try {
 			await this.keyValueService.addToSet<Image>(IMAGES + gameId, image);

@@ -12,25 +12,25 @@ describe('LobbyService', () => {
 	let lobbyEventsTest;
 	let lobbyId;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+	beforeEach(async () => {
+		const module: TestingModule = await Test.createTestingModule({
 			imports: [RedisModule],
-      providers: [LobbyService],
+			providers: [LobbyService],
 		})
 			.overrideProvider(RedisClient.KEY_VALUE).useValue(redisKeyValueMock)
 			.overrideProvider(RedisClient.PUB).useValue(redisPubMock)
 			.overrideProvider(RedisClient.SUB).useValue(redisSubMock)
 			.compile();
-		
+
 		await module.init();
 
-    service = module.get<LobbyService>(LobbyService);
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+		service = module.get<LobbyService>(LobbyService);
 	});
-	
+
+	it('should be defined', () => {
+		expect(service).toBeDefined();
+	});
+
 	it('should init lobby', async (done) => {
 		const [lobby, lobbyEvents] = await service.initLobby(new Player('12345', 'Lucas'));
 		lobbyEventsTest = lobbyEvents;
@@ -38,13 +38,13 @@ describe('LobbyService', () => {
 		expect(lobby.playerCount()).toEqual(1);
 		done();
 	});
-	
+
 	it('player should join lobby', async (done) => {
 		const [lobby, lobbyEvents] = await service.joinLobby(lobbyId, new Player('1234567', 'Markus'));
 		expect(lobby.playerCount()).toEqual(2);
 		done();
 	});
-	
+
 	it('player should join and leave lobby', async (done) => {
 		const player = new Player('12345678', 'Jonas');
 		const [lobby, lobbyEvents] = await service.joinLobby(lobbyId, player);
@@ -52,6 +52,6 @@ describe('LobbyService', () => {
 		await service.leaveLobby(lobbyId, player);
 		expect((await service.getLobby(lobbyId)).playerCount()).toEqual(2);
 		done();
-  });
+	});
 });
 
