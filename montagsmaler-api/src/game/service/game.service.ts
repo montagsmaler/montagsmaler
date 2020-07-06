@@ -21,10 +21,12 @@ export class GameService {
 		return await this.lobbyService.joinLobby(lobbyId, player);
 	}
 
-	public async initGame(lobbyId: string, gameConfig: GameConfig): Promise<[Game, Observable<GameEvent>]> {
+	public async initGame(lobbyId: string, initPlayer: Player, gameConfig: GameConfig): Promise<[Game, Observable<GameEvent>]> {
 		const lock = await this.lockService.lockRessource(lobbyId);
 		try {
-			const gameData = await this.gameRoundService.initGame(await this.lobbyService.getLobby(lobbyId), gameConfig.roundDuration, gameConfig.rounds);
+			const lobby = await this.lobbyService.getLobby(lobbyId);
+			if (lobby.getLeader().id !== initPlayer.id) throw new Error('Player is not authorized to start the lobby.');
+			const gameData = await this.gameRoundService.initGame(lobby, gameConfig.roundDuration, gameConfig.rounds);
 			await this.lobbyService.consumeLobby(lobbyId);
 			return gameData;
 		} catch (err) {

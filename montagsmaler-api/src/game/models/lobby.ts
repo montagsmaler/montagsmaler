@@ -15,6 +15,10 @@ export class Lobby {
 		return this.members;
 	}
 
+	public getLeader(): Player {
+		return this.members[0];
+	}
+
   public addPlayer(player: Player): void {
     if (this.playerCount() > LOBBY_MAX_SIZE)
       throw new Error(
