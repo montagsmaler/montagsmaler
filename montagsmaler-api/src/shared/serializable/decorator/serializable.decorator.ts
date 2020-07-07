@@ -12,7 +12,7 @@ export interface JSONSerializableOptions {
  * @param options 
  */
 export const JSONSerializable = (options?: JSONSerializableOptions) => {
-	return <T extends Class>(constructor: T): T => {
+	return <T extends Class<{}>>(constructor: T): T => {
 		const className: string = (options && options.costumClassName) ? options.costumClassName : constructor.name;
 		const classRegistry: ClassRegistry = (options && options.costumClassRegistry) ? options.costumClassRegistry : GlobalClassRegistry.getInstance();
 		const wrapper = {};

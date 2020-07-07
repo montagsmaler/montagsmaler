@@ -1,6 +1,6 @@
 import { GameEvent } from './game.event';
 import { JSONSerializable } from '../../shared/serializable';
-import { Player, Game } from '.';
+import { Player, Game, GameEvents } from '.';
 import { CreatedAt } from '../../shared/helper';
 
 //@CreatedAt()
@@ -15,5 +15,9 @@ export class NewGameRoundEvent implements GameEvent {
 
   public getMessage(): string {
     return `${this.round}/${this.game.rounds} round begins for game ${this.game.id}. New image submissions are allowed for ${this.game.durationRound} seconds.`;
-  }
+	}
+	
+	public getType(): GameEvents {
+		return GameEvents.ROUND_STARTED;
+	}
 }

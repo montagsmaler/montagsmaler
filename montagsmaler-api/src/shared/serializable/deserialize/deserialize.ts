@@ -2,46 +2,59 @@ import { Class } from '../class-registry/class.type';
 import { GlobalClassRegistry, ClassRegistry } from '../class-registry/class-registry';
 
 export interface ToClassInstanceOptions {
-	useClass?: Class | string,
+	useClass?: Class<{}> | string,
 	performDeep?: boolean;
 	ignoreErrors?: boolean;
 	costumClassRegistry?: ClassRegistry,
 }
 
-const objectToClassInstancePrimitive = <T>(object: Record<string, any>, classToInstantiate: Class): T => {
+const createClassInstanceFromObject = <T>(object: Record<string, any>, classToInstantiate: Class<{}>): T => {
 	const newInstance = Object.create(classToInstantiate.prototype) as T;
 	Object.assign(newInstance, object);
 	return newInstance;
 };
 
-const objectToClassInstanceRecursive = (object: Record<string, any>, classRegistry: ClassRegistry, skipErrors: boolean) => {
-	for (const key in object) {
-		if (typeof object[key] === 'object' && object[key] !== null) {
-			object[key] = objectToClassInstanceRecursive(object[key], classRegistry, skipErrors);
-		}
-	}
+const objectToClassInstancePrimitive = <T>(object: Record<string, any>, classRegistry: ClassRegistry, skipErrors: boolean): T => {
 	if (!Array.isArray(object)) {
 		try {
 			const className = object.__className;
 			if (!className) throw new Error('Could not infer class for instantiation.');
 			const classToInstantiate = classRegistry.getClass(className);
 			if (!classToInstantiate) throw new Error('Could not find class for instantiation.');
-			return objectToClassInstancePrimitive(object, classToInstantiate);
+			return createClassInstanceFromObject<T>(object, classToInstantiate);
 		} catch (err) {
 			if (skipErrors) {
-				return object;
+				return object as T;
 			} else {
 				throw err;
 			}
 		}
 	} else {
-		return object;
+		return object as unknown as T;
 	}
+};
+
+
+const objectToClassInstanceRecursive = (object: Record<string, any>, classRegistry: ClassRegistry, skipErrors: boolean, objects = [], classInstances = []) => {
+	const index = objects.indexOf(object); //needed to handle cyclic dependencies
+	if (index === -1) {
+		objects.push(object);
+		object = objectToClassInstancePrimitive(object, classRegistry, skipErrors);
+		classInstances.push(object);
+		for (const key in object) {
+			if (typeof object[key] === 'object' && object[key] !== null) {
+				object[key] = objectToClassInstanceRecursive(object[key], classRegistry, skipErrors, objects, classInstances);
+			}
+		}
+	} else {
+		object = classInstances[index];
+	}
+	return object;
 };
 
 export const objectToClassInstance = <T>(object: Record<string, any>, options?: ToClassInstanceOptions): T => {
 	let performDeep = true;
-	let classForInstance: Class | string;
+	let classForInstance: Class<{}> | string;
 	let skipErrors = false;
 	let classRegistry: ClassRegistry = GlobalClassRegistry.getInstance();
 	if (options) {
@@ -70,7 +83,7 @@ export const objectToClassInstance = <T>(object: Record<string, any>, options?: 
 			if (!className) throw new Error('Could not infer class for instantiation.');
 			const classToInstantiate = (typeof className === 'string') ? classRegistry.getClass(className) : className;
 			if (!classToInstantiate) throw new Error('Could not find class for instantiation.');
-			return objectToClassInstancePrimitive<T>(object, classToInstantiate);
+			return createClassInstanceFromObject<T>(object, classToInstantiate);
 		} catch (err) {
 			if (skipErrors) {
 				return object as T;

@@ -1,6 +1,6 @@
 import { GameEvent } from './game.event';
 import { JSONSerializable } from '../../shared/serializable';
-import { Player, Game, Image } from '.';
+import { Player, Game, Image, GameEvents } from '.';
 import { CreatedAt } from '../../shared/helper';
 
 //@CreatedAt()
@@ -15,5 +15,9 @@ export class GameRoundOverEvent implements GameEvent {
 
   public getMessage(): string {
     return `${this.round}/${this.game.rounds} round is over for game ${this.game.id}. No submissions accepted anymore for round ${this.round}.`;
-  }
+	}
+	
+	public getType(): GameEvents {
+		return GameEvents.ROUND_OVER;
+	}
 }

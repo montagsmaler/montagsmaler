@@ -2,7 +2,7 @@ import { JSONSerializable } from '../decorator/serializable.decorator';
 import { Class } from '../index';
 
 export const IsCarnivore = (isCarnivore: boolean) => {
-	return <T extends Class>(constructor: T) => {
+	return <T extends Class<{}>>(constructor: T) => {
 		return class extends constructor {
 			isCarnivore = isCarnivore;
 		};

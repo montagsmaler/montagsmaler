@@ -3,6 +3,7 @@ import { JSONSerializable } from '../../shared/serializable';
 import { Game } from './game';
 import { Player } from './player';
 import { CreatedAt } from '../../shared/helper';
+import { GameEvents } from './game.events';
 
 //@CreatedAt()
 @JSONSerializable()
@@ -15,5 +16,9 @@ export class GameOverEvent implements GameEvent {
 
   public getMessage(): string {
     return `Game "${this.game.id}" is over.`;
-  }
+	}
+	
+	public getType(): GameEvents {
+		return GameEvents.GAME_OVER;
+	}
 }

@@ -3,16 +3,16 @@ import { Class } from './class.type';
 
 export interface AddClassConfig {
 	name: string;
-	class: Class;
+	class: Class<{}>;
 }
 
 export interface ClassRegistry {
 	addClasses(...classes: AddClassConfig[]): void;
-	getClass(className: string): Class | undefined;
+	getClass(className: string): Class<{}> | undefined;
 }
 
 class BasicClassRegistry implements ClassRegistry {
-	private readonly registry = new Map<string, Class>();
+	private readonly registry = new Map<string, Class<{}>>();
 
 	addClasses(...classes: AddClassConfig[]): void {
 		for (const classConfig of classes) {
@@ -20,7 +20,7 @@ class BasicClassRegistry implements ClassRegistry {
 		}
 	}
 
-	getClass(className: string): Class | undefined {
+	getClass(className: string): Class<{}> | undefined {
 		return this.registry.get(className);
 	}
 }
@@ -46,7 +46,7 @@ export class GlobalClassRegistry implements ClassRegistry {
 		this.registry.addClasses(...classes);
 	}
 
-	public getClass(className: string): Class | undefined {
+	public getClass(className: string): Class<{}> | undefined {
 		return this.registry.getClass(className);
 	}
 }

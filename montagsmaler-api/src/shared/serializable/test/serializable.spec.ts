@@ -111,7 +111,7 @@ describe('serializable', () => {
 			addClasses: (...classes: AddClassConfig[]): void => {
 				return;
 			},
-			getClass: (className: string): Class | undefined => {
+			getClass: (className: string): Class<{}> | undefined => {
 				return undefined;
 			},
 		}
@@ -129,7 +129,7 @@ describe('serializable', () => {
 			addClasses: (...classes: AddClassConfig[]): void => {
 				return;
 			},
-			getClass: (className: string): Class | undefined => {
+			getClass: (className: string): Class<{}> | undefined => {
 				return Animal; //always returns animal
 			},
 		}

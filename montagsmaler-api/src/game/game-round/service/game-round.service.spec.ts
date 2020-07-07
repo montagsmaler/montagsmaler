@@ -4,6 +4,7 @@ import { RedisModule, RedisClient } from '../../../shared/redis';
 import * as RedisMock from 'ioredis-mock';
 import { Lobby, GameOverEvent } from '../../../game/models';
 import { timeProvider } from './time.provider';
+import { GameStateModule } from '../../game-state';
 
 describe('GameRoundService', () => {
 	let service: GameRoundService;
@@ -14,7 +15,7 @@ describe('GameRoundService', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
-			imports: [RedisModule],
+			imports: [RedisModule, GameStateModule],
 			providers: [...timeProvider, GameRoundService],
 		})
 			.overrideProvider(RedisClient.KEY_VALUE).useValue(redisKeyValueMock)
@@ -36,7 +37,7 @@ describe('GameRoundService', () => {
 		const [game, events] = await service.initGame(new Lobby('1234', new Date().getTime(), []), 1, 3);
 		expect(game.duration).toEqual(3);
 		events.subscribe(event => {
-			console.log(event);
+			//console.log(event);
 			if (event instanceof GameOverEvent) {
 				done();
 			}

@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { sleepRange, HOUR_IN_SECONDS, sleep } from '../../../shared/helper';
 import { Observable } from 'rxjs';
 import { PubSubService, KeyValueService, LockService } from '../../../shared/redis';
+import { GameStateService } from '../../game-state';
 
 const ACTIVE_GAMES = 'ACTIVE_GAMES';
 const GAME = 'game:';
@@ -18,6 +19,7 @@ export class GameRoundService {
 		private readonly pubSubService: PubSubService,
 		private readonly keyValueService: KeyValueService,
 		private readonly lockService: LockService,
+		private readonly gameStateService: GameStateService,
 		@Inject('SECOND_IN_MILLISECONDS') private readonly SECOND_IN_MILLISECONDS: number,
 	) { }
 
@@ -27,9 +29,10 @@ export class GameRoundService {
 			const game = new Game(id, new Date().getTime(), lobby.getPlayers(), duration, rounds);
 			await this.setGame(id, game);
 			this.startGameLoop(game);
-			return [game, this.pubSubService.onChannelPub<GameEvent>(id)];
+			const events = this.pubSubService.onChannelPub<GameEvent>(id);
+			await this.gameStateService.registerGame(game, events);
+			return [game, events];
 		} catch (err) {
-			console.log(err);
 			throw new Error('Failed to init Game');
 		}
 	}
