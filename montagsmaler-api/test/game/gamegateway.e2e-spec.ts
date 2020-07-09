@@ -2,23 +2,23 @@ import { getClientWebsocketForAppAndNamespace } from '../ws-client.helper';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
-import { GameGateway } from '../../src/api/ws/game/game-gateway';
+import { LobbyGateway } from '../../src/api/ws/lobby/lobby-gateway';
 import { Namespace } from '../../src/api/ws/namespaces';
-import { GameEvent } from '../../src/api/ws/game/game-events';
-import { GameModule } from '../../src/api/ws/game/game.module';
+import { WsLobbyEvents } from '../../src/api/ws/lobby/ws.lobby.events';
+import { WsLobbyModule } from '../../src/api/ws/lobby/ws.lobby.module';
 
 describe('GameGateway e2e', () => {
   let app: INestApplication;
-  let gameGateway: GameGateway;
+  let lobbyGateway: LobbyGateway;
 
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
-      imports: [GameModule],
+      imports: [WsLobbyModule],
     }).compile();
 
     app = await moduleFixture.createNestApplication().init();
 
-    gameGateway = app.get<GameGateway>(GameGateway);
+    lobbyGateway = app.get<LobbyGateway>(LobbyGateway);
 	});
 	
 	describe('startGameProcess', () => {

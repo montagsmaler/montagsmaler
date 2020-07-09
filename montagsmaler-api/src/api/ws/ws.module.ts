@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { GameModule } from './game/game.module';
+import { WsLobbyModule } from './lobby/ws.lobby.module';
 
 @Module({
-	imports: [GameModule],
+	imports: [WsLobbyModule],
 })
 export class WsModule {}

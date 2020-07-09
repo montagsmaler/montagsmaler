@@ -4,7 +4,7 @@ import { sleepRange, HOUR_IN_SECONDS, sleep } from '../../../shared/helper';
 import { Observable } from 'rxjs';
 import { PubSubService, KeyValueService, LockService } from '../../../shared/redis';
 import { Lobby } from '../../lobby/models';
-import { Game, GameStartedEvent, Image, NewGameRoundEvent, GameImagesShouldPublishEvent, GameRoundOverEvent, GameOverEvent, GameImageAddedEvent, GameEvent } from '../models';
+import { Game, GameStartedEvent, Image, NewGameRoundEvent, GameImagesShouldPublishEvent, GameRoundOverEvent, GameOverEvent, GameImageAddedEvent, GameEvent, GameEvents } from '../models';
 
 const ACTIVE_GAMES = 'ACTIVE_GAMES';
 const GAME = 'game:';
@@ -28,7 +28,7 @@ export class GameRoundService {
 		try {
 			const game = new Game(id, new Date().getTime(), lobby.getPlayers(), duration, rounds);
 			await this.setGame(id, game);
-			this.startGameLoop(game);
+			setTimeout(() => this.startGameLoop(game));
 			const events = this.pubSubService.onChannelPub<GameEvent>(id);
 			return [game, events];
 		} catch (err) {
@@ -41,7 +41,7 @@ export class GameRoundService {
 			await sleep(this.WAIT_TIME_TO_GAME_START);
 			await this.pubGameEvent(game.id, new GameStartedEvent(game));
 			await sleep(this.WAIT_TIME_BETWEEN_ROUND);
-			await this.pubGameEvent(game.id, new NewGameRoundEvent(game, 1));
+			await this.pubGameEvent(game.id, new NewGameRoundEvent(game, 1, new Date().getTime()));
 			const roundDuration = (game.durationRound < this.WAIT_UNTIL_IMAGE_IS_PUBLISHED) ?  game.durationRound : game.durationRound - this.WAIT_UNTIL_IMAGE_IS_PUBLISHED;
 			for await (const roundIndex of sleepRange(1, game.rounds, roundDuration)) {
 				await this.pubGameEvent(game.id, new GameImagesShouldPublishEvent(game));
@@ -50,7 +50,7 @@ export class GameRoundService {
 				await sleep(this.WAIT_TIME_BETWEEN_ROUND);
 				const newRoundIndex = roundIndex + 1;
 				if (newRoundIndex <= game.rounds) {
-					await this.pubGameEvent(game.id, new NewGameRoundEvent(game, newRoundIndex));
+					await this.pubGameEvent(game.id, new NewGameRoundEvent(game, newRoundIndex, new Date().getTime()));
 				}
 			}
 			await this.pubGameEvent(game.id, new GameOverEvent(game, game.decideWinner(), await this.getImages(game.id)));
@@ -59,9 +59,9 @@ export class GameRoundService {
 		}
 	}
 
-	private async pubGameEvent(id: string, event: GameEvent): Promise<void> {
+	private async pubGameEvent(gameId: string, event: GameEvent): Promise<void> {
 		try {
-			await this.pubSubService.pubToChannel<GameEvent>(id, event);
+			await this.pubSubService.pubToChannel<GameEvent>(gameId, event);
 		} catch (err) {
 			throw new Error('Could not publish LobbyEvent.');
 		}
@@ -77,15 +77,16 @@ export class GameRoundService {
 
 	public async deleteGame(gameId: string): Promise<void> {
 		try {
-			await this.keyValueService.delete(GAME + gameId);
+			await Promise.all([this.keyValueService.delete(GAME + gameId), this.pubSubService.deleteChannelHistory(gameId)]);
 		} catch (err) {
-			throw new Error('Could delete Game.');
+			//throw new Error('Could not delete Game.');
 		}
 	}
 
-	public async getGameEvents(gameId: string): Promise<GameEvent[]> {
+	public async getGameEvents(gameId: string, eventType?: GameEvents): Promise<GameEvent[]> {
 		try {
-			return await this.pubSubService.getChannelHistory<GameEvent>(gameId);
+			const gameEvents = await this.pubSubService.getChannelHistory<GameEvent>(gameId);
+			return (eventType) ? gameEvents.filter(gameEvent => gameEvent.getType() === eventType) : gameEvents;
 		} catch (err) {
 			throw new Error('Could not retrieve eventhistory for given id.');
 		}
@@ -108,10 +109,18 @@ export class GameRoundService {
 		}
 	}
 
-	private async getImages(gameId: string, round?: number): Promise<Image[]> {
+	public async getImages(gameId: string, round?: number, playerId?: string): Promise<Image[]> {
 		try {
 			const images = await this.keyValueService.getSet<Image>(IMAGES + gameId);
-			return (round) ? images.filter(image => image.getRound() === round) : images;
+			if (round && playerId) {
+				return images.filter(image => image.getRound() === round && image.player.id === playerId);
+			} else if (round) {
+				return images.filter(image => image.getRound() === round);
+			} else if (playerId) {
+				return images.filter(image => image.player.id === playerId);
+			} else {
+				return images;
+			}
 		} catch (err) {
 			throw new Error('Error while retrieving images from set.');
 		}

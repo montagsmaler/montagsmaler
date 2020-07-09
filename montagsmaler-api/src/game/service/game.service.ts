@@ -26,17 +26,18 @@ export class GameService {
 
 	public async initGame(lobbyId: string, initPlayer: Player, gameConfig: GameConfig): Promise<[Game, Observable<GameEvent>]> {
 		const lock = await this.lockService.lockRessource(lobbyId);
-		let gameData: [Game, Observable<GameEvent>];
+		let game: Game; 
+		let events: Observable<GameEvent>;
 		try {
 			const lobby = await this.lobbyService.getLobby(lobbyId);
 			if (lobby.getLeader().id !== initPlayer.id) throw new Error('Player is not authorized to start the lobby.');
-			gameData = await this.gameRoundService.initGame(lobby, gameConfig.roundDuration, gameConfig.rounds);
-			await this.gameStateService.registerGame(...gameData);
-			await this.lobbyService.consumeLobby(lobbyId);
-			return gameData;
+			[game, events] = await this.gameRoundService.initGame(lobby, gameConfig.roundDuration, gameConfig.rounds);
+			await this.gameStateService.registerGame(game, events);
+			await this.lobbyService.consumeLobby(lobbyId, initPlayer, game);
+			return [game, events];
 		} catch (err) {
-			if (gameData) {
-				await this.gameRoundService.deleteGame(gameData[0].id);
+			if (game) {
+				await this.gameRoundService.deleteGame(game.id);
 			}
 			throw err;
 		} finally {
@@ -47,10 +48,10 @@ export class GameService {
 	public async tryPublishImage(gameId: string, image: Image): Promise<boolean> {
 		try {
 			const canPublish = await this.gameStateService.canPublishImage(gameId, image.player.id, image.getRound());
-			if (canPublish) {
+			if (canPublish.accepted) {
 				await this.gameRoundService.addImage(gameId, image);
 			}
-			return canPublish;
+			return canPublish.accepted;
 		} catch (err) {
 			throw err;
 		}

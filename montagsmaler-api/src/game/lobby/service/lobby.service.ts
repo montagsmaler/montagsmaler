@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { HOUR_IN_SECONDS } from '../../../shared/helper';
 import { Player, Lobby, LobbyEvent, LobbyPlayerJoinedEvent, LobbyPlayerLeftEvent } from '../models';
+import { LobbyConsumedEvent } from '../models/events/lobby.consumed.event';
+import { Game } from '../../../game/game-round/models';
 
 const ACTIVE_LOBBIES = 'ACTIVE_LOBBIES';
 const LOBBY = 'lobby:';
@@ -87,8 +89,9 @@ export class LobbyService {
 		}
 	}
 
-	public async consumeLobby(id: string): Promise<void> {
+	public async consumeLobby(id: string, player: Player, game: Game): Promise<void> {
 		try {
+			await this.pubLobbyEvent(id, new LobbyConsumedEvent(player, game))
 			await Promise.all([this.keyValueService.delete(LOBBY + id), this.pubSubService.deleteChannelHistory(id)]);
 		} catch (err) {
 			throw new Error('Could not delete Lobby.');

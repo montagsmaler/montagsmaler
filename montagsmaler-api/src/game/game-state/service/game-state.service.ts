@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { LockService, KeyValueService, PubSubService } from '../../../shared/redis';
-import { GameStateContext } from '../models/GameStateContext';
-import { Observable, Subscription } from 'rxjs';
-import { filter, switchMap } from 'rxjs/internal/operators';
+import { GameStateContext } from '../state/GameStateContext';
+import { Observable, Subscription, Subject } from 'rxjs';
+import { filter, tap } from 'rxjs/internal/operators';
 import { Lock } from 'redlock';
 import { Game, GameEvents, GameEvent } from '../../game-round/models';
+import { IStateAccepted } from '../state/GameState';
+import { HOUR_IN_SECONDS } from '../../../shared/helper';
 
 const GAME_STATE = 'gamestate:';
 const GAME_STATE_MESSAGES = 'gamestatemessages:';
@@ -13,6 +15,7 @@ const GAME_STATE_MESSAGES = 'gamestatemessages:';
 export class GameStateService {
 
 	private readonly subscriptions = new Map<string, Subscription>();
+	private readonly stateAccepted = new Subject<{ gameId: string, eventType: GameEvents, stateAccepted: IStateAccepted }>();
 
 	constructor(
 		private readonly lockService: LockService,
@@ -20,16 +23,16 @@ export class GameStateService {
 		private readonly keyValueService: KeyValueService,
 	) { }
 
-	public async registerGame(game: Game, gameEvents: Observable<GameEvent>): Promise<Observable<{ eventType: GameEvents, accepted: boolean }>> {
+	public async registerGame(game: Game, gameEvents: Observable<GameEvent>): Promise<Observable<{ eventType: GameEvents, stateAccepted: IStateAccepted }>> {
 		await this.setGameState(game.id, new GameStateContext(game));
 		const stateObservable = gameEvents
 			.pipe(
 				filter(event => event.getTrigger() === 'GAME'),
-				switchMap(async gameLoopEvent => {
+				tap(async gameLoopEvent => {
 					const lock = await this.lockGameState(game.id);
 					try {
 						const gameState = await this.getGameState(game.id);
-						let stateAccepted = false;
+						let stateAccepted: IStateAccepted = { currentState: 'no current state', accepted: false };
 						const eventType = gameLoopEvent.getType();
 						switch (eventType) {
 							case GameEvents.GAME_STARTED:
@@ -37,6 +40,9 @@ export class GameStateService {
 								break;
 							case GameEvents.GAME_OVER:
 								stateAccepted = gameState.endGame();
+								if (stateAccepted.accepted) {
+									this.unsubscribeGameState(game.id);
+								}
 								break;
 							case GameEvents.ROUND_STARTED:
 								stateAccepted = gameState.startRound();
@@ -50,7 +56,7 @@ export class GameStateService {
 								break;
 						}
 						await this.setGameState(game.id, gameState);
-						return { eventType, accepted: stateAccepted };
+						this.stateAccepted.next({ gameId: game.id, eventType, stateAccepted });
 					} catch (err) {
 						this.unsubscribeGameState(game.id);
 					} finally {
@@ -59,10 +65,10 @@ export class GameStateService {
 				}),
 			);
 		this.subscriptions.set(game.id, stateObservable.subscribe());
-		return stateObservable;
+		return this.stateAccepted.pipe(filter(stateAccepted => stateAccepted.gameId === game.id));
 	}
 
-	public async canPublishImage(gameId: string, playerId: string, forRound: number): Promise<boolean> {
+	public async canPublishImage(gameId: string, playerId: string, forRound: number): Promise<IStateAccepted> {
 		const lock = await this.lockGameState(gameId);
 		try {
 			const gameState = await this.getGameState(gameId);
@@ -115,7 +121,7 @@ export class GameStateService {
 
 	private async setGameState(gameId: string, stateContext: GameStateContext): Promise<void> {
 		try {
-			await this.keyValueService.set<GameStateContext>(GAME_STATE + gameId, stateContext);
+			await this.keyValueService.set<GameStateContext>(GAME_STATE + gameId, stateContext, HOUR_IN_SECONDS);
 		} catch (err) {
 			throw new Error('Could not set GameState.');
 		}

@@ -1,4 +1,4 @@
-import { IGameState } from './GameState';
+import { IGameState, IStateAccepted } from './GameState';
 import { JSONSerializable, Class } from '../../../shared/serializable';
 import { GameNotStarted } from './states/GameNotStarted';
 import { Game } from '../../game-round/models';
@@ -27,7 +27,7 @@ export class GameStateContext implements IGameState {
 	}
 
 	public hasSubmitted(playerId: string, round: number): boolean | undefined {
-		return this.playerSubmissions[playerId][round];
+		return (this.playerSubmissions[playerId]) ? this.playerSubmissions[playerId][round] : true;
 	}
 
 	public get currentRound(): number {
@@ -38,31 +38,39 @@ export class GameStateContext implements IGameState {
 		return this._rounds;
 	}
 
-	public incrementRound(): void {
+	private incrementRound(): void {
 		this._currentRound += 1;
 	}
 
-	public startGame(): boolean {
+	public startGame(): IStateAccepted {
 		return this.currentGameState.startGame();
 	}
-	
-	public endGame(): boolean {
+
+	public endGame(): IStateAccepted {
 		return this.currentGameState.endGame();
 	}
-	
-	public startRound(): boolean {
-		return this.currentGameState.startRound();
+
+	public startRound(): IStateAccepted {
+		const stateAccepted = this.currentGameState.startRound();
+		if (stateAccepted.accepted) {
+			this.incrementRound();
+		}
+		return stateAccepted;
 	}
-	
-	public endRound(): boolean {
+
+	public endRound(): IStateAccepted {
 		return this.currentGameState.endRound();
 	}
-	
-	public publishImage(playerId: string, forRound: number): boolean {
+
+	public publishImage(playerId: string, forRound: number): IStateAccepted {
 		return this.currentGameState.publishImage(playerId, forRound);
 	}
 
-	public imagesShouldBePublished(): boolean {
+	public imagesShouldBePublished(): IStateAccepted {
 		return this.currentGameState.imagesShouldBePublished();
+	}
+
+	public getCurrentState(): string {
+		return this.currentGameState.getCurrentState();
 	}
 }

@@ -5,7 +5,7 @@ import * as RedisMock from 'ioredis-mock';
 import { timeProvider } from './time.provider';
 import { GameStateModule } from '../../game-state';
 import { Lobby } from '../../lobby/models';
-import { GameOverEvent } from '../models';
+import { GameOverEvent, GameStartedEvent, NewGameRoundEvent, GameImagesShouldPublishEvent, GameRoundOverEvent } from '../models';
 
 describe('GameRoundService', () => {
 	let service: GameRoundService;
@@ -34,14 +34,51 @@ describe('GameRoundService', () => {
 		expect(service).toBeDefined();
 	});
 
-	it('should run game and gameloop', async (done) => {
+	it('should create game and send gameloop events in correct oder', async (done) => {
 		const [game, events] = await service.initGame(new Lobby('1234', new Date().getTime(), []), 1, 3);
+		expect(game).toBeDefined();
 		expect(game.duration).toEqual(3);
+		expect(events).toBeDefined();
+	
+		let eventCount = 0;
 		events.subscribe(event => {
-			//console.log(event);
-			if (event instanceof GameOverEvent) {
-				done();
+			switch (eventCount) {
+				case 0:
+					expect(event instanceof GameStartedEvent).toBeTruthy();
+					break;
+				case 1:
+					expect(event instanceof NewGameRoundEvent).toBeTruthy();
+					break;
+				case 2:
+					expect(event instanceof GameImagesShouldPublishEvent).toBeTruthy();
+					break;
+				case 3:
+					expect(event instanceof GameRoundOverEvent).toBeTruthy();
+					break;
+				case 4:
+					expect(event instanceof NewGameRoundEvent).toBeTruthy();
+					break;
+				case 5:
+					expect(event instanceof GameImagesShouldPublishEvent).toBeTruthy();
+					break;
+				case 6:
+					expect(event instanceof GameRoundOverEvent).toBeTruthy();
+					break;
+				case 7:
+					expect(event instanceof NewGameRoundEvent).toBeTruthy();
+					break;
+				case 8:
+					expect(event instanceof GameImagesShouldPublishEvent).toBeTruthy();
+					break;
+				case 9:
+					expect(event instanceof GameRoundOverEvent).toBeTruthy();
+					break;
+				case 10:
+					expect(event instanceof GameOverEvent).toBeTruthy();
+					done();
+					break;
 			}
+			++eventCount;
 		});
 	});
 });
