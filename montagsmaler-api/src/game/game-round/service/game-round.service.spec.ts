@@ -2,9 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GameRoundService } from './game-round.service';
 import { RedisModule, RedisClient } from '../../../shared/redis';
 import * as RedisMock from 'ioredis-mock';
-import { Lobby, GameOverEvent } from '../../../game/models';
 import { timeProvider } from './time.provider';
 import { GameStateModule } from '../../game-state';
+import { Lobby } from '../../lobby/models';
+import { GameOverEvent } from '../models';
 
 describe('GameRoundService', () => {
 	let service: GameRoundService;

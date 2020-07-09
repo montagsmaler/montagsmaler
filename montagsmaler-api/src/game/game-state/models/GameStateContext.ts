@@ -1,7 +1,7 @@
 import { IGameState } from './GameState';
-import { Game } from '../../../game/models';
 import { JSONSerializable, Class } from '../../../shared/serializable';
 import { GameNotStarted } from './states/GameNotStarted';
+import { Game } from '../../game-round/models';
 
 @JSONSerializable()
 export class GameStateContext implements IGameState {
@@ -60,5 +60,9 @@ export class GameStateContext implements IGameState {
 	
 	public publishImage(playerId: string, forRound: number): boolean {
 		return this.currentGameState.publishImage(playerId, forRound);
+	}
+
+	public imagesShouldBePublished(): boolean {
+		return this.currentGameState.imagesShouldBePublished();
 	}
 }

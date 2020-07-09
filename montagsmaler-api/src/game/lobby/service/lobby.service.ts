@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PubSubService, KeyValueService, LockService } from '../../../shared/redis';
 import { Observable } from 'rxjs';
-import { Player, Lobby, LobbyEvent, LobbyPlayerJoinedEvent, LobbyPlayerLeftEvent } from '../../models';
 import { v4 as uuidv4 } from 'uuid';
 import { HOUR_IN_SECONDS } from '../../../shared/helper';
+import { Player, Lobby, LobbyEvent, LobbyPlayerJoinedEvent, LobbyPlayerLeftEvent } from '../models';
 
 const ACTIVE_LOBBIES = 'ACTIVE_LOBBIES';
 const LOBBY = 'lobby:';

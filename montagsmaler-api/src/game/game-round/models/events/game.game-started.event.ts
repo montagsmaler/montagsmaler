@@ -1,9 +1,9 @@
-import { GameEvent } from './game.event';
-import { JSONSerializable } from '../../shared/serializable';
-import { Game } from './game';
-import { Player } from './player';
-import { CreatedAt } from '../../shared/helper';
-import { GameEvents } from '.';
+import { GameEvent } from '../game.event';
+import { JSONSerializable } from '../../../../shared/serializable';
+import { Game } from '../game';
+import { Player } from '../../../lobby/models/player';
+import { CreatedAt } from '../../../../shared/helper';
+import { GameEvents } from '../game.events';
 
 //@CreatedAt()
 @JSONSerializable()

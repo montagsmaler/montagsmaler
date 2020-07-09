@@ -1,4 +1,4 @@
-import { Player } from './player';
+import { Player } from '../../lobby/models/player';
 import { GameEvents } from './game.events';
 
 export interface GameEvent {

@@ -1,5 +1,5 @@
-import { Image } from './image';
-import { JSONSerializable } from '../../shared/serializable';
+import { Image } from '../../game-round/models/image';
+import { JSONSerializable } from '../../../shared/serializable';
 
 @JSONSerializable()
 export class Player {

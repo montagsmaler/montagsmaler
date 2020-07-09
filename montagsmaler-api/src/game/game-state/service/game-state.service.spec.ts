@@ -2,9 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GameStateService } from './game-state.service';
 import { RedisModule, RedisClient } from '../../../shared/redis';
 import * as RedisMock from 'ioredis-mock';
-import { Game, Player, GameStartedEvent, GameEvent, GameEvents } from '../../../game/models';
 import { Subject, Observable } from 'rxjs';
 import { sleep } from '../../../shared/helper';
+import { Player } from '../../lobby/models';
+import { Game, GameEvents, GameEvent } from '../../game-round/models';
 
 describe('GameStateService', () => {
 	let service: GameStateService;

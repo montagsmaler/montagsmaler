@@ -22,4 +22,7 @@ export class GameStarted extends GameState {
 	publishImage(playerId: string, forRound: number): boolean {
 		return false;
 	}
+	imagesShouldBePublished(): boolean {
+		return false;
+	}
 }

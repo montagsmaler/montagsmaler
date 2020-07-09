@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { LockService, KeyValueService, PubSubService } from '../../../shared/redis';
-import { Game, GameEvent, GameEvents } from '../../../game/models';
 import { GameStateContext } from '../models/GameStateContext';
 import { Observable, Subscription } from 'rxjs';
 import { filter, switchMap } from 'rxjs/internal/operators';
 import { Lock } from 'redlock';
+import { Game, GameEvents, GameEvent } from '../../game-round/models';
 
 const GAME_STATE = 'gamestate:';
 const GAME_STATE_MESSAGES = 'gamestatemessages:';
@@ -44,6 +44,8 @@ export class GameStateService {
 							case GameEvents.ROUND_OVER:
 								stateAccepted = gameState.endRound();
 								break;
+							case GameEvents.IMAGES_SHOULD_PUBLISH:
+								stateAccepted = gameState.imagesShouldBePublished();
 							default:
 								break;
 						}

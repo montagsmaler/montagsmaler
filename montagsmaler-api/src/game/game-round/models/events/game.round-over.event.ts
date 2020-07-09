@@ -1,7 +1,7 @@
-import { GameEvent } from './game.event';
-import { JSONSerializable } from '../../shared/serializable';
-import { Player, Game, Image, GameEvents } from '.';
-import { CreatedAt } from '../../shared/helper';
+import { JSONSerializable } from '../../../../shared/serializable';
+import { CreatedAt } from '../../../../shared/helper';
+import { GameEvents,  GameEvent, Game, Image } from '../';
+import { Player } from '../../../lobby/models';
 
 //@CreatedAt()
 @JSONSerializable()

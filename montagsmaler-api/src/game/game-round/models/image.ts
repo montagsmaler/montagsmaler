@@ -1,5 +1,5 @@
-import { Player } from './player';
-import { JSONSerializable } from '../../shared/serializable';
+import { Player } from '../../lobby/models/player';
+import { JSONSerializable } from '../../../shared/serializable';
 
 @JSONSerializable()
 export class Image {
@@ -13,5 +13,9 @@ export class Image {
 
   public getRound(): number {
     return this.round;
-  }
+	}
+	
+	/*public static fromS3Object(s3objekt): Image {
+		return new Image....
+	}*/
 }

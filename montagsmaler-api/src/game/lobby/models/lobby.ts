@@ -1,5 +1,5 @@
 import { Player } from './player';
-import { JSONSerializable } from '../../shared/serializable';
+import { JSONSerializable } from '../../../shared/serializable';
 
 export const LOBBY_MAX_SIZE = 5;
 

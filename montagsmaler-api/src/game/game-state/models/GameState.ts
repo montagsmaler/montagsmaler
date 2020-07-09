@@ -6,6 +6,7 @@ export interface IGameState {
 	startRound(): boolean;
 	endRound(): boolean;
 	publishImage(playerId: string, forRound: number): boolean;
+	imagesShouldBePublished(): boolean;
 }
 
 export abstract class GameState implements IGameState {
@@ -17,4 +18,5 @@ export abstract class GameState implements IGameState {
 	abstract startRound(): boolean;
 	abstract endRound(): boolean;
 	abstract publishImage(playerId: string, forRound: number): boolean;
+	abstract imagesShouldBePublished(): boolean;
 }

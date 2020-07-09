@@ -1,6 +1,6 @@
-import { LobbyEvent } from './lobby.event';
-import { Player } from  './player';
-import { JSONSerializable } from '../../shared/serializable';
+import { LobbyEvent } from '../lobby.event';
+import { Player } from  '../player';
+import { JSONSerializable } from '../../../../shared/serializable';
 
 @JSONSerializable()
 export class LobbyPlayerLeftEvent implements LobbyEvent {

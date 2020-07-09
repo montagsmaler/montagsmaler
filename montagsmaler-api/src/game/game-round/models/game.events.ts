@@ -3,4 +3,6 @@ export enum GameEvents {
 	GAME_OVER = 1,
 	ROUND_STARTED = 2,
 	ROUND_OVER = 3,
+	IMAGES_SHOULD_PUBLISH = 4,
+	IMAGE_ADDED = 5,
 }

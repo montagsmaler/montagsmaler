@@ -1,5 +1,5 @@
-import { JSONSerializable } from '../../shared/serializable';
-import { Player } from '.';
+import { JSONSerializable } from '../../../shared/serializable';
+import { Player } from '../../lobby/models';
 
 @JSONSerializable()
 export class Game {
@@ -17,11 +17,11 @@ export class Game {
 		return this.durationRound * this.rounds;
 	}
 
-	public decideWinner(): Record<string, number>[] {
+	public decideWinner(): { player: Player, score: number }[] {
 		const retArr = [];
 		for (const key in this.scores) {
-			retArr.push({ player: key, score: this.scores[key] });
+			retArr.push({ player: this.players.find(player => player.id === key), score: this.scores[key] });
 		}
-		return retArr.sort((a, b) => (a > b) ? 1 : -1);
+		return retArr.sort((a, b) => (a.score > b.score) ? 1 : -1);
 	}
 }

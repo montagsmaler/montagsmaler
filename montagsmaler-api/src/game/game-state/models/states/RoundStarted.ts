@@ -26,4 +26,7 @@ export class RoundStarted extends GameState {
 			return false;
 		}
 	}
+	imagesShouldBePublished(): boolean {
+		return true;
+	}
 }

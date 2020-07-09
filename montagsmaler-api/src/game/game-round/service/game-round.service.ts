@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { Lobby, Game, GameEvent, NewGameRoundEvent, Image, GameStartedEvent, GameOverEvent, GameRoundOverEvent } from '../../models';
 import { v4 as uuidv4 } from 'uuid';
 import { sleepRange, HOUR_IN_SECONDS, sleep } from '../../../shared/helper';
 import { Observable } from 'rxjs';
 import { PubSubService, KeyValueService, LockService } from '../../../shared/redis';
-import { GameStateService } from '../../game-state';
+import { Lobby } from '../../lobby/models';
+import { Game, GameStartedEvent, Image, NewGameRoundEvent, GameImagesShouldPublishEvent, GameRoundOverEvent, GameOverEvent, GameImageAddedEvent, GameEvent } from '../models';
 
 const ACTIVE_GAMES = 'ACTIVE_GAMES';
 const GAME = 'game:';
@@ -14,12 +14,12 @@ const IMAGES = 'images:';
 export class GameRoundService {
 	private readonly WAIT_TIME_TO_GAME_START = this.SECOND_IN_MILLISECONDS * 10;
 	private readonly WAIT_TIME_BETWEEN_ROUND = this.SECOND_IN_MILLISECONDS * 2;
+	private readonly WAIT_UNTIL_IMAGE_IS_PUBLISHED = this.SECOND_IN_MILLISECONDS * 5;
 
 	constructor(
 		private readonly pubSubService: PubSubService,
 		private readonly keyValueService: KeyValueService,
 		private readonly lockService: LockService,
-		private readonly gameStateService: GameStateService,
 		@Inject('SECOND_IN_MILLISECONDS') private readonly SECOND_IN_MILLISECONDS: number,
 	) { }
 
@@ -30,7 +30,6 @@ export class GameRoundService {
 			await this.setGame(id, game);
 			this.startGameLoop(game);
 			const events = this.pubSubService.onChannelPub<GameEvent>(id);
-			await this.gameStateService.registerGame(game, events);
 			return [game, events];
 		} catch (err) {
 			throw new Error('Failed to init Game');
@@ -43,7 +42,10 @@ export class GameRoundService {
 			await this.pubGameEvent(game.id, new GameStartedEvent(game));
 			await sleep(this.WAIT_TIME_BETWEEN_ROUND);
 			await this.pubGameEvent(game.id, new NewGameRoundEvent(game, 1));
-			for await (const roundIndex of sleepRange(1, game.rounds, game.durationRound)) {
+			const roundDuration = (game.durationRound < this.WAIT_UNTIL_IMAGE_IS_PUBLISHED) ?  game.durationRound : game.durationRound - this.WAIT_UNTIL_IMAGE_IS_PUBLISHED;
+			for await (const roundIndex of sleepRange(1, game.rounds, roundDuration)) {
+				await this.pubGameEvent(game.id, new GameImagesShouldPublishEvent(game));
+				await sleep(this.WAIT_UNTIL_IMAGE_IS_PUBLISHED);
 				await this.pubGameEvent(game.id, new GameRoundOverEvent(game, roundIndex, await this.getImages(game.id, roundIndex)));
 				await sleep(this.WAIT_TIME_BETWEEN_ROUND);
 				const newRoundIndex = roundIndex + 1;
@@ -51,7 +53,7 @@ export class GameRoundService {
 					await this.pubGameEvent(game.id, new NewGameRoundEvent(game, newRoundIndex));
 				}
 			}
-			await this.pubGameEvent(game.id, new GameOverEvent(game, game.decideWinner()));
+			await this.pubGameEvent(game.id, new GameOverEvent(game, game.decideWinner(), await this.getImages(game.id)));
 		} catch (err) {
 			throw new Error('Error in the gameloop.');
 		}
@@ -67,9 +69,17 @@ export class GameRoundService {
 
 	private async setGame(gameId: string, game: Game): Promise<void> {
 		try {
-			await this.keyValueService.set<Game>(GAME + gameId, game, game.duration * 1000 + HOUR_IN_SECONDS);
+			await this.keyValueService.set<Game>(GAME + gameId, game, game.duration + HOUR_IN_SECONDS);
 		} catch (err) {
 			throw new Error('Could not set Game.');
+		}
+	}
+
+	public async deleteGame(gameId: string): Promise<void> {
+		try {
+			await this.keyValueService.delete(GAME + gameId);
+		} catch (err) {
+			throw new Error('Could delete Game.');
 		}
 	}
 
@@ -89,9 +99,10 @@ export class GameRoundService {
 		}
 	}
 
-	private async addImage(gameId: string, image: Image): Promise<void> {
+	public async addImage(gameId: string, image: Image): Promise<void> {
 		try {
 			await this.keyValueService.addToSet<Image>(IMAGES + gameId, image);
+			await this.pubGameEvent(gameId, new GameImageAddedEvent(gameId, image));
 		} catch (err) {
 			throw new Error('Could not add image to set.');
 		}
@@ -100,7 +111,7 @@ export class GameRoundService {
 	private async getImages(gameId: string, round?: number): Promise<Image[]> {
 		try {
 			const images = await this.keyValueService.getSet<Image>(IMAGES + gameId);
-			return (round) ? images.filter(image => image.round === round) : images;
+			return (round) ? images.filter(image => image.getRound() === round) : images;
 		} catch (err) {
 			throw new Error('Error while retrieving images from set.');
 		}
