@@ -19,8 +19,9 @@ export interface PublicKeyMeta {
 }
 
 export interface ClaimVerfiedCognitoUser {
+	readonly id: string;
   readonly userName: string;
-  readonly clientId: string;
+	readonly clientId: string;
 }
 
 export interface Claim {

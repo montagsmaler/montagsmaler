@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { LobbyService } from '../lobby/service/lobby.service';
 import { GameRoundService } from '../game-round/service/game-round.service';
 import { LockService } from '../../shared/redis';

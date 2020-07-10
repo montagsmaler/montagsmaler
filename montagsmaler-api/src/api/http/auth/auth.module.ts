@@ -10,5 +10,6 @@ import { ValidationModule } from '../../../shared/validation/validation.module';
 	imports: [ConfigModule, ValidationModule],
 	controllers: [AuthController],
 	providers: [...awsProvider, AuthService, AuthCognitoGuard],
+	exports: [AuthCognitoGuard, AuthService],
 })
 export class AuthModule {}

@@ -6,7 +6,7 @@ import { LobbyEvents } from '../lobby.events';
 @JSONSerializable()
 export class LobbyPlayerJoinedEvent implements LobbyEvent {
 
-	constructor(private readonly player: Player) { }
+	constructor(public readonly player: Player) { }
 
 	public getTrigger(): Player {
 		return this.player;

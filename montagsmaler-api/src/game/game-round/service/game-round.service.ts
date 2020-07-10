@@ -26,7 +26,7 @@ export class GameRoundService {
 	public async initGame(lobby: Lobby, duration: number, rounds: number): Promise<[Game, Observable<GameEvent>]> {
 		const id = uuidv4();
 		try {
-			const game = new Game(id, new Date().getTime(), lobby.getPlayers(), duration, rounds);
+			const game = new Game(id, new Date().getTime(), lobby.getPlayers(), duration * this.SECOND_IN_MILLISECONDS, rounds);
 			await this.setGame(id, game);
 			setTimeout(() => this.startGameLoop(game));
 			const events = this.pubSubService.onChannelPub<GameEvent>(id);

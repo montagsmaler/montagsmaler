@@ -7,14 +7,21 @@ export class AuthCognitoGuard implements CanActivate {
   constructor(private readonly authService: AuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+		const request = context.switchToHttp().getRequest();
+		let headers: Record<string, any> = {};
+
+		if (request.headers) {
+			headers = request.headers;
+		} else if (request.handshake && request.handshake.headers) {
+			headers = request.handshake.headers;
+		}
 
     try {
-      if (!request.headers.authorization) {
+      if (!headers.authorization) {
         throw new UnauthorizedException('No authheader sent.');
       }
 
-      const token = this.extractBearerToken(request.headers.authorization);
+			const token = this.extractBearerToken(headers.authorization);
       if (!token) {
         throw new UnauthorizedException('No bearertoken sent.');
       }

@@ -12,16 +12,31 @@ const spyOn = jest.spyOn;
 
 const PRIVATE_PEM = jwkToPem(PRIVATE_KEY, { private: true });
 
-const mockData = { issuer: '127.0.0.1', user: 'lucas', clientId: 'abc123' };
+export interface MockUser {
+	issuer: string,
+	id: string;
+	user: string;
+	clientId: string;
+}
+export const mockUserData: MockUser = { issuer: '127.0.0.1', id: '012a8738-a7a2-4368-9f75-cfabb4c9c0ce', user: 'lucas', clientId: 'abc123' };
+export const mockUser2Data: MockUser = { issuer: '127.0.0.1', id: '011a8738-a7a2-5368-9f75-cfabb4c9c0ce', user: 'niklas', clientId: 'abc123' };
 
 const getExpForDateStr = (dateStr: string): number => Math.floor(new Date(dateStr).getTime() / 1000);
 
-const claimPayloadMockFactory = (username: string, client_id: string, exp: number, iss: string, token_use: string) => ({ username, client_id, exp, iss, token_use });
+const claimPayloadMockFactory = (username: string, sub: string, client_id: string, exp: number, iss: string, token_use: string) => ({ username, sub, client_id, exp, iss, token_use });
 
-const signedTokenMockFactory = (username: string, client_id: string, exp: number, iss: string, token_use: string, kid: string = PRIVATE_KEY.kid, privateKeyPem: string = PRIVATE_PEM) => jwt.sign(claimPayloadMockFactory(username, client_id, exp, iss, token_use), privateKeyPem, { algorithm: 'RS256', noTimestamp: true, header: { kid } });
+export const signedTokenMockFactory = (username: string, sub: string, client_id: string, exp: number, iss: string, token_use: string, kid: string = PRIVATE_KEY.kid, privateKeyPem: string = PRIVATE_PEM) => jwt.sign(claimPayloadMockFactory(username, sub, client_id, exp, iss, token_use), privateKeyPem, { algorithm: 'RS256', noTimestamp: true, header: { kid } });
 
-const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
+export const getTomorrow = (): Date => {
+	const tomorrow = new Date();
+	tomorrow.setDate(tomorrow.getDate() + 1);
+	return tomorrow;
+}
+
+export const signedTokenFromMock = (mockUser: MockUser): string => {
+	return signedTokenMockFactory(mockUser.user, mockUser.id, mockUser.clientId, getExpForDateStr(getTomorrow().toDateString()), mockUser.issuer, 'access');
+};
+
 
 describe('AuthService', () => {
 	let authService: AuthService;
@@ -33,7 +48,7 @@ describe('AuthService', () => {
 			.overrideProvider('aws_cognito_user_pool')
 			.useValue(new CognitoUserPool({ UserPoolId: 'us-east-1_LKayH2xzJ', ClientId: 'imrcgq4gidp29idmtval97nsv' }))
 			.overrideProvider('aws_cognito_issuer_url')
-			.useValue(mockData.issuer)
+			.useValue(mockUserData.issuer)
 			.compile();
 
 		authService = module.get<AuthService>(AuthService);
@@ -52,10 +67,10 @@ describe('AuthService', () => {
 	});
 
 	it('should be verified', async () => {
-		const expectedResult: ClaimVerfiedCognitoUser = { userName: mockData.user, clientId: mockData.clientId };
+		const expectedResult: ClaimVerfiedCognitoUser = { id: mockUserData.id, userName: mockUserData.user, clientId: mockUserData.clientId };
 		expect(
 			await authService.verifyToken(
-				signedTokenMockFactory(mockData.user, mockData.clientId, getExpForDateStr(tomorrow.toDateString()), mockData.issuer, 'access')
+				signedTokenMockFactory(mockUserData.user, mockUserData.id, mockUserData.clientId, getExpForDateStr(getTomorrow().toDateString()), mockUserData.issuer, 'access')
 			)
 		)
 			.toEqual(expectedResult);
@@ -66,7 +81,7 @@ describe('AuthService', () => {
 		let verifiedClaim;
 		try {
 			verifiedClaim = await authService.verifyToken(
-				signedTokenMockFactory(mockData.user, mockData.clientId, getExpForDateStr('2020-06-16T19:36:00'), mockData.issuer, 'access')
+				signedTokenMockFactory(mockUserData.user, mockUserData.id, mockUserData.clientId, getExpForDateStr('2020-06-16T19:36:00'), mockUserData.issuer, 'access')
 			);
 		} catch (err) {
 			expect(err).toEqual(new Error('jwt expired'));
@@ -79,7 +94,7 @@ describe('AuthService', () => {
 		let verifiedClaim;
 		try {
 			verifiedClaim = await authService.verifyToken(
-				signedTokenMockFactory(mockData.user, mockData.clientId, getExpForDateStr(tomorrow.toDateString()), mockData.issuer, 'refresh')
+				signedTokenMockFactory(mockUserData.user, mockUserData.id, mockUserData.clientId, getExpForDateStr(getTomorrow().toDateString()), mockUserData.issuer, 'refresh')
 			);
 		} catch (err) {
 			expect(err).toEqual(new Error('Claim use is not access.'));
@@ -92,7 +107,7 @@ describe('AuthService', () => {
 		let verifiedClaim;
 		try {
 			verifiedClaim = await authService.verifyToken(
-				signedTokenMockFactory(mockData.user, mockData.clientId, getExpForDateStr(tomorrow.toDateString()), 'facebook.com', 'access')
+				signedTokenMockFactory(mockUserData.user, mockUserData.id, mockUserData.clientId, getExpForDateStr(getTomorrow().toDateString()), 'facebook.com', 'access')
 			);
 		} catch (err) {
 			expect(err).toEqual(new Error('Claim issuer is invalid.'));
@@ -105,7 +120,7 @@ describe('AuthService', () => {
 		let verifiedClaim;
 		try {
 			verifiedClaim = await authService.verifyToken(
-				signedTokenMockFactory(mockData.user, mockData.clientId, getExpForDateStr(tomorrow.toDateString()), mockData.issuer, 'access', '11111')
+				signedTokenMockFactory(mockUserData.user, mockUserData.id, mockUserData.clientId, getExpForDateStr(getTomorrow().toDateString()), mockUserData.issuer, 'access', '11111')
 			);
 		} catch (err) {
 			expect(err).toEqual(new Error('Claim made for unknown kid.'));
@@ -118,7 +133,7 @@ describe('AuthService', () => {
 		let verifiedClaim;
 		try {
 			verifiedClaim = await authService.verifyToken(
-				signedTokenMockFactory(mockData.user, mockData.clientId, getExpForDateStr(tomorrow.toDateString()), mockData.issuer, 'access', UNFITTING_PRIVATE_KEY.kid, jwkToPem(UNFITTING_PRIVATE_KEY, { private: true }))
+				signedTokenMockFactory(mockUserData.user, mockUserData.id, mockUserData.clientId, getExpForDateStr(getTomorrow().toDateString()), mockUserData.issuer, 'access', UNFITTING_PRIVATE_KEY.kid, jwkToPem(UNFITTING_PRIVATE_KEY, { private: true }))
 			);
 		} catch (err) {
 			expect(err).toEqual(new Error('invalid signature'));

@@ -5,6 +5,6 @@ import { timeProvider } from './service/time.provider';
 @Module({
 	imports: [RedisModule],
   providers: [...timeProvider, GameRoundService],
-  exports: [GameRoundService],
+  exports: [...timeProvider, GameRoundService],
 })
 export class GameRoundModule {}

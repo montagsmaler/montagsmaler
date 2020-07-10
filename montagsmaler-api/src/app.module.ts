@@ -5,7 +5,7 @@ import { ConfigModuleOptions } from '@nestjs/config/dist/interfaces';
 import { RedisModule } from './shared/redis/redis.module';
 import { GameModule } from './game';
 
-const configModuleOptionsFactory = (): ConfigModuleOptions => {
+export const configModuleOptionsFactory = (): ConfigModuleOptions => {
 	const NODE_ENV = process.env.NODE_ENV;
 	const USE_FILE = process.env.USE_FILE;
   if (USE_FILE === 'false') {
