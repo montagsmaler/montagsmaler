@@ -1,5 +1,5 @@
 export * from './game';
-export * from './image';
+export * from '../../image/models/image';
 export * from './game.event';
 export * from './events/game.game-over.event';
 export * from './events/game.new-round.event';

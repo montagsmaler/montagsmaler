@@ -8,7 +8,7 @@ export class Lobby {
   constructor(
     public readonly id: string,
     public readonly createdAt: number,
-    public members: Player[],
+    private members: Player[],
 	) {}
 	
 	public getPlayers(): Player[] {

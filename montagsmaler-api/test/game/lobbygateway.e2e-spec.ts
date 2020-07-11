@@ -3,10 +3,10 @@ import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { configModuleOptionsFactory } from '../../src/app.module';
 import { LobbyGateway } from '../../src/api/ws/lobby/lobby-gateway';
-import { Namespace } from '../../src/api/ws/namespaces';
+import { WsNamespace } from '../../src/api/ws/ws.namespaces';
 import { WsLobbyEvents } from '../../src/api/ws/lobby/ws.lobby.events';
 import { WsLobbyModule } from '../../src/api/ws/lobby/ws.lobby.module';
-import { HandleConnection } from '../../src/api/ws/handleconnection';
+import { WsHandleConnection } from '../../src/api/ws/ws.handleconnection';
 import { ConfigModule } from '@nestjs/config';
 import { AuthService } from '../../src/api/http/auth/service/auth.service';
 import { PublicKeys } from '../../src/api/http/auth/models/aws-token';
@@ -19,7 +19,7 @@ import { LobbyConsumedEvent } from '../../src/game/lobby/models/events/lobby.con
 const spyOn = jest.spyOn;
 
 describe('LobbyGateway e2e', () => {
-  let app: INestApplication;
+	let app: INestApplication;
 	let lobbyGateway: LobbyGateway;
 	let authService: AuthService;
 	let userSocket: SocketIOClient.Socket;
@@ -31,11 +31,11 @@ describe('LobbyGateway e2e', () => {
 	const redisPubMock = redisSubMock.createConnectedClient();
 	let lobbyId: string;
 	let currentLobby: Lobby;
-	const SECOND_IN_MILLISECONDS = 10; 
+	const SECOND_IN_MILLISECONDS = 10;
 
-  beforeAll(async () => {
-    const moduleFixture = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot(configModuleOptionsFactory()), WsLobbyModule],
+	beforeAll(async () => {
+		const moduleFixture = await Test.createTestingModule({
+			imports: [ConfigModule.forRoot(configModuleOptionsFactory()), WsLobbyModule],
 		})
 			.overrideProvider('aws_cognito_issuer_url').useValue(mockUserData.issuer)
 			.overrideProvider(RedisClient.KEY_VALUE).useValue(redisKeyValueMock)
@@ -50,7 +50,7 @@ describe('LobbyGateway e2e', () => {
 		spyOn(authService as any, 'fetchPublicKeys').mockImplementation(async (): Promise<PublicKeys> => ({ keys: [PUBLIC_KEY] }));
 
 		lobbyGateway = app.get<LobbyGateway>(LobbyGateway);
-		
+
 		await app.init();
 	});
 
@@ -60,19 +60,19 @@ describe('LobbyGateway e2e', () => {
 	});
 
 	it('should init two client connections to lobby namespace', (done) => {
-		userSocket = getClientWebsocketForAppAndNamespace(app, Namespace.LOBBY, tokenUser);     
-		userSocket.on(HandleConnection.CONNECTED, (payload) => {
+		userSocket = getClientWebsocketForAppAndNamespace(app, WsNamespace.LOBBY, tokenUser);
+		userSocket.on(WsHandleConnection.CONNECTED, (payload) => {
 			expect(payload.success).toBeTruthy();
 			if (payload && payload.success) {
-				user2Socket = getClientWebsocketForAppAndNamespace(app, Namespace.LOBBY, tokenUser2);
-				user2Socket.on(HandleConnection.CONNECTED, (payload) => {
+				user2Socket = getClientWebsocketForAppAndNamespace(app, WsNamespace.LOBBY, tokenUser2);
+				user2Socket.on(WsHandleConnection.CONNECTED, (payload) => {
 					expect(payload.success).toBeTruthy();
 					done();
 				});
 			}
 		});
 	});
-	
+
 	it('should init lobby', (done) => {
 		userSocket.on(WsLobbyEvents.GET_LOBBY, (lobby: Lobby) => {
 			expect(lobby).toBeDefined();
@@ -112,7 +112,8 @@ describe('LobbyGateway e2e', () => {
 		user2Socket.on(WsLobbyEvents.CONSUMED, (event: LobbyConsumedEvent) => {
 			expect(event).toBeDefined();
 			expect(event.player.id).toEqual(mockUserData.id);
-			expect(event.game.players).toEqual(currentLobby.members);
+			expect(event.game.id).toBeDefined();
+			expect(event.game.players).toEqual(currentLobby['members']);
 			expect(event.game.rounds * event.game.durationRound).toEqual(60 * SECOND_IN_MILLISECONDS);
 			if (finished) {
 				done();
@@ -122,7 +123,8 @@ describe('LobbyGateway e2e', () => {
 		userSocket.on(WsLobbyEvents.CONSUMED, (event: LobbyConsumedEvent) => {
 			expect(event).toBeDefined();
 			expect(event.player.id).toEqual(mockUserData.id);
-			expect(event.game.players).toEqual(currentLobby.members);
+			expect(event.game.id).toBeDefined();
+			expect(event.game.players).toEqual(currentLobby['members']);
 			expect(event.game.rounds * event.game.durationRound).toEqual(60 * SECOND_IN_MILLISECONDS);
 			if (finished) {
 				done();

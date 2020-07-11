@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { LobbyConsumedEvent } from '../lobby/models/events/lobby.consumed.event';
 import { first } from 'rxjs/internal/operators';
 import { GameEvent, Game, GameStartedEvent } from '../game-round/models';
+import { ImageModule } from '../image';
 
 describe('GameService', () => {
 	let service: GameService;
@@ -24,26 +25,26 @@ describe('GameService', () => {
 	let gameEvents: Observable<GameEvent>;
 	let game: Game;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-			imports: [RedisModule, LobbyModule, GameRoundModule, GameStateModule],
-      providers: [GameService],
+	beforeEach(async () => {
+		const module: TestingModule = await Test.createTestingModule({
+			imports: [RedisModule, LobbyModule, GameRoundModule, GameStateModule, ImageModule],
+			providers: [GameService],
 		})
 			.overrideProvider(RedisClient.KEY_VALUE).useValue(redisKeyValueMock)
 			.overrideProvider(RedisClient.PUB).useValue(redisPubMock)
 			.overrideProvider(RedisClient.SUB).useValue(redisSubMock)
 			.overrideProvider('SECOND_IN_MILLISECONDS').useValue(1)
 			.compile();
-		
+
 		await module.init();
 
-    service = module.get<GameService>(GameService);
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+		service = module.get<GameService>(GameService);
 	});
-	
+
+	it('should be defined', () => {
+		expect(service).toBeDefined();
+	});
+
 	it('should init lobby', async (done) => {
 		[lobby, lobbyEvents] = await service.initLobby(testPlayer);
 		expect(lobby).toBeDefined();
@@ -51,13 +52,13 @@ describe('GameService', () => {
 		expect(lobby.playerCount()).toEqual(1);
 		done();
 	});
-	
+
 	it('player should join lobby', async (done) => {
 		const [lobbyPlayer, lobbyEventsPlayer] = await service.joinLobby(lobby.id, testPlayer2);
 		expect(lobbyPlayer.playerCount()).toEqual(2);
 		done();
 	});
-	
+
 	it('should throw error since player is not lobby leader', async (done) => {
 		try {
 			const [game, gameEvents] = await service.initGame(lobby.id, testPlayer2, { roundDuration: 5, rounds: 2 });
@@ -71,7 +72,7 @@ describe('GameService', () => {
 		lobbyEvents.pipe(first()).subscribe(lobbyEvent => {
 			expect(lobbyEvent instanceof LobbyConsumedEvent).toBeTruthy();
 		})
-		const [newGame, events]  = await service.initGame(lobby.id, testPlayer, { roundDuration: 5, rounds: 2 });
+		const [newGame, events] = await service.initGame(lobby.id, testPlayer, { roundDuration: 5, rounds: 2 });
 		game = newGame;
 		gameEvents = events;
 		gameEvents.pipe(first()).subscribe(gameEvent => {

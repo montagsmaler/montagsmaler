@@ -6,6 +6,8 @@ import { HOUR_IN_SECONDS } from '../../../shared/helper';
 import { Player, Lobby, LobbyEvent, LobbyPlayerJoinedEvent, LobbyPlayerLeftEvent } from '../models';
 import { LobbyConsumedEvent } from '../models/events/lobby.consumed.event';
 import { Game } from '../../../game/game-round/models';
+import { takeWhile } from 'rxjs/internal/operators';
+import { LobbyEvents } from '../models/lobby.events';
 
 const ACTIVE_LOBBIES = 'ACTIVE_LOBBIES';
 const LOBBY = 'lobby:';
@@ -24,7 +26,7 @@ export class LobbyService {
 			const id = uuidv4();
 			const lobby = new Lobby(id, new Date().getTime(), [initPlayer]);
 			await this.setLobby(id, lobby);
-			return [lobby, this.pubSubService.onChannelPub<LobbyEvent>(id)];
+			return [lobby, this.onLobbyEvent(id)];
 		} catch (err) {
 			throw new Error('Failed to init lobby.');
 		}
@@ -37,7 +39,7 @@ export class LobbyService {
 			lobby.addPlayer(player);
 			try {
 				await Promise.all([this.setLobby(id, lobby), this.pubLobbyEvent(id, new LobbyPlayerJoinedEvent(player))]);
-				return [lobby, this.pubSubService.onChannelPub<LobbyEvent>(id)];
+				return [lobby, this.onLobbyEvent(id)];
 			} catch (err) {
 				throw new Error('Failed to join Lobby.');
 			}
@@ -46,6 +48,10 @@ export class LobbyService {
 		} finally {
 			await lock.unlock();
 		}
+	}
+
+	private onLobbyEvent(lobbyId: string): Observable<LobbyEvent> {
+		return this.pubSubService.onChannelPub<LobbyEvent>(lobbyId).pipe(takeWhile(lobbyEvent => lobbyEvent.getType() !== LobbyEvents.CONSUMED, true));
 	}
 
 	public async leaveLobby(id: string, leavingPlayer: Player): Promise<void> {

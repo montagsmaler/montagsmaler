@@ -17,6 +17,10 @@ export class Game {
 		return this.durationRound * this.rounds;
 	}
 
+	public isPlayerMember(playerId: string): boolean {
+    return this.players.findIndex(player => player.id === playerId) !== -1;
+  }
+
 	public decideWinner(): { player: Player, score: number }[] {
 		const retArr = [];
 		for (const key in this.scores) {

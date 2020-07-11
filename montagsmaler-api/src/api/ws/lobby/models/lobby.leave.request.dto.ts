@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class LobbyJoinRequestDto {
+export class LobbyLeaveRequestDto {
 
 	@IsString()
 	@IsNotEmpty()

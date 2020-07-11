@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LobbyGateway } from './lobby-gateway';
+import { GameGateway } from './game.gateway';
 import { GameModule } from '../../../game';
 import { RedisClient } from '../../../shared/redis';
 import * as RedisMock from 'ioredis-mock';
@@ -7,8 +7,9 @@ import { AuthModule } from '../../http/auth/auth.module';
 import { ValidationModule } from '../../../shared/validation';
 import { CognitoUserPool } from 'amazon-cognito-identity-js';
 
-describe('LobbyGateway', () => {
-	let gateway: LobbyGateway;
+describe('GameGateway', () => {
+	let gateway: GameGateway;
+
 	const redisKeyValueMock = new RedisMock();
 	const redisSubMock = new RedisMock();
 	const redisPubMock = redisSubMock.createConnectedClient();
@@ -16,7 +17,7 @@ describe('LobbyGateway', () => {
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			imports: [GameModule, AuthModule, ValidationModule],
-			providers: [LobbyGateway],
+			providers: [GameGateway],
 		})
 			.overrideProvider('aws_cognito_user_pool').useValue(new CognitoUserPool({ UserPoolId: 'us-east-1_LKayH2xzJ', ClientId: 'imrcgq4gidp29idmtval97nsv' }))
 			.overrideProvider('aws_cognito_issuer_url').useValue('127.0.0.1')
@@ -28,7 +29,7 @@ describe('LobbyGateway', () => {
 
 		await module.init();
 
-		gateway = module.get<LobbyGateway>(LobbyGateway);
+		gateway = module.get<GameGateway>(GameGateway);
 	});
 
 	it('should be defined', () => {

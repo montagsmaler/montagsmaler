@@ -1,5 +1,6 @@
 export enum WsLobbyEvents {
 	PLAYER_JOINED = 'player_joined',
+	PLAYER_LEFT = 'player_left',
 	INIT_LOBBY = 'lobby_init',
 	GET_LOBBY = 'get_lobby',
 	CONSUMED = 'lobby_consumed',

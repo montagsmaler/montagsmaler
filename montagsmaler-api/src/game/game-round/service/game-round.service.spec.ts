@@ -3,9 +3,10 @@ import { GameRoundService } from './game-round.service';
 import { RedisModule, RedisClient } from '../../../shared/redis';
 import * as RedisMock from 'ioredis-mock';
 import { timeProvider } from './time.provider';
-import { GameStateModule } from '../../game-state';
 import { Lobby } from '../../lobby/models';
 import { GameOverEvent, GameStartedEvent, NewGameRoundEvent, GameImagesShouldPublishEvent, GameRoundOverEvent } from '../models';
+import { forwardRef } from '@nestjs/common';
+import { ImageModule } from '../../../game/image';
 
 describe('GameRoundService', () => {
 	let service: GameRoundService;
@@ -16,7 +17,7 @@ describe('GameRoundService', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
-			imports: [RedisModule, GameStateModule],
+			imports: [RedisModule, forwardRef(() => ImageModule)],
 			providers: [...timeProvider, GameRoundService],
 		})
 			.overrideProvider(RedisClient.KEY_VALUE).useValue(redisKeyValueMock)

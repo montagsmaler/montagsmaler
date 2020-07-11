@@ -1,8 +1,8 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class LobbyJoinRequestDto {
+export class GameJoinRequestDto {
 
 	@IsString()
 	@IsNotEmpty()
-	lobbyId: string;
+	gameId: string;
 }

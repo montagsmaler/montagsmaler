@@ -3,7 +3,7 @@ import { JSONSerializable } from '../../../../shared/serializable';
 import { Game } from '../game';
 import { Player } from '../../../lobby/models/player'
 import { GameEvents } from '../game.events';
-import { Image } from '../image';
+import { Image } from '../../../image/models/image';
 
 //@CreatedAt()
 @JSONSerializable()

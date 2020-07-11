@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString, IsNumber, Min, Max } from 'class-validator';
 
 export class GameInitRequestDto {
-	
+
 	@IsString()
 	@IsNotEmpty()
 	lobbyId: string;

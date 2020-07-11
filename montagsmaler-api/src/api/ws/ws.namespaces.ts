@@ -1,4 +1,4 @@
-export enum Namespace {
+export enum WsNamespace {
 	GAME = 'game',
 	LOBBY = 'lobby',
 }
