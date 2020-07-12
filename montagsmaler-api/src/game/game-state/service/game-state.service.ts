@@ -13,14 +13,18 @@ export class GameStateService {
 
 	public async canPublishImage(gameId: string, playerId: string, forRound: number): Promise<IStateAccepted> {
 		try {
-			const gameState = await this.getGameState(gameId);
+			const gameState = await this.getGameStateContext(gameId);
 			return gameState.publishImage(playerId, forRound);
 		} catch (err) {
 			throw err;
 		}
 	}
 
-	public async getGameState(gameId: string): Promise<GameStateContext> {
+	public async getGameStateAsString(gameId: string): Promise<string> {
+		return (await this.getGameStateContext(gameId)).getCurrentState();
+	}
+
+	public async getGameStateContext(gameId: string): Promise<GameStateContext> {
 		try {
 			const [game, events] = await Promise.all([this.gameRoundService.getGame(gameId), this.gameRoundService.getGameEvents(gameId)]);
 			if (events.length <= 0) throw new Error('Game not found.');

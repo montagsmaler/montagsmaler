@@ -69,6 +69,7 @@ describe('GameStateService', () => {
 	it('should accept image publish now', async () => {
 		await gameRoundService.pubGameEvent(testGame.id, new GameRoundOverEvent(4, testGame, 1, [testImage]));
 		await gameRoundService.pubGameEvent(testGame.id, new NewGameRoundEvent(5, testGame, 'bird', 2, new Date().getTime()));
+		expect(await gameStateService.getGameStateAsString(testGame.id)).toEqual('RoundStarted');
 		expect((await gameStateService.canPublishImage(testGame.id, testPlayer.id, 2)).accepted).toBeTruthy(); // next round hasnt started yet
 	});
 
