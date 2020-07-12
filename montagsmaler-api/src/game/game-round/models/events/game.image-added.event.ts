@@ -1,6 +1,8 @@
 import { GameEvents,  GameEvent, Image} from '../';
 import { Player } from '../../../lobby/models';
+import { JSONSerializable } from '../../../../shared/serializable';
 
+@JSONSerializable()
 export class GameImageAddedEvent implements GameEvent {
 
 	constructor(public readonly id: number, public readonly gameId: string, public readonly image: Image) { }

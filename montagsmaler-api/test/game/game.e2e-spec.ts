@@ -16,11 +16,17 @@ import { signedTokenFromMock, mockUserData, mockUser2Data } from '../../src/api/
 import { RedisClient } from '../../src/shared/redis';
 import { Lobby, LobbyPlayerJoinedEvent } from '../../src/game/lobby/models';
 import { LobbyConsumedEvent } from '../../src/game/lobby/models/events/lobby.consumed.event';
+import { GameGateway } from '../../src/api/ws/game/game.gateway';
+import { WsGameModule } from '../../src/api/ws/game/ws.game.module';
+import { Game, GameStartedEvent, NewGameRoundEvent, GameRoundOverEvent, GameOverEvent, GameImageAddedEvent } from '../../src/game/game-round/models';
+import { WsGameEvents } from '../../src/api/ws/game/ws.game.events';
+import { GameJoinRequestDto, GameImagePublishRequestDto } from '../../src/api/ws/game/models';
 const spyOn = jest.spyOn;
 
-describe('LobbyGateway e2e', () => {
+describe('Game e2e', () => {
 	let app: INestApplication;
 	let lobbyGateway: LobbyGateway;
+	let gameGateway: GameGateway;
 	let authService: AuthService;
 	let userSocket: SocketIOClient.Socket;
 	let user2Socket: SocketIOClient.Socket;
@@ -31,11 +37,13 @@ describe('LobbyGateway e2e', () => {
 	const redisPubMock = redisSubMock.createConnectedClient();
 	let lobbyId: string;
 	let currentLobby: Lobby;
-	const SECOND_IN_MILLISECONDS = 10;
+	let gameId: string;
+	const SECOND_IN_MILLISECONDS = 50;
+	const testedEvents = [WsGameEvents.GAME_STARTED, WsGameEvents.ROUND_STARTED, WsGameEvents.IMAGE_ADDED, WsGameEvents.ROUND_OVER, WsGameEvents.GAME_OVER];
 
 	beforeAll(async () => {
 		const moduleFixture = await Test.createTestingModule({
-			imports: [ConfigModule.forRoot(configModuleOptionsFactory()), WsLobbyModule],
+			imports: [ConfigModule.forRoot(configModuleOptionsFactory()), WsLobbyModule, WsGameModule],
 		})
 			.overrideProvider('aws_cognito_issuer_url').useValue(mockUserData.issuer)
 			.overrideProvider(RedisClient.KEY_VALUE).useValue(redisKeyValueMock)
@@ -50,6 +58,7 @@ describe('LobbyGateway e2e', () => {
 		spyOn(authService as any, 'fetchPublicKeys').mockImplementation(async (): Promise<PublicKeys> => ({ keys: [PUBLIC_KEY] }));
 
 		lobbyGateway = app.get<LobbyGateway>(LobbyGateway);
+		gameGateway = app.get<GameGateway>(GameGateway);
 
 		await app.init();
 	});
@@ -57,6 +66,7 @@ describe('LobbyGateway e2e', () => {
 	it('should be defined', () => {
 		expect(app).toBeDefined();
 		expect(lobbyGateway).toBeDefined();
+		expect(gameGateway).toBeDefined();
 	});
 
 	it('should init two client connections to lobby namespace', (done) => {
@@ -109,12 +119,14 @@ describe('LobbyGateway e2e', () => {
 
 	it('should consume lobby and push notification', (done) => {
 		let finished = false;
+		const roundDuration = 30;
+		const rounds = 2;
 		user2Socket.on(WsLobbyEvents.CONSUMED, (event: LobbyConsumedEvent) => {
 			expect(event).toBeDefined();
 			expect(event.player.id).toEqual(mockUserData.id);
 			expect(event.game.id).toBeDefined();
 			expect(event.game.players).toEqual(currentLobby['members']);
-			expect(event.game.rounds * event.game.durationRound).toEqual(60 * SECOND_IN_MILLISECONDS);
+			expect(event.game.rounds * event.game.durationRound).toEqual(roundDuration * rounds * SECOND_IN_MILLISECONDS);
 			if (finished) {
 				done();
 			}
@@ -124,14 +136,125 @@ describe('LobbyGateway e2e', () => {
 			expect(event).toBeDefined();
 			expect(event.player.id).toEqual(mockUserData.id);
 			expect(event.game.id).toBeDefined();
+			gameId = event.game.id;
 			expect(event.game.players).toEqual(currentLobby['members']);
-			expect(event.game.rounds * event.game.durationRound).toEqual(60 * SECOND_IN_MILLISECONDS);
+			expect(event.game.rounds * event.game.durationRound).toEqual(roundDuration * rounds * SECOND_IN_MILLISECONDS);
 			if (finished) {
 				done();
 			}
 			finished = true;
 		});
-		userSocket.emit(WsLobbyEvents.GAME_INIT, { lobbyId: lobbyId, roundDuration: 30, rounds: 2 });
+		userSocket.emit(WsLobbyEvents.GAME_INIT, { lobbyId: lobbyId, roundDuration, rounds });
+	});
+
+	it('should init two client connections to game namespace', (done) => {
+		let finished = false;
+		userSocket = getClientWebsocketForAppAndNamespace(app, WsNamespace.GAME, tokenUser);
+		user2Socket = getClientWebsocketForAppAndNamespace(app, WsNamespace.GAME, tokenUser2);
+		userSocket.on(WsHandleConnection.CONNECTED, (payload) => {
+			expect(payload.success).toBeTruthy();
+			if (finished) {
+				done();
+			}
+			finished = true;
+		});
+		user2Socket.on(WsHandleConnection.CONNECTED, (payload) => {
+			expect(payload.success).toBeTruthy();
+			if (finished) {
+				done();
+			}
+			finished = true;
+		});
+	});
+
+	it('should join game', (done) => {
+		let finished = false;
+		userSocket.on(WsGameEvents.GET_GAME, (game: Game) => {
+			expect(game).toBeDefined();
+			expect(game.id).toBeDefined();
+			expect(game.id).toEqual(gameId);
+			if (finished) {
+				done();
+			}
+			finished = true;
+		});
+		user2Socket.on(WsGameEvents.GET_GAME, (game: Game) => {
+			expect(game).toBeDefined();
+			expect(game.id).toBeDefined();
+			expect(game.id).toEqual(gameId);
+			if (finished) {
+				done();
+			};
+			finished = true;
+		});
+		const request: GameJoinRequestDto = { gameId: gameId };
+		userSocket.emit(WsGameEvents.JOIN_GAME, request);
+		user2Socket.emit(WsGameEvents.JOIN_GAME, request);
+	});
+
+	it('should receive game events', (done) => {
+		const finished = {};
+		let currentEventId = 0;
+		userSocket.on(WsGameEvents.GAME_STARTED, (event: GameStartedEvent) => {
+			expect(event).toBeDefined();
+			expect(event.id).toBeDefined();
+			expect(event.id).toBeGreaterThan(currentEventId);
+			currentEventId = event.id;
+			expect(event['game'].id).toEqual(gameId);
+			finished[WsGameEvents.GAME_STARTED] = true;
+		});
+
+		const imageAddedCb = jest.fn((event: GameImageAddedEvent) => {
+			expect(event).toBeDefined();
+			expect(event.id).toBeDefined();
+			expect(event.id).toBeGreaterThan(currentEventId);
+			currentEventId = event.id;
+			expect(event.gameId).toEqual(gameId);
+			expect(event.image.player.id).toEqual(mockUser2Data.id);
+			finished[WsGameEvents.IMAGE_ADDED] = true;
+		});
+		userSocket.on(WsGameEvents.IMAGE_ADDED, imageAddedCb);
+
+		let round = 1;
+		const newGameRoundCb = jest.fn((event: NewGameRoundEvent) => {
+			expect(event).toBeDefined();
+			expect(event.id).toBeDefined();
+			expect(event.id).toBeGreaterThan(currentEventId);
+			currentEventId = event.id;
+			expect(event['game'].id).toEqual(gameId);
+			finished[WsGameEvents.ROUND_STARTED] = true;
+			const request: GameImagePublishRequestDto = { gameId: gameId, forRound: round, imageBase64: 'feeek' };
+			user2Socket.emit(WsGameEvents.PUBLISH_IMAGE, request);
+			++round;
+		});
+		userSocket.on(WsGameEvents.ROUND_STARTED, newGameRoundCb);
+
+		const gameRoundOverCb = jest.fn((event: GameRoundOverEvent) => {
+			expect(event).toBeDefined();
+			expect(event.id).toBeDefined();
+			expect(event.id).toBeGreaterThan(currentEventId);
+			currentEventId = event.id;
+			expect(event['game'].id).toEqual(gameId);
+			finished[WsGameEvents.ROUND_OVER] = true;
+		});
+		userSocket.on(WsGameEvents.ROUND_OVER, gameRoundOverCb);
+
+		userSocket.on(WsGameEvents.GAME_OVER, (event: GameOverEvent) => {
+			expect(event).toBeDefined();
+			expect(event.id).toBeDefined();
+			expect(event.id).toBeGreaterThan(currentEventId);
+			currentEventId = event.id;
+			expect(event['game'].id).toEqual(gameId);
+			finished[WsGameEvents.GAME_OVER] = true;
+
+			for (const testedEvent of testedEvents) {
+				expect(finished[testedEvent]).toBeTruthy();
+			}
+			expect(gameRoundOverCb).toHaveBeenCalledTimes(2);
+			expect(newGameRoundCb).toHaveBeenCalledTimes(2);
+			expect(imageAddedCb).toHaveBeenCalledTimes(2);
+			done();
+		});
 	});
 
 	afterAll(async (done) => {

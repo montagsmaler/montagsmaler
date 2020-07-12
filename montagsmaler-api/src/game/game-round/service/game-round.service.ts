@@ -42,6 +42,7 @@ export class GameRoundService {
 
 	public async joinGame(gameId: string, playerId: string): Promise<[Game, Observable<GameEvent>]> {
 		const game = await this.getGame(gameId);
+		if (!game) throw new Error('Game does not exist.');
 		if (!game.isPlayerMember(playerId)) throw new Error('Player is not member of the game.');
 		return [game, this.onGameEvent(gameId)];
 	}

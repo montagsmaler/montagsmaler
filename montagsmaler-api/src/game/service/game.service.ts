@@ -55,9 +55,9 @@ export class GameService {
 		}
 	}
 
-	public async joinGame(lobbyId: string, joinPlayer: Player): Promise<[Game, Observable<GameEvent>]> {
+	public async joinGame(gameId: string, joinPlayer: Player): Promise<[Game, Observable<GameEvent>]> {
 		try {
-			return await this.gameRoundService.joinGame(lobbyId, joinPlayer.id);
+			return await this.gameRoundService.joinGame(gameId, joinPlayer.id);
 		} catch (err) {
 			throw err;
 		}
