@@ -42,7 +42,6 @@ export class GameService {
 			const lobby = await this.lobbyService.getLobby(lobbyId);
 			if (lobby.getLeader().id !== initPlayer.id) throw new Error('Player is not authorized to start the lobby.');
 			[game, events] = await this.gameRoundService.initGame(lobby, gameConfig.roundDuration, gameConfig.rounds);
-			await this.gameStateService.registerGame(game, events);
 			await this.lobbyService.consumeLobby(lobbyId, initPlayer, game);
 			return [game, events];
 		} catch (err) {
@@ -64,14 +63,17 @@ export class GameService {
 	}
 
 	public async tryPublishImage(gameId: string, player: Player, imageBase64: string, forRound: number): Promise<boolean> {
+		const lock = await this.lockService.lockRessource(gameId);
 		try {
 			const canPublish = await this.gameStateService.canPublishImage(gameId, player.id, forRound);
 			if (canPublish.accepted) {
-				this.imageService.publishAndRateImage(gameId, player, imageBase64, forRound);
+				await this.imageService.publishAndRateImage(gameId, player, imageBase64, forRound);
 			}
 			return canPublish.accepted;
 		} catch (err) {
 			throw err;
+		} finally {
+			await lock.unlock();
 		}
 	}
 

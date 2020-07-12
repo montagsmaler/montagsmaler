@@ -3,7 +3,6 @@ import { Player } from '../../lobby/models';
 
 @JSONSerializable()
 export class Game {
-	private readonly scores: Record<string, number> = {};
 
 	constructor(
 		public readonly id: string,
@@ -20,12 +19,4 @@ export class Game {
 	public isPlayerMember(playerId: string): boolean {
     return this.players.findIndex(player => player.id === playerId) !== -1;
   }
-
-	public decideWinner(): { player: Player, score: number }[] {
-		const retArr = [];
-		for (const key in this.scores) {
-			retArr.push({ player: this.players.find(player => player.id === key), score: this.scores[key] });
-		}
-		return retArr.sort((a, b) => (a.score > b.score) ? 1 : -1);
-	}
 }

@@ -3,6 +3,8 @@ import { Redis } from 'ioredis';
 import { valueToWrappedStringMessage, getValueFromWrappedStringMessage } from '../../redis.helper';
 import { RedisClient } from '../../redisconfig/redis-client.enum';
 
+const SET_SCORE = 'set_score:';
+
 @Injectable()
 export class KeyValueService {
 
@@ -25,7 +27,7 @@ export class KeyValueService {
 	public async addToSet<T>(set: string, value: T): Promise<void> {
 		try {
 			const wrappedMsgAsString = valueToWrappedStringMessage<T>(value);
-			await this.redisKeyValue.zadd(set, process.hrtime().join(''), wrappedMsgAsString);
+			await this.redisKeyValue.zadd(set, await this.increment(SET_SCORE), wrappedMsgAsString);
 		} catch (err) {
 			throw new Error(`Could not add value to set "${set}"`);
 		}

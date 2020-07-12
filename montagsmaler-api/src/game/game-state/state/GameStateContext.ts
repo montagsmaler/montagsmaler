@@ -2,19 +2,21 @@ import { IGameState, IStateAccepted } from './GameState';
 import { JSONSerializable, Class } from '../../../shared/serializable';
 import { GameNotStarted } from './states/GameNotStarted';
 import { Game } from '../../game-round/models';
+import { GameImagePublishRequestDto } from 'src/api/ws/game/models';
 
 @JSONSerializable()
 export class GameStateContext implements IGameState {
 	private _currentRound = 0;
 	private readonly _rounds: number;
 	private currentGameState: IGameState;
-	private readonly playerSubmissions: Record<string, Record<number, boolean | undefined>> = {};
+	private readonly playerSubmissions: Record<string, Record<number, boolean | undefined>>;
 
 	constructor(game: Game) {
 		this._rounds = game.rounds;
-		for (const player of game.players) {
-			this.playerSubmissions[player.id] = {};
-		}
+		this.playerSubmissions = game.players.reduce((submissions, player) => {
+			submissions[player.id] = {};
+			return submissions;
+		}, {} as Record<string, Record<number, boolean | undefined>>);
 		this.setState(GameNotStarted);
 	}
 

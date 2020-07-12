@@ -9,7 +9,7 @@ export class Image {
 		public readonly imageUrl: string,
 		public readonly player: Player,
 		public readonly round: number,
-		public readonly points: number,
+		public readonly score: number,
 	) { }
 
 	public getRound(): number {

@@ -8,7 +8,7 @@ import { Image } from '../../../image/models/image';
 //@CreatedAt()
 @JSONSerializable()
 export class GameOverEvent implements GameEvent {
-  constructor(public readonly id: number, private readonly game: Game, public readonly winner: {player: Player, score: number}[], public readonly images: Image[]) {}
+  constructor(public readonly id: number, private readonly game: Game, public readonly scoreboard: {player: Player, score: number}[], public readonly images: Image[]) {}
 
   public getTrigger(): 'GAME' | Player {
     return 'GAME';
