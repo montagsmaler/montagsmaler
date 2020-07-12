@@ -4,5 +4,7 @@ export * from './pubsub/service/pubsub.service';
 export * from './pubsub/pubsub.module';
 export * from './lock/lock.module';
 export * from './lock/service/lock.service';
+export * from './id/id.module';
+export * from './id/service/id.service';
 export * from './redis.module';
 export * from './redisconfig/redis-client.enum';

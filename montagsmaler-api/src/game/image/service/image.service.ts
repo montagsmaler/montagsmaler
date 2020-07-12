@@ -1,23 +1,22 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { KeyValueService } from '../../../shared/redis';
+import { IdService } from '../../../shared/redis';
 import { GameImageAddedEvent, GameEvents, NewGameRoundEvent } from '../../../game/game-round/models';
 import { Image } from '../models';
 import { GameRoundService } from '../../../game/game-round/service/game-round.service';
 import { Player } from '../../lobby/models';
 
-const IMAGES = 'images:';
-
 @Injectable()
 export class ImageService {
 
 	constructor(
-		private readonly keyValueService: KeyValueService,
+		private readonly idService: IdService,
 		@Inject(forwardRef(() => GameRoundService)) private readonly gameRoundService: GameRoundService,
 	) { }
 
 	public async publishAndRateImage(gameId: string, player: Player, imageBase64: string, forRound: number): Promise<Image> {
 		try {
-			const timeToPublish = await this.getTimeToPublish(gameId, forRound);
+			const [timeToPublish, noun] = await this.getTimeToPublishAndNoun(gameId, forRound);
+			//nomen ->
 			//implement base64 image upload to S3 and Rekognition request here//
 			const fakeRating = 420;
 			const image = new Image('123', new Date().getTime(), '127.0.0.1', player, forRound, this.imageRating(fakeRating, timeToPublish));
@@ -32,16 +31,16 @@ export class ImageService {
 		return Math.floor(rekognitionPoints / timeToPublish);
 	}
 
-	private async getTimeToPublish(gameId: string, round: number): Promise<number> {
+	private async getTimeToPublishAndNoun(gameId: string, round: number): Promise<[number, string]> {
 		const currentTime = new Date().getTime();
 		const roundStartedEvents = await this.gameRoundService.getGameEvents(gameId, GameEvents.ROUND_STARTED) as NewGameRoundEvent[];
 		const event = roundStartedEvents.find(event => event.round === round);
-		return currentTime - event.createdAt;
+		return [currentTime - event.createdAt, event.noun];
 	}
 
 	private async addImage(gameId: string, image: Image): Promise<void> {
 		try {
-			await this.gameRoundService.pubGameEvent(gameId, new GameImageAddedEvent(gameId, image));
+			await this.gameRoundService.pubGameEvent(gameId, new GameImageAddedEvent(await this.idService.getIncrementalID(), gameId, image));
 		} catch (err) {
 			throw new Error('Could not add image to set.');
 		}

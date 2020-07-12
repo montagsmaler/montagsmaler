@@ -48,10 +48,11 @@ describe('LockService', () => {
 		expect(keyValService).toBeDefined();
 	});
 
-	it('should increment ressource', async () => {
+	it('should increment ressource', async (done) => {
 			expect(await keyValService.get(testKey)).toEqual(0);
 			await incrementRessource(testKey, lockService, keyValService);
 			expect(await keyValService.get(testKey)).toEqual(1);
+			done();
 	});
 
 
@@ -67,11 +68,12 @@ describe('LockService', () => {
 		}
 	});
 
-	it('should increment since ressource is unlocked', async () => {
+	it('should increment since ressource is unlocked', async (done) => {
 		const lock = await lockService.lockRessource(testKey, 10000);
 		await lock.unlock();
 		expect(await keyValService.get(testKey)).toEqual(0);
 		await incrementRessource(testKey, lockService, keyValService);
 		expect(await keyValService.get(testKey)).toEqual(1);
+		done();
 	});
 });

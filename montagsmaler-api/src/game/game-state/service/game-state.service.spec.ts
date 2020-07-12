@@ -49,7 +49,7 @@ describe('GameStateService', () => {
 			expect(result.stateAccepted.accepted).toBeTruthy();
 			done();
 		});
-		fakeGameEvents.next(new GameStartedEvent(testGame));
+		fakeGameEvents.next(new GameStartedEvent(0, testGame));
 	});
 
 	it('should throw error state not accepted', (done) => {
@@ -58,7 +58,7 @@ describe('GameStateService', () => {
 			expect(result.stateAccepted.accepted).toBeFalsy();
 			done();
 		});
-		fakeGameEvents.next(new GameStartedEvent(testGame));
+		fakeGameEvents.next(new GameStartedEvent(1, testGame));
 	});
 
 	it('should accept next state', (done) => {
@@ -67,7 +67,7 @@ describe('GameStateService', () => {
 			expect(result.stateAccepted.accepted).toBeTruthy();
 			done();
 		});
-		fakeGameEvents.next(new NewGameRoundEvent(testGame, 1, new Date().getTime()));
+		fakeGameEvents.next(new NewGameRoundEvent(2, testGame, 'bird', 1, new Date().getTime()));
 	});
 
 	it('should accept image publish', async () => {
@@ -97,7 +97,7 @@ describe('GameStateService', () => {
 			done();
 		});
 		const newImage = new Image('imageid', new Date().getTime(), '213131.de', testPlayer, 1, 20);
-		fakeGameEvents.next(new GameRoundOverEvent(testGame, 1, [newImage]));
+		fakeGameEvents.next(new GameRoundOverEvent(3, testGame, 1, [newImage]));
 	});
 
 	it('should accept next state', (done) => {
@@ -106,7 +106,7 @@ describe('GameStateService', () => {
 			expect(result.stateAccepted.accepted).toBeTruthy();
 			done();
 		});
-		fakeGameEvents.next(new NewGameRoundEvent(testGame, 2, new Date().getTime()));
+		fakeGameEvents.next(new NewGameRoundEvent(4, testGame, 'bird', 2, new Date().getTime()));
 	});
 
 	it('should accept image publish now', async () => {

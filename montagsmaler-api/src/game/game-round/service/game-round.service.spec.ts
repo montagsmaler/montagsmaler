@@ -7,6 +7,7 @@ import { Lobby } from '../../lobby/models';
 import { GameOverEvent, GameStartedEvent, NewGameRoundEvent, GameImagesShouldPublishEvent, GameRoundOverEvent } from '../models';
 import { forwardRef } from '@nestjs/common';
 import { ImageModule } from '../../../game/image';
+import { RekognitionNounModule } from '../../rekognition-noun';
 
 describe('GameRoundService', () => {
 	let service: GameRoundService;
@@ -17,7 +18,7 @@ describe('GameRoundService', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
-			imports: [RedisModule, forwardRef(() => ImageModule)],
+			imports: [RedisModule, RekognitionNounModule, forwardRef(() => ImageModule)],
 			providers: [...timeProvider, GameRoundService],
 		})
 			.overrideProvider(RedisClient.KEY_VALUE).useValue(redisKeyValueMock)

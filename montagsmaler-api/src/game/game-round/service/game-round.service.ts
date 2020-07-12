@@ -1,12 +1,12 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 import { sleepRange, HOUR_IN_SECONDS, sleep } from '../../../shared/helper';
 import { Observable } from 'rxjs';
-import { PubSubService, KeyValueService, LockService } from '../../../shared/redis';
+import { PubSubService, KeyValueService, LockService, IdService } from '../../../shared/redis';
 import { Lobby } from '../../lobby/models';
 import { Game, GameStartedEvent, NewGameRoundEvent, GameImagesShouldPublishEvent, GameRoundOverEvent, GameOverEvent, GameEvent, GameEvents } from '../models';
 import { ImageService } from '../../image/service/image.service';
 import { takeWhile } from 'rxjs/internal/operators';
+import { RekognitionNounService } from '../../rekognition-noun';
 
 const ACTIVE_GAMES = 'ACTIVE_GAMES';
 const GAME = 'game:';
@@ -20,13 +20,15 @@ export class GameRoundService {
 	constructor(
 		private readonly pubSubService: PubSubService,
 		private readonly keyValueService: KeyValueService,
+		private readonly idService: IdService,
+		private readonly nounService: RekognitionNounService,
 		@Inject(forwardRef(() => ImageService)) private readonly imageService: ImageService,
 		private readonly lockService: LockService,
 		@Inject('SECOND_IN_MILLISECONDS') private readonly SECOND_IN_MILLISECONDS: number,
 	) { }
 
 	public async initGame(lobby: Lobby, duration: number, rounds: number): Promise<[Game, Observable<GameEvent>]> {
-		const id = uuidv4();
+		const id = this.idService.getUUID();
 		try {
 			const game = new Game(id, new Date().getTime(), lobby.getPlayers(), duration * this.SECOND_IN_MILLISECONDS, rounds);
 			await this.setGame(id, game);
@@ -47,21 +49,21 @@ export class GameRoundService {
 	private async startGameLoop(game: Game): Promise<void> {
 		try {
 			await sleep(this.WAIT_TIME_TO_GAME_START);
-			await this.pubGameEvent(game.id, new GameStartedEvent(game));
+			await this.pubGameEvent(game.id, new GameStartedEvent(await this.idService.getIncrementalID(), game));
 			await sleep(this.WAIT_TIME_BETWEEN_ROUND);
-			await this.pubGameEvent(game.id, new NewGameRoundEvent(game, 1, new Date().getTime()));
+			await this.pubGameEvent(game.id, new NewGameRoundEvent(await this.idService.getIncrementalID(), game, this.nounService.next(), 1, new Date().getTime()));
 			const roundDuration = (game.durationRound < this.WAIT_UNTIL_IMAGE_IS_PUBLISHED) ? game.durationRound : game.durationRound - this.WAIT_UNTIL_IMAGE_IS_PUBLISHED;
 			for await (const roundIndex of sleepRange(1, game.rounds, roundDuration)) {
-				await this.pubGameEvent(game.id, new GameImagesShouldPublishEvent(game));
+				await this.pubGameEvent(game.id, new GameImagesShouldPublishEvent(await this.idService.getIncrementalID(), game));
 				await sleep(this.WAIT_UNTIL_IMAGE_IS_PUBLISHED);
-				await this.pubGameEvent(game.id, new GameRoundOverEvent(game, roundIndex, await this.imageService.getImages(game.id, roundIndex)));
+				await this.pubGameEvent(game.id, new GameRoundOverEvent(await this.idService.getIncrementalID(), game, roundIndex, await this.imageService.getImages(game.id, roundIndex)));
 				await sleep(this.WAIT_TIME_BETWEEN_ROUND);
 				const newRoundIndex = roundIndex + 1;
 				if (newRoundIndex <= game.rounds) {
-					await this.pubGameEvent(game.id, new NewGameRoundEvent(game, newRoundIndex, new Date().getTime()));
+					await this.pubGameEvent(game.id, new NewGameRoundEvent(await this.idService.getIncrementalID(), game, this.nounService.next(), newRoundIndex, new Date().getTime()));
 				}
 			}
-			await this.pubGameEvent(game.id, new GameOverEvent(game, game.decideWinner(), await this.imageService.getImages(game.id)));
+			await this.pubGameEvent(game.id, new GameOverEvent(await this.idService.getIncrementalID(), game, game.decideWinner(), await this.imageService.getImages(game.id)));
 		} catch (err) {
 			throw new Error('Error in the gameloop.');
 		}

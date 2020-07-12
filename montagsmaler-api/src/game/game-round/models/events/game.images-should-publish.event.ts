@@ -6,7 +6,7 @@ import { GameEvents } from '..';
 
 @JSONSerializable()
 export class GameImagesShouldPublishEvent implements GameEvent {
-  constructor(private readonly game: Game) {}
+  constructor(public readonly id: number, private readonly game: Game) {}
 
   public getTrigger(): 'GAME' | Player {
     return 'GAME';

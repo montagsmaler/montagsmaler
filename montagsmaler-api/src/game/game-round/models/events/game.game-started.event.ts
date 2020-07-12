@@ -8,7 +8,7 @@ import { GameEvents } from '../game.events';
 //@CreatedAt()
 @JSONSerializable()
 export class GameStartedEvent implements GameEvent {
-  constructor(private readonly game: Game) {}
+  constructor(public readonly id: number, private readonly game: Game) {}
 
   public getTrigger(): 'GAME' | Player {
     return 'GAME';

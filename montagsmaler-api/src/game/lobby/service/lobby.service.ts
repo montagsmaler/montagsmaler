@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PubSubService, KeyValueService, LockService } from '../../../shared/redis';
+import { PubSubService, KeyValueService, LockService, IdService } from '../../../shared/redis';
 import { Observable } from 'rxjs';
-import { v4 as uuidv4 } from 'uuid';
 import { HOUR_IN_SECONDS } from '../../../shared/helper';
 import { Player, Lobby, LobbyEvent, LobbyPlayerJoinedEvent, LobbyPlayerLeftEvent } from '../models';
 import { LobbyConsumedEvent } from '../models/events/lobby.consumed.event';
@@ -18,12 +17,13 @@ export class LobbyService {
 	constructor(
 		private readonly pubSubService: PubSubService,
 		private readonly keyValueService: KeyValueService,
+		private readonly idService: IdService,
 		private readonly lockService: LockService,
 	) { }
 
 	public async initLobby(initPlayer: Player): Promise<[Lobby, Observable<LobbyEvent>]> {
 		try {
-			const id = uuidv4();
+			const id = this.idService.getUUID();
 			const lobby = new Lobby(id, new Date().getTime(), [initPlayer]);
 			await this.setLobby(id, lobby);
 			return [lobby, this.onLobbyEvent(id)];
@@ -38,7 +38,7 @@ export class LobbyService {
 			const lobby = await this.getLobby(id);
 			lobby.addPlayer(player);
 			try {
-				await Promise.all([this.setLobby(id, lobby), this.pubLobbyEvent(id, new LobbyPlayerJoinedEvent(player))]);
+				await Promise.all([this.setLobby(id, lobby), this.pubLobbyEvent(id, new LobbyPlayerJoinedEvent(await this.idService.getIncrementalID(), player))]);
 				return [lobby, this.onLobbyEvent(id)];
 			} catch (err) {
 				throw new Error('Failed to join Lobby.');
@@ -60,7 +60,7 @@ export class LobbyService {
 			const lobby = await this.getLobby(id);
 			lobby.removePlayer(leavingPlayer);
 			try {
-				await Promise.all([this.setLobby(id, lobby), this.pubLobbyEvent(id, new LobbyPlayerLeftEvent(leavingPlayer))]);
+				await Promise.all([this.setLobby(id, lobby), this.pubLobbyEvent(id, new LobbyPlayerLeftEvent(await this.idService.getIncrementalID(), leavingPlayer))]);
 			} catch (err) {
 				throw new Error('Hotel California.');
 			}
@@ -97,7 +97,7 @@ export class LobbyService {
 
 	public async consumeLobby(id: string, player: Player, game: Game): Promise<void> {
 		try {
-			await this.pubLobbyEvent(id, new LobbyConsumedEvent(player, game))
+			await this.pubLobbyEvent(id, new LobbyConsumedEvent(await this.idService.getIncrementalID(), player, game))
 			await Promise.all([this.keyValueService.delete(LOBBY + id), this.pubSubService.deleteChannelHistory(id)]);
 		} catch (err) {
 			throw new Error('Could not delete Lobby.');

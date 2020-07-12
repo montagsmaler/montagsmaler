@@ -7,7 +7,7 @@ import { Player } from '../../../lobby/models';
 @JSONSerializable()
 export class GameRoundOverEvent implements GameEvent {
 
-	constructor(public readonly game: Game, public readonly round: number, public readonly imageSubmissions: Image[]) {}
+	constructor(public readonly id: number, public readonly game: Game, public readonly round: number, public readonly imageSubmissions: Image[]) {}
 
   public getTrigger(): 'GAME' | Player {
     return 'GAME';
