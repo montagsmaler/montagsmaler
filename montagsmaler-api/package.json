@@ -30,6 +30,7 @@
     "@nestjs/websockets": "^7.2.0",
     "amazon-cognito-identity-js": "^4.3.2",
     "aws-sdk": "^2.703.0",
+    "aws-sdk-mock": "^5.1.0",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.12.2",
     "cross-fetch": "^3.0.5",
