@@ -11,3 +11,31 @@
 div {
   font-family: IBMplexMono;
 }
+
+button {
+  font-family: IBMplexMono;
+}
+
+.btn_green {
+  border-radius: 25px;
+  padding: 5%;
+  width: 250px;
+  color: white;
+  background-color: #4CAF50;
+  border: none;
+  box-shadow: 0 4px #999;
+}
+
+input {
+  font-family: IBMplexMono;
+  text-align: center;
+  box-sizing: border-box;
+  border-radius: 25px;
+  border: 2px solid #dedfdc;
+  padding: 5%;
+  width: 250px;
+}
+
+body {
+  margin: 0;
+}

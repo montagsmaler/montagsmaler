@@ -1,25 +1,25 @@
-<h2>Login</h2>
+<div class="content">
 
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm.value)">
+  <h2>Login</h2>
 
-  <div>
-    <label for="email">
-      Emailaddresse
-    </label>
-    <input id="email" type="text" formControlName="email">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm.value)">
+
+    <div class="form_item">
+      <input id="email" type="text" formControlName="email" placeholder="Emailaddresse">
+    </div>
+
+    <div class="form_item">
+      <input id="password" type="text" formControlName="password" placeholder="Passwort">
+    </div>
+
+    <button class="form_item btn_green" type="submit">Einloggen</button>
+
+  </form>
+
+  <div id="switch">
+    <a id="btn_switch" (click)="switch()">
+      Zum Registrieren
+    </a>
   </div>
 
-  <div>
-    <label for="password">
-      Passwort
-    </label>
-    <input id="password" type="text" formControlName="password">
-  </div>
 
-  <button class="button" type="submit">Einloggen</button>
-
-</form>
-
-<button (click)="switch()">
-  Zum Registrierung
-</button>
