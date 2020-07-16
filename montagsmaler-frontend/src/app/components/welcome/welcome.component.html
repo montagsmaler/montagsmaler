@@ -1,0 +1,10 @@
+<h1>Montagsmaler</h1>
+
+<ng-container *ngIf="getLoginState(); else register">
+  <app-login (stateChanges)="setLoginState($event)"></app-login>
+</ng-container>
+
+<ng-template #register>
+  <app-register (stateChanges)="setLoginState($event)"></app-register>
+</ng-template>
+
