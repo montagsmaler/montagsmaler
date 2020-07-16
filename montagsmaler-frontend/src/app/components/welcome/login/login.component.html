@@ -1,25 +1,25 @@
-<p>login works!</p>
+<h2>Login</h2>
 
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm.value)">
 
   <div>
     <label for="email">
-      Email
+      Emailaddresse
     </label>
     <input id="email" type="text" formControlName="email">
   </div>
 
   <div>
     <label for="password">
-      Password
+      Passwort
     </label>
     <input id="password" type="text" formControlName="password">
   </div>
 
-  <button class="button" type="submit">Login</button>
+  <button class="button" type="submit">Einloggen</button>
 
 </form>
 
 <button (click)="switch()">
-  Zur Registrierung
+  Zum Registrieren
 </button>
