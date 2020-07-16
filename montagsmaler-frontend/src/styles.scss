@@ -1,1 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
+@font-face {
+  font-family: CoveredByYourGrace;
+  src: url("../src/assets/fonts/Covered_By_Your_Grace/CoveredByYourGrace-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: IBMPlexMono;
+  src: url("../src/assets/fonts/IBM_Plex_Mono/IBMPlexMono-Regular.ttf") format("truetype");
+}
+
+div {
+  font-family: IBMplexMono;
+}
