@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { LayoutComponent } from './layout/layout.component';
 import { RouterModule } from '@angular/router';
 import { WelcomeModule } from './welcome/welcome.module';
+import { GameLobbyModule } from './game-lobby/game-lobby.module';
 
 @NgModule({
   declarations: [
@@ -11,7 +12,8 @@ import { WelcomeModule } from './welcome/welcome.module';
   imports: [
     CommonModule,
     RouterModule,
-    WelcomeModule
+    WelcomeModule,
+    GameLobbyModule
   ]
 })
 export class CompontentsModule { }
