@@ -4,14 +4,6 @@
   an und tritt gegen deine Freunde an!
 </p>
 
-<!-- <mat-grid-list cols="4" rowHeight="240px">
-  <mat-grid-tile *ngFor="let game of games">
-    <app-lobby-item  [game]="game"></app-lobby-item>
-  </mat-grid-tile>
-  <mat-grid-tile>
-    <app-create-lobby></app-create-lobby>
-  </mat-grid-tile>
-</mat-grid-list> -->
 <div class="container">
     <app-lobby-item *ngFor="let game of games" [game]="game"></app-lobby-item>
     <app-create-lobby></app-create-lobby>
