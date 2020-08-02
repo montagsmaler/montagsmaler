@@ -1,4 +1,15 @@
+<h1>Montagsmaler</h1>
 <p>
-  Schaffst du es besser zu malen, als deine Mitspieler? Nimm die Herausforderung
+  Schaffst du es besser zu malen, als deine Mitspieler? <br>Nimm die Herausforderung
   an und tritt gegen deine Freunde an!
 </p>
+
+<!-- <div class="columns">
+<app-lobby-item *ngFor="let game of games" [game]="game"></app-lobby-item>
+</div> -->
+
+<mat-grid-list cols="4">
+  <mat-grid-tile *ngFor="let game of games">
+    <app-lobby-item  [game]="game"></app-lobby-item>
+</mat-grid-tile>
+</mat-grid-list>

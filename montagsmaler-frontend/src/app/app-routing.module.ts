@@ -18,12 +18,9 @@ const routes: Routes = [
         path: 'welcome',
         component: WelcomeComponent,
       },
-      { path: 'lobby',
-        component: GameLobbyComponent
-      }
-
+      { path: 'home', component: GameLobbyComponent },
     ],
-  },
+  }
 ];
 
 @NgModule({
