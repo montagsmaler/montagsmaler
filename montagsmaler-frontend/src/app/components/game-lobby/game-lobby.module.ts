@@ -4,11 +4,12 @@ import { RouterModule } from '@angular/router';
 import { GameLobbyComponent } from './game-lobby.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LobbyItemComponent } from './lobby-item/lobby-item.component';
-import { MatGridListModule } from "@angular/material/grid-list";
+import { MatGridListModule } from '@angular/material/grid-list';
+import { CreateLobbyComponent } from './create-lobby/create-lobby.component';
 
 
 @NgModule({
-  declarations: [GameLobbyComponent, LobbyItemComponent],
+  declarations: [GameLobbyComponent, LobbyItemComponent, CreateLobbyComponent],
   imports: [
     CommonModule,
     RouterModule,

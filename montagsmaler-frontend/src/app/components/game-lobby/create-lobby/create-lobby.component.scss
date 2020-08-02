@@ -1,9 +1,8 @@
 .background {
-  background-color: white;
   height: 200px;
   width: 170px;
+  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='30' ry='30' stroke='%23333' stroke-width='2' stroke-dasharray='17%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
   border-radius: 30px;
-  box-shadow: 5px 5px #B4B4B4;
   display: flex;
   align-items: center;
   justify-content: start;
@@ -13,20 +12,10 @@
 
 .title {
   text-align: center;
-  width: 170px;
-  margin-top: 20px;
-  margin-bottom: 15px;
-  white-space: nowrap;
-}
-
-.subtitle {
+  line-height: 25px;
   text-align: center;
   width: 170px;
-  font-size: 13px;
-  font-style: italic;
-  font-weight: 100;
-  margin-top: 0px;
-  white-space: nowrap;
+  margin-top: 20px;
 }
 
 .icon-background {

@@ -13,3 +13,11 @@ p {
   -moz-column-gap: 6rem;
   column-gap: 6rem;
 }
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
