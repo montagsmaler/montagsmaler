@@ -8,7 +8,7 @@
 <app-lobby-item *ngFor="let game of games" [game]="game"></app-lobby-item>
 </div> -->
 
-<mat-grid-list cols="4">
+<mat-grid-list cols="4" rowHeight="240px">
   <mat-grid-tile *ngFor="let game of games">
     <app-lobby-item  [game]="game"></app-lobby-item>
 </mat-grid-tile>
