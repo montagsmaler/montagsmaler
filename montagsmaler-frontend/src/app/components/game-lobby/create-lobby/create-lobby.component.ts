@@ -1,22 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: "app-create-lobby",
-  templateUrl: "./create-lobby.component.html",
-  styleUrls: ["./create-lobby.component.scss"],
+  selector: 'app-create-lobby',
+  templateUrl: './create-lobby.component.html',
+  styleUrls: ['./create-lobby.component.scss'],
 })
 export class CreateLobbyComponent implements OnInit {
   create: boolean = false;
-  constructor() {
-  }
+  name: string = '';
+  constructor() {}
 
   ngOnInit() {}
 
-  public addNew(event) {
+  addNew(event) {
     this.create = true;
   }
 
-  public cancel(event) {
+  cancel(event) {
     this.create = false;
+  }
+
+  onKey(value: string) {
+    this.name = value;
   }
 }
