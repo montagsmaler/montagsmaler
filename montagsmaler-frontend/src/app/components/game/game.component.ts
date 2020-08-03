@@ -20,7 +20,8 @@ import {
   ],
 })
 export class GameComponent implements OnInit {
-  boolCountdown: boolean = false;
+  boolCountdown: boolean = true;
+  boolGameStarted: boolean = false;
   counter: number = 3;
   interval;
 
@@ -43,5 +44,10 @@ export class GameComponent implements OnInit {
         clearInterval(this.interval);
       }
     }, 1000);
+  }
+
+  startGame() {
+    this.boolGameStarted = true;
+    this.startCountdown()
   }
 }

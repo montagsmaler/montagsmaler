@@ -4,10 +4,11 @@ import { RouterModule } from '@angular/router';
 import { GameComponent } from './game.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CountdownComponent } from './countdown/countdown.component';
+import { WaitForPlayersComponent } from './wait-for-players/wait-for-players.component';
 
 
 @NgModule({
-  declarations: [GameComponent, CountdownComponent],
+  declarations: [GameComponent, CountdownComponent, WaitForPlayersComponent],
   imports: [
     CommonModule,
     RouterModule,
