@@ -5,9 +5,25 @@
   border-radius: 30px;
   display: flex;
   align-items: center;
-  justify-content: start;
   flex-direction: column;
   margin: 15px;
+  z-index: 10;
+  position: relative;
+
+}
+
+.background-focus {
+  background-color: white;
+  background-image: none;
+  height: 200px;
+  width: 170px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin: 15px;
+  z-index: 10;
+  position: relative;
 }
 
 .title {
@@ -16,6 +32,8 @@
   text-align: center;
   width: 170px;
   margin-top: 20px;
+  z-index: 10;
+
 }
 
 .icon-background {
@@ -26,8 +44,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
+
 }
 
 .background:hover {
   cursor: pointer;
+}
+
+
+.focus {
+  width: 100vw;
+  height: 100vh;
+  z-index: 5;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+input {
+  margin-top: 15px;
+ border-style: none;
+ width: 160px;
+ font-size: 16px;
 }

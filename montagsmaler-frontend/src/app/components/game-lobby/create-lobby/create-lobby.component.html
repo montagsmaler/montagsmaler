@@ -1,7 +1,11 @@
-<div class="background">
+<div class="focus" *ngIf="create"></div>
+
+<div class="{{create? 'background-focus' : 'background'}}" (click)="addNew($event)">
   <div class="icon-background" [ngStyle]="{'backgroundColor' : '#00D5B9'}">
     <img class="img-responsive" src="assets/images/plus.svg">
   </div>
 
-  <p class="title">Spiellobby erstellen</p>
+  <p *ngIf="!create" class="title">Spiellobby erstellen</p>
+  <input *ngIf="create" placeholder="Name eingeben">
 </div>
+
