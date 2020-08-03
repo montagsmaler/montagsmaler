@@ -15,4 +15,8 @@ export class CreateLobbyComponent implements OnInit {
   public addNew(event) {
     this.create = true;
   }
+
+  public cancel(event) {
+    this.create = false;
+  }
 }

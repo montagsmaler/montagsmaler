@@ -52,6 +52,10 @@
   cursor: pointer;
 }
 
+.focus:hover {
+  cursor: pointer;
+}
+
 
 .focus {
   width: 100vw;
@@ -64,8 +68,9 @@
 }
 
 input {
-  margin-top: 15px;
- border-style: none;
- width: 160px;
- font-size: 16px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  border-style: none;
+  width: 160px;
+  font-size: 16px;
 }
