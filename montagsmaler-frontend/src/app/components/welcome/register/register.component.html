@@ -1,0 +1,30 @@
+<div class="content">
+
+  <h2>Registrieren</h2>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit(registerForm.value)">
+
+    <div class="form_item">
+      <input id="username" type="text" formControlName="username" placeholder="Nickname">
+    </div>
+
+    <div class="form_item">
+      <input id="email" type="text" formControlName="email" placeholder="Emailaddresse">
+    </div>
+
+
+    <div class="form_item">
+      <input id="password" type="text" formControlName="password" placeholder="Passwort">
+    </div>
+
+    <button class="form_item btn_green" type="submit">Registrieren</button>
+
+  </form>
+
+  <div id="switch">
+  <a id="btn_switch" (click)="switch()">
+    Zum Login
+  </a>
+</div>
+
+</div>

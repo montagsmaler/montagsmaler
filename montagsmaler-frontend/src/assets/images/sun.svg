@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="49px" viewBox="0 0 48 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group 3</title>
+    <defs>
+        <filter id="filter-1">
+            <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 1.000000 0"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
+        <g id="Lobbyauswahl" transform="translate(-600.000000, -452.000000)">
+            <g id="Group-3" transform="translate(537.000000, 409.500000)" filter="url(#filter-1)">
+                <g transform="translate(87.000000, 67.000000) rotate(8.000000) translate(-87.000000, -67.000000) translate(68.500000, 48.500000)">
+                    <path d="M12.8350569,7.99545946 C-0.0387453208,11.5229846 4.98304383,30.1575012 18.6901905,28.743756 C20.0373937,28.6048064 21.1715642,27.6101016 22.2614398,26.8060899 C27.098348,23.237856 29.113892,17.3959849 26.4348888,11.4669636 C24.6109826,7.43039558 17.2174303,5.15554524 13.4984088,7.06792277 L12.8350569,7.99545946 Z" id="Path-3" stroke="#979797" stroke-width="4"></path>
+                    <path d="M20.6895681,7.10129545 C23.3428736,2.92498776 21.6197965,4.85505201 26.1136535,1.5491261" id="Path-4" stroke="#979797" stroke-width="4"></path>
+                    <path d="M26.5969047,11.6580641 C32.518266,12.1079314 32.5442973,12.9416725 36.1551004,9.37995944" id="Path-5" stroke="#979797" stroke-width="4"></path>
+                    <path d="M27.4666452,19.001731 C31.4903188,24.0600104 28.9999158,21.764488 35.2253264,25.5627246" id="Path-6" stroke="#979797" stroke-width="4"></path>
+                    <path d="M24.9504572,24.2569021 C27.9325364,29.4852672 27.005819,26.9437007 28.1641155,31.7092632" id="Path-7" stroke="#979797" stroke-width="4"></path>
+                    <path d="M9.97414224,26.6794975 C6.1127234,26.6794975 3.9491865,29.6446368 1.37741528,32.0972439" id="Path-9" stroke="#979797" stroke-width="4"></path>
+                    <path d="M5.58218612,19.77415 C3.72145741,19.7655116 1.86072871,19.7568732 -8.76336041e-15,19.7482349" id="Path-10" stroke="#979797" stroke-width="4"></path>
+                    <path d="M7.55490284,11.1729485 C5.05095774,9.53426923 2.54701263,7.89559001 0.0430675326,6.25691079" id="Path-11" stroke="#979797" stroke-width="4"></path>
+                    <path d="M13.0442421,7.74096949 C9.03400105,1.40375038 10.0038203,4.17287665 8.8543864,0" id="Path-12" stroke="#979797" stroke-width="4"></path>
+                    <path d="M16.14462,28.81657 C15.9664505,31.5123481 15.788281,34.2081263 15.6101114,36.9039044" id="Path-8" stroke="#979797" stroke-width="4"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

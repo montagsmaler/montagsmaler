@@ -1,0 +1,9 @@
+<div class="background">
+<div class="icon-background" [ngStyle]="{'backgroundColor' : getRandomColor(game)}">
+    <img src="assets/images/{{getRandomImage(game)}}.svg">
+  </div>
+
+  <p class="title">Sonnengruppe</p>
+  <p class="subtitle">noch {{game}} {{game == 1 ? "Platz frei" : "freie Plätze" }}</p>
+</div>
+

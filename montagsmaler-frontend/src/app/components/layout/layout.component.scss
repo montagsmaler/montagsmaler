@@ -1,0 +1,26 @@
+.content {
+  padding: 0 20%;
+  position:fixed;
+  width:60%;
+  height:100%;
+  top:0px;
+  left:0px;
+  background-color: #ECECED;
+}
+
+.footer {
+  position: fixed;
+  bottom: 8%;
+  right: 0;
+  left: 0;
+}
+
+.footerText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0%;
+  font-size: 14px;
+  color: grey;
+}
+

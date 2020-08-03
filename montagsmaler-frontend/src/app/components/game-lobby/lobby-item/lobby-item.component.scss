@@ -1,0 +1,53 @@
+.background {
+  background-color: white;
+  height: 200px;
+  width: 170px;
+  border-radius: 30px;
+  box-shadow: 3px 5px #B4B4B4;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin: 15px;
+}
+
+.background:hover {
+  cursor: pointer;
+}
+
+.background:active {
+  position: relative;
+  top: 5px;
+  left: 3px;
+  box-shadow: none
+}
+
+.title {
+  text-align: center;
+  width: 170px;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  white-space: nowrap;
+}
+
+.subtitle {
+  text-align: center;
+  width: 170px;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 100;
+  margin-top: 0px;
+  white-space: nowrap;
+}
+
+.icon-background {
+  width: 70px;
+  height: 70px;
+  border-radius: 35px;
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
