@@ -7,21 +7,21 @@ import {
   style,
   animate,
   transition,
-} from "@angular/animations";
+} from '@angular/animations';
 
 @Component({
-  selector: "app-game",
-  templateUrl: "./game.component.html",
-  styleUrls: ["./game.component.scss"],
+  selector: 'app-game',
+  templateUrl: './game.component.html',
+  styleUrls: ['./game.component.scss'],
   animations: [
-    trigger("ngIfAnimation", [
-      transition(":enter, :leave", [query("@*", animateChild())]),
+    trigger('ngIfAnimation', [
+      transition(':enter, :leave', [query('@*', animateChild())]),
     ]),
   ],
 })
 export class GameComponent implements OnInit {
-  boolCountdown: boolean = true;
-  boolGameStarted: boolean = false;
+  boolCountdown: boolean = false;
+  boolGameStarted: boolean = true;
   counter: number = 3;
   interval;
 
@@ -48,6 +48,6 @@ export class GameComponent implements OnInit {
 
   startGame() {
     this.boolGameStarted = true;
-    this.startCountdown()
+    this.startCountdown();
   }
 }

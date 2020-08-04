@@ -1,5 +1,13 @@
-<p>game works!</p>
+<h1>Male ein Pferd</h1>
 <p (click)="showCountdown($event)">Start</p>
+
+<app-draw-canvas></app-draw-canvas>
+
+
+
+
+
+
 <app-countdown *ngIf="boolCountdown" @ngIfAnimation>
     <h1 class="h1-counter">Mach dich Bereit!</h1>
     <h1 class="counter h1-counter">{{counter}}</h1>
@@ -8,3 +16,5 @@
 <app-wait-for-players *ngIf="!boolGameStarted">
   <p (click)="startGame($event)">close</p>
 </app-wait-for-players>
+
+
