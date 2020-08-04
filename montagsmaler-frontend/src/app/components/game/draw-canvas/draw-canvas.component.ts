@@ -14,8 +14,8 @@ import { switchMap, takeUntil, pairwise } from 'rxjs/operators';
   styleUrls: ["./draw-canvas.component.scss"],
 })
 export class DrawCanvasComponent implements AfterViewInit {
-  @Input() public width = 400;
-  @Input() public height = 400;
+  @Input() public width = 650;
+  @Input() public height = 500;
 
   @ViewChild("drawCanvas", { static: false }) public canvas: ElementRef;
 
