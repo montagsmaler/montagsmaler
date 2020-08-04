@@ -1,11 +1,9 @@
 .popup {
-  height: 80vh;
-  width: 60vw;
   background-color: #F6F6F6;
-  position: absolute;
   top: 10vh;
   left: 20vw;
   z-index: 30;
+  padding: 30px 30px 90px 30px;
 
   border-radius: 50px;
   -webkit-box-shadow: 2px 10px 79px -31px rgba(0,0,0,0.64);
