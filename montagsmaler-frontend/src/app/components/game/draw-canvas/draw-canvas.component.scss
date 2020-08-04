@@ -2,7 +2,12 @@ canvas {
   background-image: url('../../../../assets/images/canvas.svg');
   background-repeat: no-repeat;
   background-size: 650px 500px;
+}
 
-
+.layout {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
 }
 

@@ -1,9 +1,13 @@
 <h1>Male ein Pferd</h1>
-<p (click)="showCountdown($event)">Countdown</p>
-<p (click)="boolGameStarted = false; boolCountdown = true;">Start</p>
+<span (click)="boolGameStarted = false; boolCountdown = true;">Start</span>
 <div class="flex_center_column">
-  <app-draw-canvas></app-draw-canvas>
+  <app-draw-canvas style="position: relative; left: 30px;"></app-draw-canvas>
+  <p>Du hast noch: <span class="time-left">30:00</span> Sekunden Zeit</p>
+  <p (click)="showCountdown($event)" class="btn_green flex_center_column" style="flex-direction: row;">
+    <img src="assets/images/check.svg" width="20px" style="padding-right: 20px;" />
+    Fertig</p>
 </div>
+
 
 
 

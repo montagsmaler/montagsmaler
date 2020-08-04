@@ -1,5 +1,13 @@
-<canvas #drawCanvas></canvas>
-<p (click)="undo()">Undo</p>
-<p (click)="clear()">Clear</p>
-<p (click)="downloadImage()">Create Image</p>
-<a download="mypaint.png" href="{{image}}">Download</a>
+<div class="layout">
+  <canvas #drawCanvas></canvas>
+  <div class="flex_center_column">
+    <div class="btn_round_gray flex_center_column" (click)="undo()">
+      <img src="assets/images/undo.svg" width="25px">
+    </div>
+    <div class="btn_round_gray flex_center_column" (click)="clear()">
+      <img src="assets/images/bin.svg" width="25px">
+    </div>
+  </div>
+</div>
+<p (click)="downloadImage()">Create Image | <a download="mypaint.png" href="{{image}}">Download</a></p>
+

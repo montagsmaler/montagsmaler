@@ -96,6 +96,26 @@ h1 {
   box-shadow: none;
 }
 
+.btn_round_gray {
+  border-radius: 40px;
+  width: 35px;
+  height: 35px;
+  padding: 5px;
+  margin: 10px;
+  color: white;
+  background-color: #626669;
+  border: none;
+  box-shadow: 2px 3px #323639;
+}
+
+.btn_round_gray:active {
+  position: relative;
+  left: 2px;
+  top: 3px;
+  border: none;
+  box-shadow: none;
+}
+
 input {
   font-family: IBMplexMono;
   text-align: center;
