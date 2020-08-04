@@ -26,3 +26,20 @@
   align-items: center;
   flex-direction: column;
 }
+
+h1 {
+  margin-top: 40px;
+}
+
+.comopetitors {
+  display: grid;
+  grid-template-columns: repeat(2, 175px);
+}
+
+.players {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+

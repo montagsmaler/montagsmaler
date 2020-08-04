@@ -2,6 +2,18 @@
 <div class="popup"@enterAnimation >
   <p>wait-for-players works!</p>
   <h1>Alle start klar?</h1>
+  <div class class="players">
+  <app-player-item name="Du" [empty]="false"></app-player-item>
+  <div class="comopetitors">
+    <app-player-item name="Paul" [empty]="false"></app-player-item>
+    <app-player-item name="Gustav" [empty]="false"></app-player-item>
+    <app-player-item name="" [empty]="true"></app-player-item>
+    <app-player-item name="" [empty]="true"></app-player-item>
+  </div>
+  </div>
+
   <ng-content></ng-content>
 </div>
 </div>
+
+

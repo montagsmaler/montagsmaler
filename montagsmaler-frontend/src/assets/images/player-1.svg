@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="35px" height="44px" viewBox="0 0 35 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group 2 Copy 3</title>
+    <defs>
+        <filter id="filter-1">
+            <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 1.000000 0"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Spielstarten" transform="translate(-878.000000, -318.000000)">
+            <g id="Group-2-Copy-3" transform="translate(351.525000, 120.000000)" filter="url(#filter-1)">
+                <g transform="translate(528.640191, 199.239164)">
+                    <g id="Group" stroke="#979797" stroke-linecap="round" stroke-width="2">
+                        <path d="M19.0970014,10.454955 C1.62801299,8.25360873 -5.32583163,28.1346164 6.54565109,36.1901408 C30.2901814,52.3022516 41.0827735,23.1507781 16.9131283,10.2878404" id="Path-14"></path>
+                        <path d="M6.51969597,13.1647607 C5.71873003,10.2380552 4.91776409,7.31134961 4.11679815,4.38464405" id="Path-15"></path>
+                        <path d="M12.1043066,10.2859088 C18.0087142,2.48789169 12.6391829,7.78496924 12.2181449,0.547274096" id="Path-16"></path>
+                        <path d="M19.608158,11.6773005 C19.608158,4.63108589 18.8375368,7.81963728 21.5042479,2.02062932" id="Path-17"></path>
+                        <path d="M7.57975777,30.6143433 C13.46304,37.3776908 19.8561441,39.1485426 22.1328399,29.428604" id="Path-21"></path>
+                        <path d="M13.3568214,26.0922326 C13.3679016,26.7488516 13.3789819,27.4054706 13.3900621,28.0620897" id="Path-22"></path>
+                    </g>
+                    <path d="M24.6362534,15.3797855 C24.7318691,11.4038758 27.2022008,11.386911 28.6137619,7.17204756" id="Path-18" stroke="#979797" stroke-width="2" stroke-linecap="round"></path>
+                    <path d="M7.98294229,18.3410009 C12.8261248,15.9313451 6.39149523,22.4298523 8.40809555,18.0574235" id="Path-19" stroke="#979797" stroke-width="2"></path>
+                    <path d="M16.5302899,18.8344938 C23.0103252,18.556074 13.938243,22.1978745 17.4678837,18.6333071" id="Path-20" stroke="#979797" stroke-width="2"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

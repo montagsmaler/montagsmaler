@@ -1,0 +1,6 @@
+<div class="layout">
+<div class="{{empty ? 'empty-background' : 'profile-picture-background' }}">
+  <img *ngIf="!empty" src="assets/images/player-1.svg" width="45px" />
+</div>
+<p>{{!empty ? name : "leer"}}</p>
+</div>
