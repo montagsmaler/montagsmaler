@@ -9,33 +9,33 @@ import { fromEvent } from 'rxjs';
 import { switchMap, takeUntil, pairwise } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-draw-canvas',
-  templateUrl: './draw-canvas.component.html',
-  styleUrls: ['./draw-canvas.component.scss'],
+  selector: "app-draw-canvas",
+  templateUrl: "./draw-canvas.component.html",
+  styleUrls: ["./draw-canvas.component.scss"],
 })
 export class DrawCanvasComponent implements AfterViewInit {
   @Input() public width = 400;
   @Input() public height = 400;
 
-  @ViewChild('drawCanvas', { static: false }) public canvas: ElementRef;
+  @ViewChild("drawCanvas", { static: false }) public canvas: ElementRef;
 
   private cx: CanvasRenderingContext2D;
   private points = [];
   private lineWidth = 5;
-  private strokeStyle = '#000';
+  private strokeStyle = "#000";
   private lineCounter = 0;
 
-  private undoInterval;
+  image;
 
   public ngAfterViewInit() {
     const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
-    this.cx = canvasEl.getContext('2d');
+    this.cx = canvasEl.getContext("2d");
 
     canvasEl.width = this.width;
     canvasEl.height = this.height;
 
     this.cx.lineWidth = this.lineWidth;
-    this.cx.lineCap = 'round';
+    this.cx.lineCap = "round";
     this.cx.strokeStyle = this.strokeStyle;
 
     this.captureEvents(canvasEl);
@@ -43,18 +43,18 @@ export class DrawCanvasComponent implements AfterViewInit {
 
   private captureEvents(canvasEl: HTMLCanvasElement) {
     // this will capture all mousedown events from the canvas element
-    fromEvent(canvasEl, 'mousedown')
+    fromEvent(canvasEl, "mousedown")
       .pipe(
         switchMap((e) => {
           console.log(this.lineCounter);
           this.lineCounter = this.lineCounter + 1;
           // after a mouse down, we'll record all mouse moves
-          return fromEvent(canvasEl, 'mousemove').pipe(
+          return fromEvent(canvasEl, "mousemove").pipe(
             // we'll stop (and unsubscribe) once the user releases the mouse
             // this will trigger a 'mouseup' event
-            takeUntil(fromEvent(canvasEl, 'mouseup')),
+            takeUntil(fromEvent(canvasEl, "mouseup")),
             // we'll also stop (and unsubscribe) once the mouse leaves the canvas (mouseleave event)
-            takeUntil(fromEvent(canvasEl, 'mouseleave')),
+            takeUntil(fromEvent(canvasEl, "mouseleave")),
             // pairwise lets us get the previous value to draw a line from
             // the previous point to the current point
             pairwise()
@@ -99,7 +99,7 @@ export class DrawCanvasComponent implements AfterViewInit {
         color: this.strokeStyle,
         line: this.lineCounter,
       });
-      this.points[this.points.length - 1].mode = 'end';
+      this.points[this.points.length - 1].mode = "end";
     }
 
     if (prevPos) {
@@ -138,15 +138,13 @@ export class DrawCanvasComponent implements AfterViewInit {
     let lineCount = 0;
 
     for (let i = 0; i < this.points.length; i++) {
-
       console.log(this.points);
-
 
       const pt = this.points[i];
 
       if (lineCount < pt.line && lineCount !== 0) {
-         this.cx.stroke();
-       }
+        this.cx.stroke();
+      }
 
       if (lineCount < pt.line) {
         this.cx.beginPath();
@@ -157,5 +155,10 @@ export class DrawCanvasComponent implements AfterViewInit {
       this.cx.lineTo(pt.x, pt.y);
     }
     this.cx.stroke();
+  }
+
+  downloadImage() {
+    const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
+    this.image = canvasEl.toDataURL();
   }
 }
