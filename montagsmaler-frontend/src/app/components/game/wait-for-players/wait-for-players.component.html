@@ -1,17 +1,28 @@
-<div class="background">
-<div class="popup"@enterAnimation >
+<div class="background flex_center_column">
+<div class="popup flex_center_column" @enterAnimation >
   <h1>Alle start klar?</h1>
+  <br>
   <div class class="players">
-    <app-player-item name="Du" [empty]="false"></app-player-item>
+    <app-player-item name="Du" [empty]="false" playerId="4"></app-player-item>
     <div class="comopetitors">
-      <app-player-item name="Paul" [empty]="false"></app-player-item>
-      <app-player-item name="Gustav" [empty]="false"></app-player-item>
-      <app-player-item name="" [empty]="true"></app-player-item>
-      <app-player-item name="" [empty]="true"></app-player-item>
+      <app-player-item name="Paul" [empty]="false" playerId="3"></app-player-item>
+      <app-player-item name="Gustav" [empty]="false" playerId="2"></app-player-item>
+      <app-player-item name="" [empty]="true" playerId="1"></app-player-item>
+      <app-player-item name="" [empty]="true" playerId="0"></app-player-item>
     </div>
   </div>
-
-  <button class="btn_green" >Spiel starten</button>
+  <br>
+  <p>Teile den Link, um Mitspieler einzuladen</p>
+  <div class="flex_center_column" style="flex-direction: row;">
+    <div class="link_background flex_center_column" style="flex-direction: row;">
+      <a href="https://montagsmaler.invite.link.de">https://montagsmaler.invite.link.de</a>
+    </div>
+    <img class="btn_copy" src="assets/images/copy.svg" />
+  </div>
+  <br>
+  <p class="btn_green">
+    <img src="assets/images/play.svg" width="20px" style="padding-right: 20px;"/>
+    Spiel starten</p>
 
   <ng-content></ng-content>
 </div>
