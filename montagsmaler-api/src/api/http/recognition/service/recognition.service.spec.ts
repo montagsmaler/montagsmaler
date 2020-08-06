@@ -12,9 +12,9 @@ const mockResponse = { Image: { S3Object: { Bucket: 'dev4cloudmontagsmaler', Nam
 describe('RecognitionService', () => {
 	let service: RecognitionService;
 	AWSMock.setSDKInstance(AWS);
-	AWSMock.mock('Rekognition','detectLabels', (params: DetectLabelsRequest, callback: Function) => {
+	AWSMock.mock('Rekognition', 'detectLabels', (params: DetectLabelsRequest, callback: Function) => {
 		callback(null, params);
-	})
+	});
 	
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({

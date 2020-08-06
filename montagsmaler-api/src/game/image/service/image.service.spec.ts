@@ -4,6 +4,9 @@ import { forwardRef } from '@nestjs/common';
 import { GameRoundModule } from '../../game-round/game-round.module';
 import { RedisModule, RedisClient } from '../../../shared/redis';
 import * as RedisMock from 'ioredis-mock';
+import { ConfigModule } from '@nestjs/config';
+import { S3Module } from '../../../api/http/s3';
+import { RecognitionModule } from '../../../api/http/recognition';
 
 describe('ImageService', () => {
 	let service: ImageService;
@@ -15,7 +18,7 @@ describe('ImageService', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
-			imports: [RedisModule, forwardRef(() => GameRoundModule)],
+			imports: [RedisModule, forwardRef(() => GameRoundModule), ConfigModule, S3Module, RecognitionModule],
 			providers: [ImageService],
 		})
 			.overrideProvider(RedisClient.KEY_VALUE).useValue(redisKeyValueMock)

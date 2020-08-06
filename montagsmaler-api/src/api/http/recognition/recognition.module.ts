@@ -7,7 +7,7 @@ import { rekognitionProviders } from './service/rekognition.provider';
 
 @Module({
 	imports: [ConfigModule, ValidationModule],
-	controllers: [RecognitionController],
+	controllers: [],
 	providers: [...rekognitionProviders, RecognitionService],
 	exports: [RecognitionService],
 })

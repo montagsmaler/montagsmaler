@@ -21,6 +21,9 @@ import { WsGameModule } from '../../src/api/ws/game/ws.game.module';
 import { Game, GameStartedEvent, NewGameRoundEvent, GameRoundOverEvent, GameOverEvent, GameImageAddedEvent } from '../../src/game/game-round/models';
 import { WsGameEvents } from '../../src/api/ws/game/ws.game.events';
 import { GameJoinRequestDto, GameImagePublishRequestDto } from '../../src/api/ws/game/models';
+import { ImageService } from '../../src/game/image';
+import { ManagedUpload } from 'aws-sdk/clients/s3';
+import { DetectLabelsResponse } from 'aws-sdk/clients/rekognition';
 const spyOn = jest.spyOn;
 
 describe('Game e2e', () => {
@@ -28,8 +31,18 @@ describe('Game e2e', () => {
 	let lobbyGateway: LobbyGateway;
 	let gameGateway: GameGateway;
 	let authService: AuthService;
+	let imageService: ImageService;
 	let userSocket: SocketIOClient.Socket;
 	let user2Socket: SocketIOClient.Socket;
+	const expectedLabel = 'bird'
+	const testLabels: DetectLabelsResponse = {
+		Labels: [
+			{
+				Name: expectedLabel,
+				Confidence: 98.87621307373,
+			}
+		]
+	};
 	const tokenUser = signedTokenFromMock(mockUserData);
 	const tokenUser2 = signedTokenFromMock(mockUser2Data);
 	const redisKeyValueMock = new RedisMock();
@@ -50,12 +63,16 @@ describe('Game e2e', () => {
 			.overrideProvider(RedisClient.PUB).useValue(redisPubMock)
 			.overrideProvider(RedisClient.SUB).useValue(redisSubMock)
 			.overrideProvider('SECOND_IN_MILLISECONDS').useValue(SECOND_IN_MILLISECONDS)
+			.overrideProvider('rekognitionNouns').useValue([expectedLabel])
 			.compile();
 
 		app = moduleFixture.createNestApplication();
 		authService = app.get<AuthService>(AuthService);
+		imageService = app.get<ImageService>(ImageService);
 
 		spyOn(authService as any, 'fetchPublicKeys').mockImplementation(async (): Promise<PublicKeys> => ({ keys: [PUBLIC_KEY] }));
+		spyOn(imageService['s3Service'], 'upload').mockImplementation(async (): Promise<ManagedUpload.SendData> => ({ Bucket: 'test', Location: '127.0.0.1',  ETag: 'test', Key: '12345678.jpg'}));
+		spyOn(imageService['rekognitionService'], 'recognize').mockImplementation(async (): Promise<DetectLabelsResponse> => (testLabels));
 
 		lobbyGateway = app.get<LobbyGateway>(LobbyGateway);
 		gameGateway = app.get<GameGateway>(GameGateway);
