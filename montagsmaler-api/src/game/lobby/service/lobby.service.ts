@@ -97,7 +97,7 @@ export class LobbyService {
 
 	public async consumeLobby(id: string, player: Player, game: Game): Promise<void> {
 		try {
-			await this.pubLobbyEvent(id, new LobbyConsumedEvent(await this.idService.getIncrementalID(), player, game))
+			await this.pubLobbyEvent(id, new LobbyConsumedEvent(await this.idService.getIncrementalID(), player, game));
 			await Promise.all([this.keyValueService.delete(LOBBY + id), this.pubSubService.deleteChannelHistory(id)]);
 		} catch (err) {
 			throw new Error('Could not delete Lobby.');

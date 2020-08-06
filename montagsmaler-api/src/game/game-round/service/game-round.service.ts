@@ -15,6 +15,7 @@ export class GameRoundService {
 	private readonly WAIT_TIME_TO_GAME_START = this.SECOND_IN_MILLISECONDS * 10;
 	private readonly WAIT_TIME_BETWEEN_ROUND = this.SECOND_IN_MILLISECONDS * 2;
 	private readonly WAIT_UNTIL_IMAGE_IS_PUBLISHED = this.SECOND_IN_MILLISECONDS * 5;
+	private readonly WAIT_TO_DELETE_GAME = this.SECOND_IN_MILLISECONDS * 60;
 
 	constructor(
 		private readonly pubSubService: PubSubService,
@@ -64,6 +65,8 @@ export class GameRoundService {
 			}
 			const [id, scoreboard, images] = await Promise.all([this.idService.getIncrementalID(), this.getScoreboard(game.id), this.imageService.getImages(game.id)]);
 			await this.pubGameEvent(game.id, new GameOverEvent(id, game, scoreboard, images));
+			await sleep(this.WAIT_TO_DELETE_GAME);
+			await this.deleteGame(game.id);
 		} catch (err) {
 			throw new Error('Error in the gameloop.');
 		}
