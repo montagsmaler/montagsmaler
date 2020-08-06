@@ -1,9 +1,9 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { KeyValueService } from './service/keyvalue.service';
-import { RedisModule } from '../redis.module';
+import { RedisconfigModule } from '../redisconfig/redisconfig.module';
 
 @Module({
-	imports: [forwardRef(() => RedisModule)],
+	imports: [RedisconfigModule],
 	providers: [KeyValueService],
 	exports: [KeyValueService],
 })

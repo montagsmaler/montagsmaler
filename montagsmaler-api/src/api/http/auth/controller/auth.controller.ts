@@ -49,7 +49,7 @@ export class AuthController {
 	@Get('cognitoUser')
 	async getCognitoUser(@VerifiedCognitoUser() user: ClaimVerfiedCognitoUser): Promise<ICognitoUser> {
 		try {
-			return {userName: user.userName};
+			return { id: user.id, userName: user.userName };
 		} catch (err) {
 			throw new InternalServerErrorException(err.message);
 		}

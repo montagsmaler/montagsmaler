@@ -115,7 +115,7 @@ export class AuthService implements OnModuleInit {
 					if (claim.token_use !== 'access') {
 						reject(new Error('Claim use is not access.'));
 					}
-					resolve({ userName: claim.username, clientId: claim.client_id });
+					resolve({ id: claim.sub, userName: claim.username, clientId: claim.client_id });
 				});
 			});
 		} catch (err) {

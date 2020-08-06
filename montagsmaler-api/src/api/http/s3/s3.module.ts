@@ -7,7 +7,7 @@ import { S3Provider } from './service/s3.provider';
 
 @Module({
 	imports: [ConfigModule, ValidationModule],
-	controllers: [S3Controller],
+	controllers: [],
 	providers: [...S3Provider,S3Service],
 	exports: [S3Service],
 })

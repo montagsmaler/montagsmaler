@@ -5,21 +5,24 @@ import { RedisOnResult } from './pubsub.models';
 import { filter, map } from 'rxjs/internal/operators';
 import { KeyValueService } from '../../keyvalue/service/keyvalue.service';
 import { getValueFromWrappedStringMessage, valueToWrappedStringMessage } from '../../redis.helper';
+import { RedisClient } from '../../redisconfig/redis-client.enum';
+
+const CHANNEL_HISTORY = 'channel_history:';
+const MESSAGE = 'message';
 
 @Injectable()
 export class PubSubService implements OnModuleInit {
 
-	private readonly redisSubSubject = new Subject<RedisOnResult>();  
-	private readonly SET = 'SET_';
+	private readonly redisSubSubject = new Subject<RedisOnResult>();
 
 	constructor(
-		@Inject('redis_sub') private readonly redisSub: Redis,
-		@Inject('redis_pub') private readonly redisPub: Redis,
+		@Inject(RedisClient.SUB) private readonly redisSub: Redis,
+		@Inject(RedisClient.PUB) private readonly redisPub: Redis,
 		private readonly keyValueService: KeyValueService,
 	) { }
 
 	public onModuleInit(): void {
-		this.redisSub.on('message', (channel, message) => {
+		this.redisSub.on(MESSAGE, (channel, message) => {
 			this.redisSubSubject.next({ channel, message });
 		});
 	}
@@ -45,7 +48,7 @@ export class PubSubService implements OnModuleInit {
 
 	public async getChannelHistory<T>(channel: string): Promise<T[]> {
 		try {
-			return await this.keyValueService.getSet<T>(this.SET + channel);
+			return await this.keyValueService.getSet<T>(CHANNEL_HISTORY + channel);
 		} catch (err) {
 			return [];
 		}
@@ -54,13 +57,13 @@ export class PubSubService implements OnModuleInit {
 	public async pubToChannel<T>(channel: string, value: T): Promise<void> {
 		try {
 			const wrappedMsgAsString = valueToWrappedStringMessage(value);
-			await Promise.all([this.redisPub.publish(channel, wrappedMsgAsString), this.keyValueService.addToSet<T>(this.SET + channel, value)]);
+			await Promise.all([this.redisPub.publish(channel, wrappedMsgAsString), this.keyValueService.addToSet<T>(CHANNEL_HISTORY + channel, value)]);
 		} catch (err) {
 			throw new Error(`Failed to publish value to channel "${channel}".`);
 		}
 	}
 
 	public async deleteChannelHistory(channel: string): Promise<void> {
-		await this.keyValueService.delete(this.SET + channel);
+		await this.keyValueService.delete(CHANNEL_HISTORY + channel);
 	}
 }

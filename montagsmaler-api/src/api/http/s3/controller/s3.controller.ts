@@ -5,11 +5,11 @@ import { ManagedUpload } from 'aws-sdk/lib/s3/managed_upload'
 
 @Controller('s3')
 export class S3Controller {
-    
-    constructor(private readonly S3Service: S3Service) {}
-  
-    @Post('upload')
-    async create(@Body() body: S3PutObjectRequestDto): Promise<ManagedUpload.SendData> {
+
+	constructor(private readonly S3Service: S3Service) { }
+
+	@Post('upload')
+	async create(@Body() body: S3PutObjectRequestDto): Promise<ManagedUpload.SendData> {
 		try {
 			return await this.S3Service.upload(body);
 		} catch (err) {

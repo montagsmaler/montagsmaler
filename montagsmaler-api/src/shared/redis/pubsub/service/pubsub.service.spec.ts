@@ -4,6 +4,7 @@ import { first, skip } from 'rxjs/internal/operators';
 import * as RedisMock from 'ioredis-mock';
 import { Cat, Dog } from '../../../../../test/shared/cat.model';
 import { KeyValueService } from '../../keyvalue/service/keyvalue.service';
+import { RedisClient } from '../../redisconfig/redis-client.enum';
 const spyOn = jest.spyOn;
 
 describe('PubsubService', () => {
@@ -23,10 +24,10 @@ describe('PubsubService', () => {
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			providers: [
-				{ provide: 'redis_keyvalue', useValue: redisKeyValueMock },
+				{ provide: RedisClient.KEY_VALUE, useValue: redisKeyValueMock },
 				KeyValueService,
-				{ provide: 'redis_pub', useValue: redisPubMock },
-				{ provide: 'redis_sub', useValue: redisSubMock },
+				{ provide: RedisClient.PUB, useValue: redisPubMock },
+				{ provide: RedisClient.SUB, useValue: redisSubMock },
 				PubSubService,
 			],
 		})

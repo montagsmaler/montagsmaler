@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, isNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class S3PutObjectRequestDto {
 
@@ -8,12 +8,17 @@ export class S3PutObjectRequestDto {
 
 	@IsString()
 	@IsNotEmpty()
-    Key: string;
-    
-    @IsNotEmpty()
+	Key: string;
+
+	@IsString()
+	@IsNotEmpty()
 	Body: any;
-	
+
+	@IsString()
+	@IsNotEmpty()
 	ContentEncoding: string;
 
+	@IsString()
+	@IsNotEmpty()
 	ContentType: string;
 }

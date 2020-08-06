@@ -1,18 +1,21 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { valueToWrappedStringMessage, getValueFromWrappedStringMessage } from '../../redis.helper';
+import { RedisClient } from '../../redisconfig/redis-client.enum';
+
+const SET_SCORE = 'set_score:';
 
 @Injectable()
 export class KeyValueService {
 
 	constructor(
-		@Inject('redis_keyvalue') private readonly redisKeyValue: Redis,
+		@Inject(RedisClient.KEY_VALUE) private readonly redisKeyValue: Redis,
 	) { }
 
-	public async set<T>(key: string, value: T): Promise<void> {
+	public async set<T>(key: string, value: T, expireInSeconds?: number): Promise<void> {
 		try {
 			const wrappedMsgAsString = valueToWrappedStringMessage<T>(value);
-			const result = await this.redisKeyValue.set(key, wrappedMsgAsString);
+			const result = (expireInSeconds) ? await this.redisKeyValue.set(key, wrappedMsgAsString, 'ex', expireInSeconds) : await this.redisKeyValue.set(key, wrappedMsgAsString);
 			if (result !== 'OK') {
 				throw new Error(`Could not set value for key "${key}".`);
 			}
@@ -24,7 +27,7 @@ export class KeyValueService {
 	public async addToSet<T>(set: string, value: T): Promise<void> {
 		try {
 			const wrappedMsgAsString = valueToWrappedStringMessage<T>(value);
-			await this.redisKeyValue.zadd(set, process.hrtime().join(''), wrappedMsgAsString);
+			await this.redisKeyValue.zadd(set, await this.increment(SET_SCORE), wrappedMsgAsString);
 		} catch (err) {
 			throw new Error(`Could not add value to set "${set}"`);
 		}
