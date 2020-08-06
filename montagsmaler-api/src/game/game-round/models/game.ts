@@ -12,11 +12,11 @@ export class Game {
 		public readonly rounds: number,
 	) { }
 
-	public get duration() {
+	public get duration(): number {
 		return this.durationRound * this.rounds;
 	}
 
 	public isPlayerMember(playerId: string): boolean {
-    return this.players.findIndex(player => player.id === playerId) !== -1;
-  }
+		return this.players.findIndex(player => player.id === playerId) !== -1;
+	}
 }

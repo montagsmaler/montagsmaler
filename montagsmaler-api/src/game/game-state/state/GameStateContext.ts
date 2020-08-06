@@ -2,7 +2,6 @@ import { IGameState, IStateAccepted } from './GameState';
 import { JSONSerializable, Class } from '../../../shared/serializable';
 import { GameNotStarted } from './states/GameNotStarted';
 import { Game } from '../../game-round/models';
-import { GameImagePublishRequestDto } from 'src/api/ws/game/models';
 
 @JSONSerializable()
 export class GameStateContext implements IGameState {
