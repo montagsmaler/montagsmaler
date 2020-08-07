@@ -47,7 +47,7 @@ describe('auth', () => {
 			.set('Accept', 'application/json')
 			.expect('Content-Type', /json/)
 			.expect(HttpStatus.CREATED)
-			.expect(await authService.login(credentials));
+			.expect(authService.cognitoUserSessionToLoginResult(await authService.login(credentials)));
 	});
 
 	it(`should /POST login fail in validation pipe`, async () => {

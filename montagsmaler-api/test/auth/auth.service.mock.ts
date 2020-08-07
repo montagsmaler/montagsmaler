@@ -15,7 +15,12 @@ export class AuthServiceMock {
         name: 'NotAuthorizedException',
         message: 'Incorrect username or password.',
       };
-    }
+	}
+	const token = 'xyz';
+	const refreshToken = {
+		"token": token,
+		getToken: () => token,
+	};
     const userSession = {
 			"idToken": {
 					"jwtToken": "xyz",
@@ -33,9 +38,8 @@ export class AuthServiceMock {
 							"email": "lc@test.de"
 					}
 			},
-			"refreshToken": {
-					"token": "xyz"
-			},
+			"refreshToken": refreshToken,
+			getRefreshToken: () => refreshToken,
 			"accessToken": {
 					"jwtToken": "xyz",
 					"payload": {
