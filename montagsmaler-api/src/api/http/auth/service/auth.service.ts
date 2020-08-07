@@ -83,8 +83,8 @@ export class AuthService implements OnModuleInit {
 		return { idToken: { jwtToken: idToken.getJwtToken(), payload: idToken.payload as any }, accessToken: { jwtToken: accessToken.getJwtToken(), payload: accessToken.payload as any } };
 	}
 
-	public async refreshTokenForUser(userName: string, refreshToken: string): Promise<CognitoUserSession> {
-		const user = this.getCognitoUserForUsername(userName);
+	public async refreshTokens(refreshToken: string): Promise<CognitoUserSession> {
+		const user = this.getCognitoUserForUsername('');
 
 		return new Promise((resolve, reject) => {
 			user.refreshSession(new CognitoRefreshToken({ RefreshToken: refreshToken }), (err, result) => {

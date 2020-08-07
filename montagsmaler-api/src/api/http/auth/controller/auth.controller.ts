@@ -10,7 +10,6 @@ import { ICognitoUser } from '../models/cognito-user';
 import { AuthVerifyRegisterSuccess } from '../models/auth-verify.success';
 import { ValidationPipe } from '../../../../shared/validation/validation.pipe';
 import { ILoginResult } from '../models/login.result';
-import { AuthRefreshDto } from '../models/auth-refresh.dto';
 import { REFRESH_TOKEN, RefreshToken } from '../middleware/auth.refreshtoken.decorator';
 
 @UsePipes(ValidationPipe)
@@ -23,7 +22,7 @@ export class AuthController {
 	async login(@Body() body: AuthCredentialsDto, @Res() res: any): Promise<void> {
 		try {
 			const userSession = await this.authService.login(body);
-			res.cookie(REFRESH_TOKEN, userSession.getRefreshToken().getToken(), { httpOnly: true });
+			res.cookie(REFRESH_TOKEN, userSession.getRefreshToken().getToken(), { httpOnly: true, SameSite: 'None', maxAge: 2600000 });
 			res.status(HttpStatus.CREATED).json(this.authService.cognitoUserSessionToLoginResult(userSession));
 		} catch (err) {
 			throw new UnauthorizedException(err.message);
@@ -31,9 +30,9 @@ export class AuthController {
 	}
 
 	@Post('refresh')
-	async refresh(@Body() body: AuthRefreshDto, @RefreshToken() refreshToken: string): Promise<ILoginResult> {
+	async refresh(@RefreshToken() refreshToken: string): Promise<ILoginResult> {
 		try {
-			const userSession = await this.authService.refreshTokenForUser(body.name, refreshToken);
+			const userSession = await this.authService.refreshTokens(refreshToken);
 			return this.authService.cognitoUserSessionToLoginResult(userSession);
 		} catch (err) {
 			throw new UnauthorizedException(err.message);
@@ -45,7 +44,7 @@ export class AuthController {
 	async logout(@VerifiedCognitoUser() user: ClaimVerfiedCognitoUser, @Res() res: any): Promise<void> {
 		try {
 			const result = await this.authService.logout(user.userName);
-			res.cookie(REFRESH_TOKEN, '', { httpOnly: true, maxAge: 0 });
+			res.cookie(REFRESH_TOKEN, '', { httpOnly: true, SameSite: 'None', maxAge: 0 });
 			res.status(HttpStatus.CREATED).json({ message: result });
 		} catch (err) {
 			throw new BadRequestException(err.message);
