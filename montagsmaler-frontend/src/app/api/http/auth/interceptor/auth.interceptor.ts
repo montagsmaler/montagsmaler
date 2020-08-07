@@ -30,7 +30,6 @@ export class AuthInterceptor implements HttpInterceptor {
           return from(this.authService.refreshAccessToken()).pipe(
             switchMap(() => caught),
             retry(2),
-            tap(() => this.router.navigateByUrl('/welcome')),
           );
         } else {
           return caught;
