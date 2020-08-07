@@ -1,6 +1,6 @@
 import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
 import 'cross-fetch/polyfill';
-import { CognitoUserPool, AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoAccessToken } from 'amazon-cognito-identity-js';
+import { CognitoUserPool, AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoUserSession, CognitoRefreshToken, ICognitoUserData } from 'amazon-cognito-identity-js';
 import { AuthCredentialsDto } from '../models/auth-credentials.dto';
 import { AuthRegisterDto } from '../models/auth-register.dto';
 import * as Axios from 'axios';
@@ -10,6 +10,7 @@ import { PublicKeys, PublicKeyMeta, ClaimVerfiedCognitoUser, Claim, TokenHeader 
 import { AuthVerifyRegisterDto } from '../models/auth-verify.dto';
 import { ICognitoUser } from '../models/cognito-user';
 import { AuthVerifyRegisterSuccess } from '../models/auth-verify.success';
+import { ILoginResult } from '../models/login.result';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -32,28 +33,66 @@ export class AuthService implements OnModuleInit {
 		}
 	}
 
-	public login(userCredentials: AuthCredentialsDto): Promise<CognitoAccessToken> {
+	public login(userCredentials: AuthCredentialsDto): Promise<CognitoUserSession> {
 
 		const authenticationDetails = new AuthenticationDetails({
 			Username: userCredentials.name,
 			Password: userCredentials.password,
 		});
 
-		const userData = {
-			Username: userCredentials.name,
-			Pool: this.cognitoUserPool,
-		};
-
-		const user = new CognitoUser(userData);
+		const user = this.getCognitoUserForUsername(userCredentials.name);
 
 		return new Promise((resolve, reject) => {
 			user.authenticateUser(authenticationDetails, {
 				onSuccess: (result) => {
-					resolve(result.getAccessToken());
+					resolve(result);
 				},
 				onFailure: (err) => {
 					reject(err);
 				},
+			});
+		});
+	}
+
+	public logout(userName: string): Promise<string> {
+		const user = this.getCognitoUserForUsername(userName);
+
+		return new Promise((resolve, reject) => {
+			user.globalSignOut({
+				onSuccess: (result) => {
+					resolve(result);
+				},
+				onFailure: (err) => {
+					reject(err);
+				},
+			})
+		});
+	}
+
+	private getCognitoUserForUsername(userName: string): CognitoUser {
+		const userData: ICognitoUserData = {
+			Username: userName,
+			Pool: this.cognitoUserPool,
+		};
+		return new CognitoUser(userData);
+	}
+
+	public cognitoUserSessionToLoginResult(cognitoUserSession: CognitoUserSession): ILoginResult {
+		const idToken = cognitoUserSession.getIdToken();
+		const accessToken = cognitoUserSession.getAccessToken();
+		return { idToken: { jwtToken: idToken.getJwtToken(), payload: idToken.payload as any }, accessToken: { jwtToken: accessToken.getJwtToken(), payload: accessToken.payload as any } };
+	}
+
+	public async refreshTokenForUser(userName: string, refreshToken: string): Promise<CognitoUserSession> {
+		const user = this.getCognitoUserForUsername(userName);
+
+		return new Promise((resolve, reject) => {
+			user.refreshSession(new CognitoRefreshToken({ RefreshToken: refreshToken }), (err, result) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(result)
+				}
 			});
 		});
 	}

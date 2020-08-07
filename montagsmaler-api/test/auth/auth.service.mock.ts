@@ -2,6 +2,8 @@
 import { AuthCredentialsDto } from '../../src/api/http/auth/models/auth-credentials.dto';
 import { AuthRegisterDto } from '../../src/api/http/auth/models/auth-register.dto';
 import { AuthVerifyRegisterDto } from '../../src/api/http/auth/models/auth-verify.dto';
+import { ILoginResult } from '../../src/api/http/auth/models/login.result';
+import { CognitoUserSession, ICognitoUserSessionData, CognitoIdToken } from 'amazon-cognito-identity-js';
 
 export class AuthServiceMock {
   private registeredUsers = new Array<AuthRegisterDto>();
@@ -14,24 +16,53 @@ export class AuthServiceMock {
         message: 'Incorrect username or password.',
       };
     }
-    return {
-      jwtToken:
-        'eyJrhWQiOiJDQmNNYTFLQmh2bkVsNGZTaTF0c1Vrd2V4Kyt0XC9SSkM5aE1oeVVhXC9PQmc9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiI5NDE0ZWQ5Zi0xOTMyLTQxODctYTY0Yy1mMGMxODkxNzU2OGMiLCJldmVudF9pZCI6IjkzZmQ1NGU2LWY4ZDctNDcxMi1iZWFiLTM5NTJiYjA3NTkwNyIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE1OTIwNTMzNTEsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xX0xLbnlIOHh6SiIsImV4cCI6MTU5MjA1Njk1MSwiaWF0IjoxNTkyMDUzMzUxLCJqdGkiOiIwNWVlODNlYy0wODc5LTRlNTItOWYxNC00M2JlOGM2MDNhM2MiLCJjbGllbnRfaWQiOiJpbXJjZ3E0Z2VkcDI5aWRtdHZhcTk3bnN2IiwidXNlcm5hbWUiOiJsdWNhcyJ9.EGioS9amGjYoGXiU5It_WSiKwK7zdiZ_Tu8vZyZjkhpir4gACf7dlOmDiq4AUsBev5OYECq0_N4eJxc_okaZl1p0V2cXObqEmu8ypiYhCEHa-e_4DASdPBaGL4I0kEmD4wig0ZvkD1r8xb5p0mWmYG970upn8ijX17qgducaiToKOjAxOWA4a0QlZwfPpECwwKOsimJg_EVbstDLKcEqmjhD3zhJuB3AyiZpQLA0fVS_zTpec06SBkSlg8b8h2k4iAX2Qwqw37Z6xvUck2KfY4TOphMk1a_FC6ctKYnJa_Mkwbhe2_WXqJ2A08SuGJgCJONU64aXYUnQ9mT8U-g',
-      payload: {
-        sub: '9404ed9f-1932-4187-a64c-f2c18917568c',
-        event_id: '92fd54e6-f8d7-4712-beab-3752bb075907',
-        token_use: 'access',
-        scope: 'aws.cognito.signin.user.admin',
-        auth_time: 1592053351,
-        iss: 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_LKqyH8yzJ',
-        exp: 1592056951,
-        iat: 1592053351,
-        jti: '05ee83ec-0819-4e52-9f14-43be8c603a3c',
-        client_id: 'imacgq4gedp2tidmtvaq87nsv',
-        username: 'lucas',
-      },
-    };
-  }
+    const userSession = {
+			"idToken": {
+					"jwtToken": "xyz",
+					"payload": {
+							"sub": "013a8838-a7a2-4368-9f75-cfaab4c9c0ce",
+							"aud": "imrcgq4gedp30idmtvaq97nsv",
+							"email_verified": true,
+							"event_id": "3791194c-e18e-4f2e-8db7-422fd93f800a",
+							"token_use": "id",
+							"auth_time": 1596802034,
+							"iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_lKnyH9xAj",
+							"cognito:username": "luka",
+							"exp": 1596805634,
+							"iat": 1596802034,
+							"email": "lc@test.de"
+					}
+			},
+			"refreshToken": {
+					"token": "xyz"
+			},
+			"accessToken": {
+					"jwtToken": "xyz",
+					"payload": {
+							"sub": "013a8838-a7a2-4368-9f75-cfaab4c9c0ce",
+							"event_id": "3092094c-e18e-4f2e-8db7-422fd93f800a",
+							"token_use": "access",
+							"scope": "aws.cognito.signin.user.admin",
+							"auth_time": 1596802034,
+							"iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_lKnyH9xAj",
+							"exp": 1596805634,
+							"iat": 1596802034,
+							"jti": "c94fe5a8-820c-44d5-9641-705dcd3091c3",
+							"client_id": "imacgq3gedp29idmtvaq97nsv",
+							"username": "lucas"
+					}
+			},
+			"clockDrift": -1
+		};
+		return userSession;
+	}
+	
+	cognitoUserSessionToLoginResult(cognitoUserSession): ILoginResult {
+		const idToken = cognitoUserSession.idToken;
+		const accessToken = cognitoUserSession.accessToken;
+		return { idToken: { jwtToken: idToken.jwtToken, payload: idToken.payload as any }, accessToken: { jwtToken: accessToken.jwtToken, payload: accessToken.payload as any } };
+	}
+
 
   async register(userCredentials: AuthRegisterDto) {
     if (this.registeredUsers.find(user => user.name === userCredentials.name)) {

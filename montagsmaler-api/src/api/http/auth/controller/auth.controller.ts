@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Post, Body, Get, InternalServerErrorException, UnauthorizedException, BadRequestException, UsePipes } from '@nestjs/common';
+import { Controller, UseGuards, Post, Body, Get, InternalServerErrorException, UnauthorizedException, BadRequestException, UsePipes, Res, HttpStatus } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { AuthCognitoGuard } from '../middleware/auth.guard';
 import { AuthRegisterDto } from '../models/auth-register.dto';
@@ -6,10 +6,12 @@ import { AuthCredentialsDto } from '../models/auth-credentials.dto';
 import { AuthVerifyRegisterDto } from '../models/auth-verify.dto';
 import { VerifiedCognitoUser } from '../middleware/auth.cognito.user.decorator';
 import { ClaimVerfiedCognitoUser } from '../models/aws-token';
-import { CognitoAccessToken } from 'amazon-cognito-identity-js';
 import { ICognitoUser } from '../models/cognito-user';
 import { AuthVerifyRegisterSuccess } from '../models/auth-verify.success';
 import { ValidationPipe } from '../../../../shared/validation/validation.pipe';
+import { ILoginResult } from '../models/login.result';
+import { AuthRefreshDto } from '../models/auth-refresh.dto';
+import { REFRESH_TOKEN, RefreshToken } from '../middleware/auth.refreshtoken.decorator';
 
 @UsePipes(ValidationPipe)
 @Controller('auth')
@@ -18,11 +20,35 @@ export class AuthController {
 	constructor(private readonly authService: AuthService) { }
 
 	@Post('login')
-	async login(@Body() body: AuthCredentialsDto): Promise<CognitoAccessToken> {
+	async login(@Body() body: AuthCredentialsDto, @Res() res: any): Promise<void> {
 		try {
-			return await this.authService.login(body);
+			const userSession = await this.authService.login(body);
+			res.cookie(REFRESH_TOKEN, userSession.getRefreshToken().getToken(), { httpOnly: true });
+			res.status(HttpStatus.CREATED).json(this.authService.cognitoUserSessionToLoginResult(userSession));
 		} catch (err) {
 			throw new UnauthorizedException(err.message);
+		}
+	}
+
+	@Post('refresh')
+	async refresh(@Body() body: AuthRefreshDto, @RefreshToken() refreshToken: string): Promise<ILoginResult> {
+		try {
+			const userSession = await this.authService.refreshTokenForUser(body.name, refreshToken);
+			return this.authService.cognitoUserSessionToLoginResult(userSession);
+		} catch (err) {
+			throw new UnauthorizedException(err.message);
+		}
+	}
+
+	@UseGuards(AuthCognitoGuard)
+	@Post('logout')
+	async logout(@VerifiedCognitoUser() user: ClaimVerfiedCognitoUser, @Res() res: any): Promise<void> {
+		try {
+			const result = await this.authService.logout(user.userName);
+			res.cookie(REFRESH_TOKEN, '', { httpOnly: true, maxAge: 0 });
+			res.status(HttpStatus.CREATED).json({ message: result });
+		} catch (err) {
+			throw new BadRequestException(err.message);
 		}
 	}
 
