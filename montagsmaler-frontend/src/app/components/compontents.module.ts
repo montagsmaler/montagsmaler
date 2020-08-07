@@ -13,7 +13,7 @@ import { GameLobbyModule } from './game-lobby/game-lobby.module';
     CommonModule,
     RouterModule,
     WelcomeModule,
-    GameLobbyModule
+    GameLobbyModule,
   ]
 })
 export class CompontentsModule { }

@@ -1,5 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { AuthService, ILoginRequest } from 'src/app/api/http/auth';
 
 @Component({
   selector: 'app-login',
@@ -14,9 +15,10 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
+    private readonly authService: AuthService,
   ) {
     this.loginForm = this.formBuilder.group({
-      email: '',
+      name: '',
       password: ''
     });
   }
@@ -28,7 +30,11 @@ export class LoginComponent implements OnInit {
     this.stateChanges.emit(false);
   }
 
-  onSubmit() {
-    this.loginForm.reset();
+  async onSubmit(value: ILoginRequest) {
+    try {
+      await this.authService.login(value);
+    } catch (err) {
+      //display error
+    }
   }
 }
