@@ -4,8 +4,7 @@ import { AuthService } from '../service/auth.service';
 import { Observable, throwError } from 'rxjs';
 import { catchError, first, switchMap, map } from 'rxjs/internal/operators';
 import { UNAUTHORIZED } from 'http-status-codes';
-import { SKIP_TOKEN_REFRESH } from './auth.skip.token.refresh';
-import { getReqFromAccessToken, getReqWithCredentials } from './auth.utility';
+import { getReqFromAccessToken, getReqWithCredentials, SKIP_ACCESS_TOKEN } from './auth.utility';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -19,7 +18,7 @@ export class AuthInterceptor implements HttpInterceptor {
    * @param next
    */
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (!request.headers.get(SKIP_TOKEN_REFRESH)) {
+    if (!request.headers.get(SKIP_ACCESS_TOKEN)) {
       return this.authService.getAccessToken$().pipe(
         first(),
         map(accessToken => getReqFromAccessToken(request, accessToken)),

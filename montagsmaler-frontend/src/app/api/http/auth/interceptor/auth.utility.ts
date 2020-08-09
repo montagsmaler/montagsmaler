@@ -24,3 +24,5 @@ export const getReqFromAccessToken = (request: HttpRequest<any>, accessToken: IA
     getReqWithCredentialsAndBearerToken(request, accessToken.jwtToken) :
     getReqWithCredentials(request);
 };
+
+export const SKIP_ACCESS_TOKEN = 'skipaccesstoken';

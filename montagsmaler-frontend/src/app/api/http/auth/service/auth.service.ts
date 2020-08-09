@@ -4,13 +4,13 @@ import { ILoginRequest, IRegisterResult, IRegisterRequest, IVerifyRequest, IVeri
 import { environment } from 'src/environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Router } from '@angular/router';
-import { SKIP_TOKEN_REFRESH } from '../interceptor/auth.skip.token.refresh';
 import { filter, first, switchMap } from 'rxjs/internal/operators';
+import { SKIP_ACCESS_TOKEN } from '../interceptor/auth.utility';
 
-const skipRefreshHeader = {
+const skipAccessToken = {
   headers: {},
 };
-skipRefreshHeader.headers[SKIP_TOKEN_REFRESH] = 'true';
+skipAccessToken.headers[SKIP_ACCESS_TOKEN] = 'true';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +41,7 @@ export class AuthService {
 
   public async login(loginRequest: ILoginRequest): Promise<void> {
     try {
-      const tokens = await this.http.post<ILoginResult>(`${this.baseUrlAuth}/login`, loginRequest, skipRefreshHeader).toPromise();
+      const tokens = await this.http.post<ILoginResult>(`${this.baseUrlAuth}/login`, loginRequest, skipAccessToken).toPromise();
       this.setLoggedInUser(tokens.idToken);
       this.setAccessToken(tokens.accessToken);
     } catch (err) {
@@ -78,7 +78,7 @@ export class AuthService {
   public async refreshAccessToken(): Promise<void> {
     try {
       this.newAccessTokenInProgress$.next(true);
-      const tokens = await this.http.post<ILoginResult>(`${this.baseUrlAuth}/refresh`, {}, skipRefreshHeader).toPromise();
+      const tokens = await this.http.post<ILoginResult>(`${this.baseUrlAuth}/refresh`, {}, skipAccessToken).toPromise();
       this.setLoggedInUser(tokens.idToken);
       this.setAccessToken(tokens.accessToken);
     } catch (err) {
