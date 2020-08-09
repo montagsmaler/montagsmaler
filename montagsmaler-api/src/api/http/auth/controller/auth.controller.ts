@@ -32,6 +32,7 @@ export class AuthController {
 	@Post('refresh')
 	async refresh(@RefreshToken() refreshToken: string): Promise<ILoginResult> {
 		try {
+			if (!refreshToken) throw new Error('No refreshtoken cookie.');
 			const userSession = await this.authService.refreshTokens(refreshToken);
 			return this.authService.cognitoUserSessionToLoginResult(userSession);
 		} catch (err) {
@@ -43,9 +44,9 @@ export class AuthController {
 	@Post('logout')
 	async logout(@VerifiedCognitoUser() user: ClaimVerfiedCognitoUser, @Res() res: any): Promise<void> {
 		try {
-			const result = await this.authService.logout(user.userName);
+			//const result = await this.authService.logout(user.userName); skip this rn need to set access token to global signout ;/
 			res.cookie(REFRESH_TOKEN, '', { httpOnly: true, SameSite: 'None', maxAge: 0 });
-			res.status(HttpStatus.CREATED).json({ message: result });
+			res.status(HttpStatus.CREATED).json({ SUCCESS: true });
 		} catch (err) {
 			throw new BadRequestException(err.message);
 		}
