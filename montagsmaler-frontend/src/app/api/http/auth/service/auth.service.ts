@@ -22,7 +22,7 @@ export class AuthService {
   private readonly baseUrlAuth: string = `${this.baseUrl}${this.authRoute}`;
   private readonly loggedInUser$: BehaviorSubject<User | null> = new BehaviorSubject(null);
   private readonly accessToken$: BehaviorSubject<IAccessToken | null> =  new BehaviorSubject(null);
-  private readonly refreshTokenInProgress$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private readonly newAccessTokenInProgress$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
     private readonly http: HttpClient,
@@ -77,14 +77,14 @@ export class AuthService {
 
   public async refreshAccessToken(): Promise<void> {
     try {
-      this.refreshTokenInProgress$.next(true);
+      this.newAccessTokenInProgress$.next(true);
       const tokens = await this.http.post<ILoginResult>(`${this.baseUrlAuth}/refresh`, {}, skipRefreshHeader).toPromise();
       this.setLoggedInUser(tokens.idToken);
       this.setAccessToken(tokens.accessToken);
     } catch (err) {
       this.router.navigateByUrl('/welcome');
     } finally {
-      this.refreshTokenInProgress$.next(false);
+      this.newAccessTokenInProgress$.next(false);
     }
   }
 
@@ -107,17 +107,17 @@ export class AuthService {
     return this.loggedInUser$.value;
   }
 
-  public getAccessToken$(refresh?: boolean): Observable<IAccessToken | null> {
-    if ((refresh || !this.accessToken$.value) && !this.refreshTokenInProgress$.value) {
+  public getAccessToken$(options?: GetAccessToken$Options): Observable<IAccessToken | null> {
+    if (((options && options.refresh) || !this.accessToken$.value) && !this.newAccessTokenInProgress$.value) {
       this.refreshAccessToken();
     }
-    return this.refreshTokenLoadedNotify$().pipe(
+    return this.newAccessTokenLoadedNotify$().pipe(
       switchMap(() => this.accessToken$.asObservable()),
     );
   }
 
-  private refreshTokenLoadedNotify$(): Observable<boolean> {
-    return this.refreshTokenInProgress$.asObservable().pipe(
+  private newAccessTokenLoadedNotify$(): Observable<boolean> {
+    return this.newAccessTokenInProgress$.asObservable().pipe(
       filter(inProgress => inProgress === false),
       first(),
     );
@@ -126,4 +126,8 @@ export class AuthService {
   public getAccessToken(): IAccessToken | null {
     return this.accessToken$.value;
   }
+}
+
+export interface GetAccessToken$Options {
+  refresh: boolean;
 }

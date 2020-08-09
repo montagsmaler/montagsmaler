@@ -1,28 +1,11 @@
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthService } from '../service/auth.service';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, first, switchMap, filter, map } from 'rxjs/internal/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, first, switchMap, map } from 'rxjs/internal/operators';
 import { UNAUTHORIZED } from 'http-status-codes';
 import { SKIP_TOKEN_REFRESH } from './auth.skip.token.refresh';
-
-const getReqWithCredentials = (request: HttpRequest<any>): HttpRequest<any> => {
-  const clonedWithCredentials = request.clone({
-    withCredentials: true,
-  });
-  return clonedWithCredentials;
-};
-
-const getReqWithBearerToken = (request: HttpRequest<any>, bearerToken: string): HttpRequest<any> => {
-  const clonedWithBearer = request.clone({
-    headers: request.headers.set('Authorization', 'Bearer ' + bearerToken),
-  });
-  return clonedWithBearer;
-};
-
-const getReqWithCredentialsAndBearerToken = (request: HttpRequest<any>, bearerToken: string): HttpRequest<any> => {
-  return getReqWithCredentials(getReqWithBearerToken(request, bearerToken));
-};
+import { getReqFromAccessToken, getReqWithCredentials } from './auth.utility';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -39,18 +22,15 @@ export class AuthInterceptor implements HttpInterceptor {
     if (!request.headers.get(SKIP_TOKEN_REFRESH)) {
       return this.authService.getAccessToken$().pipe(
         first(),
-        switchMap(accessToken => {
-          const requestWithCredentialsAndBearer = (accessToken) ?
-            getReqWithCredentialsAndBearerToken(request, accessToken.jwtToken) :
-            getReqWithCredentials(request);
+        map(accessToken => getReqFromAccessToken(request, accessToken)),
+        switchMap(requestWithCredentialsAndBearer => {
           return next.handle(requestWithCredentialsAndBearer).pipe(
             catchError(error => {
               if (this.isAuthError(error)) {
-                return this.authService.getAccessToken$(true).pipe(
-                  filter(refreshedAccessToken => refreshedAccessToken !== null),
-                  map(refreshedAccessToken => refreshedAccessToken.jwtToken),
+                return this.authService.getAccessToken$({ refresh: true }).pipe(
                   first(),
-                  switchMap(bearerToken => next.handle(getReqWithCredentialsAndBearerToken(request, bearerToken))),
+                  map(refreshedAccessToken => getReqFromAccessToken(request, refreshedAccessToken)),
+                  switchMap(requestWithCredentialsAndNewBearer => next.handle(requestWithCredentialsAndNewBearer)),
                 );
               } else {
                 return throwError(error);
