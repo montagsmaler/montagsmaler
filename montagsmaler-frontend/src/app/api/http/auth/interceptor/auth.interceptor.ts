@@ -1,40 +1,73 @@
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthService } from '../service/auth.service';
-import { Observable, from } from 'rxjs';
-import { switchMap, catchError, retry, tap, first } from 'rxjs/internal/operators';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { catchError, first, switchMap, filter, map } from 'rxjs/internal/operators';
 import { UNAUTHORIZED } from 'http-status-codes';
-import { Router } from '@angular/router';
+import { SKIP_TOKEN_REFRESH } from './auth.skip.token.refresh';
+
+const getReqWithCredentials = (request: HttpRequest<any>): HttpRequest<any> => {
+  const clonedWithCredentials = request.clone({
+    withCredentials: true,
+  });
+  return clonedWithCredentials;
+};
+
+const getReqWithBearerToken = (request: HttpRequest<any>, bearerToken: string): HttpRequest<any> => {
+  const clonedWithBearer = request.clone({
+    headers: request.headers.set('Authorization', 'Bearer ' + bearerToken),
+  });
+  return clonedWithBearer;
+};
+
+const getReqWithCredentialsAndBearerToken = (request: HttpRequest<any>, bearerToken: string): HttpRequest<any> => {
+  return getReqWithCredentials(getReqWithBearerToken(request, bearerToken));
+};
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private readonly authService: AuthService, private readonly router: Router) { }
+  constructor(private readonly authService: AuthService) { }
 
-  public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const accessToken = this.authService.getAccessToken();
-
-    let event: Observable<HttpEvent<any>>;
-    if (accessToken) {
-      const cloned = req.clone({
-        headers: req.headers.set('Authorization', 'Bearer ' + accessToken.jwtToken),
-      });
-      event = next.handle(cloned);
-    } else {
-      event = next.handle(req);
-    }
-
-    return event.pipe(
-      catchError((err, caught) => {
-        if (err instanceof HttpErrorResponse && err.status === UNAUTHORIZED) {
-          return from(this.authService.refreshAccessToken()).pipe(
-            switchMap(() => caught),
-            retry(2),
+  /**
+   * Clone request with credentials and access token
+   * Retry request with refreshed token
+   * @param request
+   * @param next
+   */
+  public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if (!request.headers.get(SKIP_TOKEN_REFRESH)) {
+      return this.authService.getAccessToken$().pipe(
+        first(),
+        switchMap(accessToken => {
+          const requestWithCredentialsAndBearer = (accessToken) ?
+            getReqWithCredentialsAndBearerToken(request, accessToken.jwtToken) :
+            getReqWithCredentials(request);
+          return next.handle(requestWithCredentialsAndBearer).pipe(
+            catchError(error => {
+              if (this.isAuthError(error)) {
+                return this.authService.getAccessToken$(true).pipe(
+                  filter(refreshedAccessToken => refreshedAccessToken !== null),
+                  map(refreshedAccessToken => refreshedAccessToken.jwtToken),
+                  first(),
+                  switchMap(bearerToken => next.handle(getReqWithCredentialsAndBearerToken(request, bearerToken))),
+                );
+              } else {
+                return throwError(error);
+              }
+            }),
           );
-        } else {
-          return caught;
-        }
-      }),
-    );
+        }),
+      ) as Observable<HttpEvent<any>>;
+    } else {
+      return next.handle(getReqWithCredentials(request));
+    }
+  }
+
+  /**
+   * @param error
+   */
+  private isAuthError(error: any): boolean {
+    return (error instanceof HttpErrorResponse && error.status === UNAUTHORIZED);
   }
 }
