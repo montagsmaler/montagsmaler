@@ -9,8 +9,8 @@ export interface IWsConnection {
 
 export class WsConnection implements IWsConnection {
 
-  private readonly listeningEvents = new Map<string, Subject<unknown>>();
-  private readonly subscriberCount = new Map<string, number>();
+  protected readonly listeningEvents = new Map<string, Subject<unknown>>();
+  protected readonly subscriberCount = new Map<string, number>();
 
   constructor(protected readonly socket: SocketIOClient.Socket) {
   }
@@ -46,14 +46,14 @@ export class WsConnection implements IWsConnection {
     }
   }
 
-  private incrementSubscription(event: string): number {
+  protected incrementSubscription(event: string): number {
     const subscriberCount = this.subscriberCount.get(event);
     const newSubscriberCount = subscriberCount ? (subscriberCount +  1) : 1;
     this.subscriberCount.set(event, newSubscriberCount);
     return newSubscriberCount;
   }
 
-  private decrementSubscription(event: string): number {
+  protected   decrementSubscription(event: string): number {
     const newSubscriberCount = this.subscriberCount.get(event) - 1;
     if (newSubscriberCount <= 0) {
       this.subscriberCount.delete(event);

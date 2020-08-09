@@ -6,6 +6,7 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from 'src/app/api/http';
+import { LobbyModule } from 'src/app/api/ws/lobby';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { HttpModule } from 'src/app/api/http';
     FormsModule,
     ReactiveFormsModule,
     HttpModule,
+    LobbyModule,
   ]
 })
 export class WelcomeModule { }

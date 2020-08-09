@@ -11,7 +11,6 @@ import { GameService } from './service/game.service';
     GameService,
   ],
   exports: [
-    GameService,
   ],
 })
 export class GameModule { }

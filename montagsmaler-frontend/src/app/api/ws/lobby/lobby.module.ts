@@ -11,7 +11,6 @@ import { LobbyService } from './service/lobby.service';
     LobbyService,
   ],
   exports: [
-    LobbyService,
   ],
 })
 export class LobbyModule { }

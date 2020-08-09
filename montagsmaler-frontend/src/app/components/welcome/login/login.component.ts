@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { AuthService, ILoginRequest } from 'src/app/api/http/auth';
+import { LobbyService } from 'src/app/api/ws/lobby';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private readonly authService: AuthService,
+    private readonly lobbyService: LobbyService,
   ) {
     this.loginForm = this.formBuilder.group({
       name: '',
@@ -27,6 +29,7 @@ export class LoginComponent implements OnInit {
     this.authService.getLoggedInUser$().subscribe(console.log);
     this.authService.getCognitoUser().then(console.log).catch(console.warn);
     this.authService.getCognitoUser().then(console.log).catch(console.warn);
+    this.lobbyService.getLobby$().subscribe(console.log);
   }
 
   switch() {
@@ -48,5 +51,10 @@ export class LoginComponent implements OnInit {
     } catch (err) {
       console.warn(err);
     }
+  }
+
+  createLobby() {
+    this.lobbyService.initCon();
+    this.lobbyService.createLobby();
   }
 }

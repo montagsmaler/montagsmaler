@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment';
 import * as io from 'socket.io-client';
 import { AuthService } from 'src/app/api/http/auth';
 import { Router } from '@angular/router';
+import { SKIP_ACCESS_TOKEN } from 'src/app/api/http/auth/interceptor/auth.utility';
 
 @Injectable({
   providedIn: 'root'
@@ -20,11 +21,13 @@ export class WsClientService {
       this.router.navigateByUrl('/welcome');
       throw new Error('User is not authenticated.');
     }
-    const options: any = {
+    const options: any  = {
       extraHeaders: {
         Authorization: `Bearer ${token.jwtToken}`,
       },
     };
+    options.extraHeaders[SKIP_ACCESS_TOKEN] = 'true';
+
     const connection = io(`${this.wsEndpoint}/${namespace}`, options);
     return new WsConnection(connection);
   }
