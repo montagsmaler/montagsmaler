@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CompontentsModule } from './components/compontents.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { authInterceptorProvider } from './api/http/auth/interceptor/auth.interceptor.provider';
+import { authInterceptorProvider } from './api/http/auth';
 
 @NgModule({
   declarations: [
