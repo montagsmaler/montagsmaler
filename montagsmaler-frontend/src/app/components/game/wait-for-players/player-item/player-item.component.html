@@ -1,0 +1,7 @@
+<div class="layout flex_center_column">
+<div class="{{empty ? 'empty-background flex_center_column' : 'profile-picture-background flex_center_column' }}"
+  [ngStyle]="!empty ? {'backgroundColor' : getRandomColor(playerId)} : ''">
+  <img *ngIf="!empty" src="assets/images/player-1.svg" width="40px" />
+</div>
+<p class="name-label">{{!empty ? name : "leer"}}</p>
+</div>
