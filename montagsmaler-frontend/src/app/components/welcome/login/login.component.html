@@ -15,9 +15,19 @@
     <button class="form_item btn_green" type="submit">Einloggen</button>
     <br>
     <button class="form_item btn_green" type="button" (click)="logout()">Ausloggen</button>
+
+
+  </form>
+
+  <form [formGroup]="joinLobbyForm" (ngSubmit)="joinLobby(joinLobbyForm.value)">
     <br>
     <button class="form_item btn_green" type="button" (click)="createLobby()">Create Lobby</button>
-
+    <br>
+    <div class="form_item">
+      <input id="lobbyId" type="text" formControlName="lobbyId" placeholder="Lobby-ID">
+    </div>
+    <br>
+    <button class="form_item btn_green" type="submit">Join Lobby</button>
   </form>
 
   <div id="switch">

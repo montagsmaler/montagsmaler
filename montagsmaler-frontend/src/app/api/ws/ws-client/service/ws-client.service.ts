@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
-import { WsConnection, IWsConnection } from './ws-connection';
+import { RxjsWsConnection, IWsConnection, WsConnection } from './ws-connection';
 import { environment } from 'src/environments/environment';
 import * as io from 'socket.io-client';
 import { AuthService } from 'src/app/api/http/auth';
 import { Router } from '@angular/router';
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { SKIP_ACCESS_TOKEN } from 'src/app/api/http/auth/interceptor/auth.utility';
+import { WsMessage } from './models/ws-client.response';
 
 @Injectable({
   providedIn: 'root'
@@ -21,14 +23,9 @@ export class WsClientService {
       this.router.navigateByUrl('/welcome');
       throw new Error('User is not authenticated.');
     }
-    const options: any  = {
-      extraHeaders: {
-        Authorization: `Bearer ${token.jwtToken}`,
-      },
-    };
-    options.extraHeaders[SKIP_ACCESS_TOKEN] = 'true';
-
-    const connection = io(`${this.wsEndpoint}/${namespace}`, options);
-    return new WsConnection(connection);
+    const connStr = `${this.wsEndpoint}/${namespace}?authorization=Bearer ${token.jwtToken}`;
+    const websocketSubject = webSocket(connStr);
+    //return new WsConnection(io(connStr));
+    return new RxjsWsConnection(websocketSubject as WebSocketSubject<WsMessage>);
   }
 }

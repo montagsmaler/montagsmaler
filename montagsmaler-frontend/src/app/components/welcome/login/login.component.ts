@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { AuthService, ILoginRequest } from 'src/app/api/http/auth';
 import { LobbyService } from 'src/app/api/ws/lobby';
 
@@ -12,7 +12,8 @@ export class LoginComponent implements OnInit {
 
   @Output() stateChanges = new EventEmitter();
 
-  loginForm;
+  loginForm: FormGroup;
+  joinLobbyForm: FormGroup;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -22,6 +23,10 @@ export class LoginComponent implements OnInit {
     this.loginForm = this.formBuilder.group({
       name: '',
       password: ''
+    });
+
+    this.joinLobbyForm = this.formBuilder.group({
+      lobbyId: '',
     });
   }
 
@@ -51,6 +56,11 @@ export class LoginComponent implements OnInit {
     } catch (err) {
       console.warn(err);
     }
+  }
+
+  joinLobby(value) {
+    this.lobbyService.initCon();
+    this.lobbyService.joinLobby(value.lobbyId);
   }
 
   createLobby() {
