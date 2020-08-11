@@ -166,7 +166,7 @@ describe('AuthService', () => {
 	it('should return access token', async () => {
 		expect.assertions(1);
 		const payload = "jqoiwjdw";
-		spyOn(CognitoUser.prototype, 'authenticateUser').mockImplementationOnce((authenticationDetails, callbacks) => callbacks.onSuccess({ getAccessToken: () => ({ payload }) } as any));
+		spyOn(CognitoUser.prototype, 'authenticateUser').mockImplementationOnce((authenticationDetails, callbacks) => callbacks.onSuccess({ payload } as any));
 		expect(
 			await authService.login({ name: 'lucas', password: 'TestTestTest2!' })
 		)

@@ -15,6 +15,6 @@ import { GameComponent } from './game/game.component';
     WelcomeModule,
     GameLobbyModule,
     GameModule,
-  ],
+  ]
 })
 export class CompontentsModule {}

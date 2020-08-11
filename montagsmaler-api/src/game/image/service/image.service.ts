@@ -9,8 +9,8 @@ import { RecognitionService } from '../../../api/http/recognition';
 import { ConfigService } from '@nestjs/config'
 
 const CONTENT_ENCODING = 'base64';
-const CONTENT_TYPE = 'image/jpeg';
-const FILE_EXT = 'jpg';
+const CONTENT_TYPE = 'image/png';
+const FILE_EXT = 'png';
 
 @Injectable()
 export class ImageService {

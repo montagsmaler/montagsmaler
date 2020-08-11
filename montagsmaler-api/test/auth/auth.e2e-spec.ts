@@ -9,10 +9,13 @@ import { AuthRegisterDto } from '../../src/api/http/auth/models/auth-register.dt
 import { AuthVerifyRegisterDto } from '../../src/api/http/auth/models/auth-verify.dto';
 import { ConfigService } from '@nestjs/config';
 import { AuthServiceMock } from './auth.service.mock';
+import { AuthController } from '../../src/api/http/auth/controller/auth.controller';
+const spyOn = jest.spyOn;
 
 describe('auth', () => {
 	let app: INestApplication;
 
+	let authController: AuthController;
 	const authService = new AuthServiceMock();
 
 	beforeAll(async () => {
@@ -29,7 +32,11 @@ describe('auth', () => {
 			.useValue(authService)
 			.compile();
 
-		app = await moduleRef.createNestApplication().init();
+		app = moduleRef.createNestApplication();
+
+		authController = app.get<AuthController>(AuthController);
+		
+		await app.init();
 	});
 
 	it(`should /POST login successfully`, async () => {
@@ -40,7 +47,7 @@ describe('auth', () => {
 			.set('Accept', 'application/json')
 			.expect('Content-Type', /json/)
 			.expect(HttpStatus.CREATED)
-			.expect(await authService.login(credentials));
+			.expect(authService.cognitoUserSessionToLoginResult(await authService.login(credentials)));
 	});
 
 	it(`should /POST login fail in validation pipe`, async () => {

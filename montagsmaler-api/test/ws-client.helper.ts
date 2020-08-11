@@ -9,11 +9,20 @@ export const getClientWebsocketForAppAndNamespace = (app: INestApplication, name
 
 	const options = { query };
 
+	/*
 	if (bearerToken) {
-		options['extraHeaders'] = {
+		const bearerAuth = {
 			Authorization: `Bearer ${bearerToken}`,
 		};
-	}
 
-	return io(`http://127.0.0.1:${httpServer.address().port}/${namespace}`, options);
+		if (options.query) {
+			options.query['Authorization'] = `Bearer ${bearerToken}`;
+		} else {
+			options.query = bearerAuth;
+		}
+
+		options['extraHeaders'] = bearerAuth;
+	}*/
+
+	return io(`http://127.0.0.1:${httpServer.address().port}/${namespace}?authorization=Bearer ${bearerToken || ''}`, options);
 };

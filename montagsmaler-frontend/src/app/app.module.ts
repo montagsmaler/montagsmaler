@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CompontentsModule } from './components/compontents.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { authInterceptorProvider } from './api/http/auth';
 
 @NgModule({
   declarations: [
@@ -14,9 +15,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     BrowserModule,
     AppRoutingModule,
     CompontentsModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
   ],
-  providers: [],
+  providers: [
+    authInterceptorProvider,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

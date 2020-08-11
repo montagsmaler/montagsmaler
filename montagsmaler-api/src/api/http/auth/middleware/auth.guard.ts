@@ -8,20 +8,15 @@ export class AuthCognitoGuard implements CanActivate {
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest();
-		let headers: Record<string, any> = {};
-
-		if (request.headers) {
-			headers = request.headers;
-		} else if (request.handshake && request.handshake.headers) {
-			headers = request.handshake.headers;
-		}
+		const authHeader = this.extractAuthHeaderFromRequest(request);
 
 		try {
-			if (!headers.authorization) {
+			if (!authHeader) {
 				throw new UnauthorizedException('No authheader sent.');
 			}
 
-			const token = this.extractBearerToken(headers.authorization);
+			const token = this.extractBearerToken(authHeader);
+
 			if (!token) {
 				throw new UnauthorizedException('No bearertoken sent.');
 			}
@@ -40,6 +35,16 @@ export class AuthCognitoGuard implements CanActivate {
 				throw new InternalServerErrorException('Error while validating token.');
 			}
 		}
+	}
+
+	private extractAuthHeaderFromRequest(request: any): string | undefined {
+		let authHeader: string | undefined;
+		if (request.headers && request.headers.authorization) {
+			authHeader = request.headers.authorization;
+		} else if (request.handshake && request.handshake.query && request.handshake.query.authorization) {
+			authHeader = request.handshake.query.authorization;
+		}
+		return authHeader;
 	}
 
 	private extractBearerToken(authHeader: string): string | undefined {
