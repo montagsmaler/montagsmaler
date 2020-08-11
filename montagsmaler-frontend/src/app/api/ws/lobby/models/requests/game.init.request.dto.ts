@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsNumber, Min, Max } from 'class-validator';
+import { plainToClassAndValidate } from 'src/app/api/common';
 
 export interface IGameInitRequest {
   lobbyId: string;
@@ -21,11 +22,7 @@ export class GameInitRequest implements IGameInitRequest {
   @Max(10)
   rounds: number;
 
-  public static fromObject(obj: IGameInitRequest): GameInitRequest {
-    const gameInitRequest = new GameInitRequest();
-    gameInitRequest.lobbyId = obj.lobbyId;
-    gameInitRequest.roundDuration = obj.roundDuration;
-    gameInitRequest.rounds = obj.rounds;
-    return gameInitRequest;
+  public static fromObject(obj: IGameInitRequest): Promise<GameInitRequest> {
+    return plainToClassAndValidate<GameInitRequest, IGameInitRequest>(GameInitRequest, obj);
   }
 }

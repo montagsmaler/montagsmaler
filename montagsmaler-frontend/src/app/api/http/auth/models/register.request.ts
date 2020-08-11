@@ -1,3 +1,6 @@
+import { IsString, IsNotEmpty, IsEmail, Length, Matches } from 'class-validator';
+import { plainToClassAndValidate } from 'src/app/api/common';
+
 export interface IRegisterRequest {
   name: string;
   email: string;
@@ -5,13 +8,26 @@ export interface IRegisterRequest {
 }
 
 export class RegisterRequest implements IRegisterRequest {
+
+  @IsString()
+  @IsNotEmpty()
   name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
   email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Length(8)
+  @Matches(/[a-z]/)
+  @Matches(/[A-Z]/)
+  @Matches(/[0-9]/)
+  @Matches(/[$-/:-?{-~!"^_`\[\]]/)
   password: string;
 
-  constructor(obj?: IRegisterRequest) {
-    if (obj && typeof obj === 'object') {
-      Object.assign(this, obj);
-    }
+  public static fromObject(obj: IRegisterRequest): Promise<RegisterRequest> {
+    return plainToClassAndValidate(RegisterRequest, obj);
   }
 }

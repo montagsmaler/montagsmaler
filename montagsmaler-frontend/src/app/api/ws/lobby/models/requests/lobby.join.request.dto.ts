@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator'
+import { plainToClassAndValidate } from 'src/app/api/common';
 
 export interface ILobbyJoinRequest {
   lobbyId: string;
@@ -10,9 +11,7 @@ export class LobbyJoinRequest {
   @IsNotEmpty()
   lobbyId: string;
 
-  public static fromObject(obj: ILobbyJoinRequest): LobbyJoinRequest {
-    const lobbyJoinRequest = new LobbyJoinRequest();
-    lobbyJoinRequest.lobbyId = obj.lobbyId;
-    return lobbyJoinRequest;
+  public static fromObject(obj: ILobbyJoinRequest): Promise<LobbyJoinRequest> {
+    return plainToClassAndValidate(LobbyJoinRequest, obj);
   }
 }

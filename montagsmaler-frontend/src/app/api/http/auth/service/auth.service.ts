@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ILoginRequest, IRegisterResult, IRegisterRequest, IVerifyRequest, IVerifyResult, User, ILoginResult, IAccessToken, IIdToken } from '../models';
+import { ILoginRequest, IRegisterResult, IRegisterRequest, IVerifyRequest, IVerifyResult, User, ILoginResult, IAccessToken, IIdToken, LoginRequest, RegisterRequest, VerifyRequest } from '../models';
 import { environment } from 'src/environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Router } from '@angular/router';
@@ -41,7 +41,7 @@ export class AuthService {
 
   public async login(loginRequest: ILoginRequest): Promise<void> {
     try {
-      const tokens = await this.http.post<ILoginResult>(`${this.baseUrlAuth}/login`, loginRequest, skipAccessToken).toPromise();
+      const tokens = await this.http.post<ILoginResult>(`${this.baseUrlAuth}/login`, await LoginRequest.fromObject(loginRequest), skipAccessToken).toPromise();
       this.setLoggedInUser(tokens.idToken);
       this.setAccessToken(tokens.accessToken);
     } catch (err) {
@@ -61,7 +61,7 @@ export class AuthService {
 
   public async register(registerRequest: IRegisterRequest): Promise<IRegisterResult> {
     try {
-      return await this.http.post<IRegisterResult>(`${this.baseUrlAuth}/register`, registerRequest).toPromise();
+      return await this.http.post<IRegisterResult>(`${this.baseUrlAuth}/register`, await RegisterRequest.fromObject(registerRequest)).toPromise();
     } catch (err) {
       throw err;
     }
@@ -69,7 +69,7 @@ export class AuthService {
 
   public async verify(verifyRequest: IVerifyRequest): Promise<IVerifyResult> {
     try {
-      return await this.http.post<IVerifyResult>(`${this.baseUrlAuth}/verifyRegister`, verifyRequest).toPromise();
+      return await this.http.post<IVerifyResult>(`${this.baseUrlAuth}/verifyRegister`, await VerifyRequest.fromObject(verifyRequest)).toPromise();
     } catch (err) {
       throw err;
     }

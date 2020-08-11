@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { WsClientService } from '../../ws-client';
+import { WsClientService, IWsConnection } from '../../ws-client';
 import { LobbyEvents, Lobby } from '../models';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-import { first } from 'rxjs/internal/operators';
-import { LobbyJoinRequest, LobbyLeaveRequest } from '../models/requests';
+import { first, filter, tap } from 'rxjs/internal/operators';
+import { LobbyJoinRequest, LobbyLeaveRequest, IGameInitRequest, GameInitRequest } from '../models/requests';
 import { LobbyPlayerLeftEvent, LobbyPlayerJoinedEvent, LobbyConsumedEvent } from '../models/events';
-import { IWsConnection } from '../../ws-client/service/ws-connection';
+import { GameService } from '../../game';
 
 @Injectable({
   providedIn: 'root'
@@ -17,97 +17,71 @@ export class LobbyService {
   private readonly lobby$ = new BehaviorSubject<Lobby | null>(null);
   private lobbyPlayerJoinedSub: Subscription;
   private lobbyPlayerLeftSub: Subscription;
-  private lobbyConsumedSub: Subscription;
 
-  constructor(private readonly wsClient: WsClientService) { }
+  constructor(private readonly wsClient: WsClientService, private readonly gameService: GameService) { }
 
-  public initCon(): void {
+  private connect(): void {
     if (!this.lobbyConnection) {
       this.lobbyConnection = this.wsClient.getConnectionForNamespace(this.namespace);
     }
   }
 
-  public joinLobby(lobbyId: string): void {
+  public async joinLobby(lobbyId: string): Promise<void> {
+    const lobbyJoinRequest = await LobbyJoinRequest.fromObject({ lobbyId });
+    this.connect();
     this.subToLobbyEvents();
-    const lobbyJoinRequest = LobbyJoinRequest.fromObject({ lobbyId });
     this.lobbyConnection.sendMessage(LobbyEvents.PLAYER_JOINED, lobbyJoinRequest);
   }
 
   public createLobby(): void {
+    this.connect();
     this.subToLobbyEvents();
     this.lobbyConnection.sendMessage(LobbyEvents.INIT_LOBBY, {});
   }
 
-  public leaveLobby(): void {
-    if (this.getLobby() === null) throw new Error('Lobby is null');
-    const lobbyLeaveRequest = LobbyLeaveRequest.fromObject({ lobbyId: this.getLobby().id });
+  public async leaveLobby(): Promise<void> {
+    if (this.getLobby() === null) {
+      throw new Error('Lobby is null');
+    }
+    const lobbyLeaveRequest = await LobbyLeaveRequest.fromObject({ lobbyId: this.getLobby().id });
     this.lobbyConnection.sendMessage(LobbyEvents.PLAYER_LEFT, lobbyLeaveRequest);
     this.unsubscribeLobbyEvents();
     this.lobby$.next(null);
   }
 
   private subToLobbyEvents(): void {
-    this.getLobbyEvent$().subscribe({
-      next: lobby => this.lobby$.next(new Lobby(lobby.id, lobby.createdAt, lobby.members)),
-      complete: () => this.unsubscribeLobbyEvent(),
+    this.getLobbyEvent$().subscribe(lobby => this.lobby$.next(new Lobby(lobby.id, lobby.createdAt, lobby.members)));
+
+    this.lobbyPlayerJoinedSub = this.getLobbyPlayerJoinedEvents$().subscribe(lobbyPlayerJoinedEvent => {
+      const lobby = this.getLobby();
+      lobby.addPlayer(lobbyPlayerJoinedEvent.player);
+      this.lobby$.next(lobby);
     });
 
-    this.lobbyPlayerJoinedSub = this.getLobbyPlayerJoinedEvents$().subscribe(
-      {
-        next: lobbyPlayerJoinedEvent => {
-          const lobby = this.getLobby();
-          lobby.addPlayer(lobbyPlayerJoinedEvent.player);
-          this.lobby$.next(lobby);
-        },
-        complete: () => this.unsubscribeLobbyPlayerJoinedEvents(),
-      }
-    );
-
-    this.lobbyPlayerLeftSub = this.getLobbyPlayerLeftEvents$().subscribe(
-      {
-        next: lobbyPlayerLeftEvent => {
-          const lobby = this.getLobby();
-          lobby.removePlayer(lobbyPlayerLeftEvent.player);
-          this.lobby$.next(lobby);
-        },
-        complete: () => this.unsubscribeLobbyPlayerLeftEvents(),
-      }
-    );
-
-    this.lobbyConsumedSub = this.getLobbyConsumedEvent$().subscribe(
-      {
-        next: lobbyConsumedEvent => {
-          this.lobby$.next(null);
-          this.unsubscribeLobbyEvents();
-          //lobbyConsumedEvent.game todo
-
-        },
-        complete: () => this.unsubscribeLobbyConsumedEvent(),
-      },
-    );
+    this.lobbyPlayerLeftSub = this.getLobbyPlayerLeftEvents$().subscribe(lobbyPlayerLeftEvent => {
+      const lobby = this.getLobby();
+      lobby.removePlayer(lobbyPlayerLeftEvent.player);
+      this.lobby$.next(lobby);
+    });
   }
 
   private unsubscribeLobbyEvents(): void {
     try {
       if (this.lobbyPlayerJoinedSub) {
         this.lobbyPlayerJoinedSub.unsubscribe();
-        this.unsubscribeLobbyPlayerJoinedEvents();
       }
       if (this.lobbyPlayerLeftSub) {
         this.lobbyPlayerLeftSub.unsubscribe();
-        this.unsubscribeLobbyPlayerLeftEvents();
-      }
-      if (this.lobbyConsumedSub) {
-        this.lobbyConsumedSub.unsubscribe();
-        this.unsubscribeLobbyConsumedEvent();
       }
     } catch (err) {
       console.warn(err);
     }
   }
 
-  public getLobby$(): Observable<Lobby | null> {
-    return this.lobby$.asObservable();
+  public getLobby$(): Observable<Lobby> {
+    return this.lobby$.pipe(
+      filter(lobby => (lobby) ? true : false),
+    );
   }
 
   public getLobby(): Lobby | null {
@@ -120,39 +94,34 @@ export class LobbyService {
     );
   }
 
-  private unsubscribeLobbyEvent(): void {
-    //this.lobbyConnection.unsubscribeEvent(LobbyEvents.GET_LOBBY);
+  public async initGame(gameInitRequest: IGameInitRequest): Promise<void> {
+    const gameInitRequestValidated = await GameInitRequest.fromObject(gameInitRequest);
+    this.lobbyConnection.sendMessage(LobbyEvents.GAME_INIT, gameInitRequestValidated);
   }
 
   public getLobbyPlayerLeftEvents$(): Observable<LobbyPlayerLeftEvent> {
     return this.lobbyConnection.getMessages$<LobbyPlayerLeftEvent>(LobbyEvents.PLAYER_LEFT);
   }
 
-  public unsubscribeLobbyPlayerLeftEvents(): void {
-    //his.lobbyConnection.unsubscribeEvent(LobbyEvents.PLAYER_LEFT);
-  }
-
   public getLobbyPlayerJoinedEvents$(): Observable<LobbyPlayerJoinedEvent> {
     return this.lobbyConnection.getMessages$<LobbyPlayerJoinedEvent>(LobbyEvents.PLAYER_JOINED);
-  }
-
-  public unsubscribeLobbyPlayerJoinedEvents(): void {
-    //this.lobbyConnection.unsubscribeEvent(LobbyEvents.PLAYER_JOINED);
   }
 
   public getLobbyConsumedEvent$(): Observable<LobbyConsumedEvent> {
     return this.lobbyConnection.getMessages$<LobbyConsumedEvent>(LobbyEvents.CONSUMED).pipe(
       first(),
+      tap(() => this.disconnect()),
     );
   }
 
-  public unsubscribeLobbyConsumedEvent(): void {
-    //this.lobbyConnection.unsubscribeEvent(LobbyEvents.CONSUMED);
-  }
-
-  public close(): void {
-    this.lobbyConnection.close();
-    this.lobby$.next(null);
-    this.lobbyConnection = null;
+  public disconnect(): void {
+    try {
+      this.unsubscribeLobbyEvents();
+      this.lobby$.next(null);
+      this.lobbyConnection.disconnect();
+      this.lobbyConnection = null;
+    } catch (err) {
+      console.warn(err);
+    }
   }
 }
