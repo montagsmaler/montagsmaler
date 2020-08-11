@@ -121,7 +121,7 @@ export class LobbyService {
   }
 
   private unsubscribeLobbyEvent(): void {
-    this.lobbyConnection.unsubscribeEvent(LobbyEvents.GET_LOBBY);
+    //this.lobbyConnection.unsubscribeEvent(LobbyEvents.GET_LOBBY);
   }
 
   public getLobbyPlayerLeftEvents$(): Observable<LobbyPlayerLeftEvent> {
@@ -129,7 +129,7 @@ export class LobbyService {
   }
 
   public unsubscribeLobbyPlayerLeftEvents(): void {
-    this.lobbyConnection.unsubscribeEvent(LobbyEvents.PLAYER_LEFT);
+    //his.lobbyConnection.unsubscribeEvent(LobbyEvents.PLAYER_LEFT);
   }
 
   public getLobbyPlayerJoinedEvents$(): Observable<LobbyPlayerJoinedEvent> {
@@ -137,7 +137,7 @@ export class LobbyService {
   }
 
   public unsubscribeLobbyPlayerJoinedEvents(): void {
-    this.lobbyConnection.unsubscribeEvent(LobbyEvents.PLAYER_JOINED);
+    //this.lobbyConnection.unsubscribeEvent(LobbyEvents.PLAYER_JOINED);
   }
 
   public getLobbyConsumedEvent$(): Observable<LobbyConsumedEvent> {
@@ -147,7 +147,7 @@ export class LobbyService {
   }
 
   public unsubscribeLobbyConsumedEvent(): void {
-    this.lobbyConnection.unsubscribeEvent(LobbyEvents.CONSUMED);
+    //this.lobbyConnection.unsubscribeEvent(LobbyEvents.CONSUMED);
   }
 
   public close(): void {

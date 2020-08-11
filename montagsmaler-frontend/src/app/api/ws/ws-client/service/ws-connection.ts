@@ -1,39 +1,33 @@
-import { Observable, Subject } from 'rxjs';
-import { filter, map } from 'rxjs/internal/operators';
-import { WebSocketSubject } from 'rxjs/webSocket';
-import { WsMessage } from './models/ws-client.response';
+import { Observable, fromEvent } from 'rxjs';
 
 export interface IWsConnection {
   sendMessage<T>(event: string, msg: T): void;
   getMessages$<T>(event: string): Observable<T>;
-  unsubscribeEvent(event: string): void;
   close(): void;
+  disconnect(): void;
 }
 
-export class RxjsWsConnection implements IWsConnection {
-  constructor(protected readonly websocketSubject: WebSocketSubject<WsMessage>) { }
+export class WsConnection implements IWsConnection {
+
+  constructor(protected readonly socket: SocketIOClient.Socket) { }
 
   close(): void {
-    this.websocketSubject.complete();
+    this.socket.close();
+  }
+
+  disconnect(): void {
+    this.socket.disconnect();
   }
 
   sendMessage<T>(event: string, msg: T): void {
-    this.websocketSubject.next({ event, data: msg });
+    this.socket.emit(event, msg);
   }
 
   getMessages$<T>(event: string): Observable<T> {
-    return this.websocketSubject.pipe(
-      filter(wsMessage => wsMessage.event === event),
-      map(wsMessage => wsMessage.data as T),
-    );
-  }
-
-  unsubscribeEvent(event: string): void {
-
+    return fromEvent<T>(this.socket, event);
   }
 }
-
-
+/*
 export class WsConnection implements IWsConnection {
 
   protected readonly listeningEvents = new Map<string, Subject<unknown>>();
@@ -90,3 +84,4 @@ export class WsConnection implements IWsConnection {
     return newSubscriberCount;
   }
 }
+*/
