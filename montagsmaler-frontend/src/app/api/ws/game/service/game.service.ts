@@ -26,6 +26,7 @@ export class GameService {
   public getGame$(): Observable<Game> {
     return this.game$.pipe(
       filter(game => (game) ? true : false),
+      first(),
     );
   }
 

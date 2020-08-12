@@ -6,9 +6,10 @@ import { WelcomeModule } from './welcome/welcome.module';
 import { GameLobbyModule } from './game-lobby/game-lobby.module';
 import { GameModule } from './game/game.module';
 import { GameComponent } from './game/game.component';
+import { GameHomeComponent } from './game-home/game-home.component';
 
 @NgModule({
-  declarations: [LayoutComponent],
+  declarations: [LayoutComponent, GameHomeComponent],
   imports: [
     CommonModule,
     RouterModule,

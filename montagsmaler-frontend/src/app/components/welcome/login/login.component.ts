@@ -23,8 +23,6 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.authService.getLoggedInUser$().subscribe(console.log);
-    this.authService.getCognitoUser().then(console.log).catch(console.warn);
   }
 
   switch() {

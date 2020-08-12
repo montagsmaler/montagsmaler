@@ -1,6 +1,6 @@
 <div class="focus" *ngIf="create" (click)="cancel($event)"></div>
 
-<div class="{{create? 'background-focus flex_center_column' : 'background flex_center_column'}}" (click)="addNew($event)">
+<div class="{{create? 'background-focus flex_center_column' : 'background flex_center_column'}}" (click)="createLobby()">
   <div class="icon-background flex_center_column" [ngStyle]="{'backgroundColor' : '#00D5B9'}">
     <img src="assets/images/plus.svg">
   </div>

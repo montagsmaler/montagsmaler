@@ -4,24 +4,26 @@ import { LayoutComponent } from './components/layout/layout.component';
 import { WelcomeComponent } from './components/welcome/welcome.component';
 import { GameLobbyComponent } from './components/game-lobby/game-lobby.component';
 import { GameComponent } from './components/game/game.component';
+import { GameHomeComponent } from './components/game-home/game-home.component';
 
 const routes: Routes = [
   {
-    path: "",
+    path: '',
     component: LayoutComponent,
     children: [
       {
-        path: "",
-        redirectTo: "welcome",
-        pathMatch: "full",
+        path: '',
+        redirectTo: 'welcome',
+        pathMatch: 'full',
       },
       {
-        path: "welcome",
+        path: 'welcome',
         component: WelcomeComponent,
       },
-      { path: "home", component: GameLobbyComponent },
+      { path: 'home', component: GameHomeComponent },
+      { path: 'lobby/:lobbyId', component: GameLobbyComponent },
       {
-        path: "game",
+        path: 'game/:gameId',
         component: GameComponent,
       },
     ],
@@ -32,4 +34,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

@@ -89,7 +89,7 @@ export class AuthService {
   }
 
   /**
-   * Testroute
+   * returns the current logged in user
    */
   public async getCognitoUser(): Promise<any> {
     try {
