@@ -1,6 +1,14 @@
 import { Player } from '../../lobby/models';
 
-export class Game {
+export interface IGame {
+  readonly id: string;
+  readonly createdAt: number;
+  readonly players: Player[];
+  readonly durationRound: number;
+  readonly rounds: number;
+}
+
+export class Game implements IGame {
   constructor(
     public readonly id: string,
     public readonly createdAt: number,

@@ -1,6 +1,7 @@
 import { GameEvent } from '../game.event';
-import { Game } from '../game';
+import { IGame } from '../game';
 
-export class GameStartedEvent implements GameEvent {
-  constructor(public readonly id: number, public readonly game: Game) { }
+export interface GameStartedEvent extends GameEvent {
+  readonly id: number;
+  readonly game: IGame;
 }

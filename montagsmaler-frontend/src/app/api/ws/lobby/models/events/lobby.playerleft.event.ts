@@ -1,7 +1,7 @@
 import { Player } from '../player';
 import { LobbyEvent } from './lobby.event';
 
-export class LobbyPlayerLeftEvent implements LobbyEvent {
+export interface LobbyPlayerLeftEvent extends LobbyEvent {
 
   readonly id: number;
   readonly player: Player;
