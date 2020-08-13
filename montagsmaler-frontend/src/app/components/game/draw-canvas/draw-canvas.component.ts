@@ -4,16 +4,18 @@ import {
   ElementRef,
   AfterViewInit,
   ViewChild,
+  OnDestroy,
 } from '@angular/core';
-import { fromEvent } from 'rxjs';
+import { fromEvent, Subscription } from 'rxjs';
 import { switchMap, takeUntil, pairwise } from 'rxjs/operators';
+import { GameService } from 'src/app/api/ws/game';
 
 @Component({
   selector: 'app-draw-canvas',
   templateUrl: './draw-canvas.component.html',
   styleUrls: ['./draw-canvas.component.scss'],
 })
-export class DrawCanvasComponent implements AfterViewInit {
+export class DrawCanvasComponent implements AfterViewInit, OnDestroy {
   @Input() public width = 650;
   @Input() public height = 500;
 
@@ -24,8 +26,11 @@ export class DrawCanvasComponent implements AfterViewInit {
   private lineWidth = 5;
   private strokeStyle = '#000';
   private lineCounter = 0;
+  private imageShouldSubmitSub: Subscription;
 
   image;
+
+  constructor(private readonly gameService: GameService) { }
 
   public ngAfterViewInit() {
     const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
@@ -39,6 +44,16 @@ export class DrawCanvasComponent implements AfterViewInit {
     this.cx.strokeStyle = this.strokeStyle;
 
     this.captureEvents(canvasEl);
+
+    this.imageShouldSubmitSub = this.gameService.getImageShouldSubmit$().subscribe(_ => {
+      this.gameService.setSubmitImage(this.getImage());
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.imageShouldSubmitSub) {
+      this.imageShouldSubmitSub.unsubscribe();
+    }
   }
 
   private captureEvents(canvasEl: HTMLCanvasElement) {
@@ -162,8 +177,12 @@ export class DrawCanvasComponent implements AfterViewInit {
     this.cx.stroke();
   }
 
-  downloadImage() {
+  getImage() {
     const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
-    this.image = canvasEl.toDataURL();
+    return canvasEl.toDataURL();
+  }
+
+  downloadImage() {
+    this.image = this.getImage();
   }
 }

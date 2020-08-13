@@ -115,13 +115,15 @@ export class LobbyService {
   }
 
   public disconnect(): void {
-    try {
-      this.unsubscribeLobbyEvents();
-      this.lobby$.next(null);
-      this.lobbyConnection.disconnect();
-      this.lobbyConnection = null;
-    } catch (err) {
-      console.warn(err);
+    if (this.lobbyConnection) {
+      try {
+        this.unsubscribeLobbyEvents();
+        this.lobby$.next(null);
+        this.lobbyConnection.disconnect();
+        this.lobbyConnection = null;
+      } catch (err) {
+        console.warn(err);
+      }
     }
   }
 }

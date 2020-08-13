@@ -16,7 +16,21 @@ export class PlayerItemComponent implements OnInit {
 
   ngOnInit() {}
 
-  getRandomColor(inputNumber: number) {
-    return getRandomColor(inputNumber);
+  generateHashFromString(str: string): number {
+    let hash = 0, i, chr;
+    for (i = 0; i < 10; i++) {
+      chr = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    if (hash < 0) {
+      hash *= -1;
+    }
+    return hash;
+  }
+
+  getRandomColor(id: string) {
+    const hash = this.generateHashFromString(id);
+    return getRandomColor(hash);
   }
 }

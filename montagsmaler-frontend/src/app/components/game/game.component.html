@@ -3,9 +3,9 @@
 <div class="flex_center_column">
   <app-draw-canvas style="position: relative; left: 30px;"></app-draw-canvas>
   <p>Du hast noch: <span class="time-left">30:00</span> Sekunden Zeit</p>
-  <p (click)="showCountdown($event)" class="btn_green flex_center_column" style="flex-direction: row;">
+  <a (click)="submitImage()" class="btn_green flex_center_column" style="flex-direction: row;">
     <img src="assets/images/check.svg" width="20px" style="padding-right: 20px;" />
-    Fertig</p>
+    Fertig</a>
 </div>
 
 

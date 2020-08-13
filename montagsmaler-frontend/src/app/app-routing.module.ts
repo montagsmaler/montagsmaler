@@ -13,7 +13,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'welcome',
+        redirectTo: 'home',
         pathMatch: 'full',
       },
       {
