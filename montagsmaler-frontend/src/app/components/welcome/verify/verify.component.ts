@@ -21,7 +21,7 @@ export class VerifyComponent implements OnInit {
     ) {
       this.confirmationForm = this.formBuilder.group({
         name: '',
-        confirmation: ''
+        confirmationCode: ''
       });
     }
 
