@@ -8,7 +8,7 @@
   <p *ngIf="!create" class="title">Spiellobby erstellen</p>
 
     <input #box (keyup)="onKey(box.value)" *ngIf="create" placeholder="Name eingeben" >
-    <img *ngIf="create" class="btn_round_green" src="assets/images/check.svg" width="30px" />
+    <!-- <img *ngIf="create" class="btn_round_green" src="assets/images/check.svg" width="30px" (click)="createLobby()"/> -->
 
 </div>
 

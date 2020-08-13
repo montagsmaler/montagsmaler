@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { LobbyService } from 'src/app/api/ws/lobby';
 import { Subscription, Subject, from, of, Observable } from 'rxjs';
 import { Lobby } from 'src/app/api/ws/lobby/models';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { map, filter, switchMap, first } from 'rxjs/internal/operators';
 
 @Component({
@@ -16,7 +16,11 @@ export class CreateLobbyComponent implements OnInit, OnDestroy {
   private readonly lobbySubscriptions = new Set<Subscription>();
   public readonly lobby$ = new Subject<Lobby>();
 
-  constructor(private readonly lobbyService: LobbyService, private readonly activatedRoute: ActivatedRoute) { }
+  constructor(
+    private readonly lobbyService: LobbyService,
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router,
+    ) { }
 
   /**
    *
@@ -51,10 +55,17 @@ export class CreateLobbyComponent implements OnInit, OnDestroy {
     });
   }
 
+  showCreateTextField() {
+    this.create = true;
+  }
+
   createLobby() {
     this.lobbyService.createLobby();
-    this.subToLobbyEvents();
-    this.create = true;
+    this.lobbyService.getLobby$().pipe(
+      switchMap( lobby => {
+        return this.router.navigate(['/lobby/', lobby.id ]);
+      }),
+    );
   }
 
   async joinLobby(lobbyId: string) {
