@@ -13,7 +13,7 @@
       <div class="link_background flex_center_column" style="flex-direction: row;">
         <a href="{{lobbyUrl}}">{{lobbyUrl}}</a>
       </div>
-      <img class="btn_copy" src="assets/images/copy.svg" />
+      <a (click)="copyLobbyUrlToClipboard()"><img class="btn_copy" src="assets/images/copy.svg"></a>
     </div>
     <br>
     <a class="btn_green" (click)="startGame()" *ngIf="isLobbyLeader">

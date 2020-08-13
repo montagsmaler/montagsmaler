@@ -47,7 +47,6 @@ export class GameLobbyComponent implements OnInit, OnDestroy {
     ) {}
 
   async ngOnInit() {
-    const lobby = this.lobbyService.getLobby();
     if (!this.authService.getLoggedInUser()) {
       await this.authService.getCognitoUser();
     }
@@ -56,6 +55,7 @@ export class GameLobbyComponent implements OnInit, OnDestroy {
       filter(id => (id) ? true : false),
       first(),
     );
+    const lobby = this.lobbyService.getLobby();
     lobbyId$
       .pipe(
         switchMap(id => {
@@ -93,7 +93,7 @@ export class GameLobbyComponent implements OnInit, OnDestroy {
     const lobbySub = this.lobbyService.getLobby$().subscribe(lobby => {
       const members = lobby.members;
       if (members.length > 0 && members[0].id === this.authService.getLoggedInUser().id) {
-         this.isLobbyLeader = true;
+        this.isLobbyLeader = true;
       }
       this.lobby = lobby;
     });
@@ -110,5 +110,23 @@ export class GameLobbyComponent implements OnInit, OnDestroy {
 
   async startGame() {
     await this.lobbyService.initGame({ lobbyId: this.lobbyId, roundDuration: 30, rounds: 3 });
+  }
+
+  copyLobbyUrlToClipboard() {
+    this.copyToClipboard(this.lobbyUrl);
+  }
+
+  copyToClipboard(val: string) {
+    const selBox = document.createElement('textarea');
+    selBox.style.position = 'fixed';
+    selBox.style.left = '0';
+    selBox.style.top = '0';
+    selBox.style.opacity = '0';
+    selBox.value = val;
+    document.body.appendChild(selBox);
+    selBox.focus();
+    selBox.select();
+    document.execCommand('copy');
+    document.body.removeChild(selBox);
   }
 }
