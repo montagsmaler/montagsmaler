@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { getRandomColor } from '../../../../utility/utility.js';
+import { getRandomColor } from '../../../utility/utility.js';
 
 
 @Component({

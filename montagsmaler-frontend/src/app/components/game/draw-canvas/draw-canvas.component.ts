@@ -46,7 +46,6 @@ export class DrawCanvasComponent implements AfterViewInit {
     fromEvent(canvasEl, 'mousedown')
       .pipe(
         switchMap((e) => {
-          console.log(this.lineCounter);
           this.lineCounter = this.lineCounter + 1;
           // after a mouse down, we'll record all mouse moves
           return fromEvent(canvasEl, 'mousemove').pipe(
@@ -63,8 +62,6 @@ export class DrawCanvasComponent implements AfterViewInit {
       )
       .subscribe((res: [MouseEvent, MouseEvent]) => {
         const rect = canvasEl.getBoundingClientRect();
-
-        console.log(res);
 
         // previous and current position with the offset
         const prevPos = {
@@ -148,7 +145,6 @@ export class DrawCanvasComponent implements AfterViewInit {
     let lineCount = 0;
 
     for (let i = 0; i < this.points.length; i++) {
-      console.log(this.points);
 
       const pt = this.points[i];
 

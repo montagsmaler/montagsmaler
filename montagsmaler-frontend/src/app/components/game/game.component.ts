@@ -35,20 +35,20 @@ export class GameComponent implements OnInit, OnDestroy {
   constructor(private readonly gameService: GameService, private readonly activatedRoute: ActivatedRoute) {}
 
   ngOnInit() {
-    const gameId$: Observable<string> = this.activatedRoute.params.pipe(
-      map(params => params.gameId),
-      filter(id => (id) ? true : false),
-      first(),
-    );
-    gameId$.pipe(
-      switchMap(id => from(this.gameService.joinGame(id))),
-      switchMap(() => this.gameService.getGame$()),
-      first(),
-    ).subscribe(game => {
-      //we have successfully joined the game
-      this.game$.next(game);
-      this.subscribeGameEvents();
-    });
+    // const gameId$: Observable<string> = this.activatedRoute.params.pipe(
+    //   map(params => params.gameId),
+    //   filter(id => (id) ? true : false),
+    //   first(),
+    // );
+    // gameId$.pipe(
+    //   switchMap(id => from(this.gameService.joinGame(id))),
+    //   switchMap(() => this.gameService.getGame$()),
+    //   first(),
+    // ).subscribe(game => {
+    //   //we have successfully joined the game
+    //   this.game$.next(game);
+    //   this.subscribeGameEvents();
+    // });
   }
 
   private subscribeGameEvents() {

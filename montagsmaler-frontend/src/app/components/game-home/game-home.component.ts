@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { LobbyService } from 'src/app/api/ws/lobby';
 
 @Component({
   selector: 'app-game-home',
@@ -8,7 +7,8 @@ import { LobbyService } from 'src/app/api/ws/lobby';
 })
 export class GameHomeComponent implements OnInit {
 
-  constructor(private readonly lobbyService: LobbyService) { }
+  games = [0, 1, 2, 3, 4];
+  constructor() { }
 
   ngOnInit() {
   }

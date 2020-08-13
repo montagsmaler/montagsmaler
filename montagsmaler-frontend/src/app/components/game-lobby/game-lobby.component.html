@@ -1,10 +1,29 @@
-<h1>Montagsmaler</h1>
-<p>
-  Schaffst du es besser zu malen, als deine Mitspieler? <br>Nimm die Herausforderung
-  an und tritt gegen deine Freunde an!
-</p>
+<div class="background flex_center_column">
+  <div class="popup flex_center_column" @enterAnimation>
+    <h1>Alle start klar?</h1>
+    <br>
+    <div class class="players">
+      <app-player-item name="Du" [empty]="false" playerId="4"></app-player-item>
+      <div class="comopetitors">
+        <app-player-item name="Paul" [empty]="false" playerId="3"></app-player-item>
+        <app-player-item name="Gustav" [empty]="false" playerId="2"></app-player-item>
+        <app-player-item name="" [empty]="true" playerId="1"></app-player-item>
+        <app-player-item name="" [empty]="true" playerId="0"></app-player-item>
+      </div>
+    </div>
+    <br>
+    <p>Teile den Link, um Mitspieler einzuladen</p>
+    <div class="flex_center_column" style="flex-direction: row;">
+      <div class="link_background flex_center_column" style="flex-direction: row;">
+        <a href="https://montagsmaler.invite.link.de">https://montagsmaler.invite.link.de</a>
+      </div>
+      <img class="btn_copy" src="assets/images/copy.svg" />
+    </div>
+    <br>
+    <p class="btn_green">
+      <img src="assets/images/play.svg" width="20px" style="padding-right: 20px;" />
+      Spiel starten</p>
 
-<div class="container">
-    <app-lobby-item *ngFor="let game of games" [game]="game"></app-lobby-item>
-    <app-create-lobby></app-create-lobby>
+    <ng-content></ng-content>
+  </div>
 </div>
