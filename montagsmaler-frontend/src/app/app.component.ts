@@ -9,9 +9,9 @@ import { AuthService } from './api/http/auth';
 export class AppComponent implements OnInit {
   title = 'montagsmaler-frontend';
 
-  constructor(private readonly authService: AuthService) { }
+  constructor() { }
 
   ngOnInit(): void {
-    this.authService.getCognitoUser().then(console.log).catch(console.warn);
+
   }
 }

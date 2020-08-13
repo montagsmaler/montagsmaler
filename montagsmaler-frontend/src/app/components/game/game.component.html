@@ -1,4 +1,6 @@
-<h1>Male ein Pferd</h1>
+<h1 *ngIf="currentWord">Male ein {{currentWord}}</h1>
+<h1 style="color: red" *ngIf="roundOver">ROUND OVER</h1>
+<h1 *ngIf="gameOver"><strong>GAME OVER</strong></h1>
 <span (click)="boolGameStarted = false; boolCountdown = true;">Start</span>
 <div class="flex_center_column">
   <app-draw-canvas style="position: relative; left: 30px;"></app-draw-canvas>
@@ -7,11 +9,6 @@
     <img src="assets/images/check.svg" width="20px" style="padding-right: 20px;" />
     Fertig</a>
 </div>
-
-
-
-
-
 
 <app-countdown *ngIf="boolCountdown" @ngIfAnimation>
     <h1 class="h1-counter">Mach dich bereit!</h1>

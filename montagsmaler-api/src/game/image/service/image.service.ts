@@ -58,6 +58,7 @@ export class ImageService {
 			await this.addImage(gameId, image);
 			return image;
 		} catch (err) {
+			console.log(err);
 			throw new Error('Error while rating and adding image.');
 		}
 	}

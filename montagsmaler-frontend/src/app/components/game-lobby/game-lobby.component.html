@@ -1,8 +1,8 @@
 <div class="background flex_center_column">
-  <div class="popup flex_center_column" @enterAnimation>
+  <div class="popup flex_center_column" *ngIf="lobby" @enterAnimation>
     <h1>Alle start klar?</h1>
     <br>
-    <div class class="players" *ngIf="lobby">
+    <div class class="players">
       <div class="comopetitors" *ngFor="let player of lobby.members">
         <app-player-item name="{{player.name}}" [empty]="false" playerId="{{player.id}}"></app-player-item>
       </div>
@@ -11,12 +11,12 @@
     <p>Teile den Link, um Mitspieler einzuladen</p>
     <div class="flex_center_column" style="flex-direction: row;">
       <div class="link_background flex_center_column" style="flex-direction: row;">
-        <a href="{{lobbyUrl}}">{{lobbyUrl}}</a>
+        <a href="javascript:">{{lobbyUrl}}</a>
       </div>
-      <a (click)="copyLobbyUrlToClipboard()"><img class="btn_copy" src="assets/images/copy.svg"></a>
+      <a href="javascript:" (click)="copyLobbyUrlToClipboard()"><img class="btn_copy" src="assets/images/copy.svg"></a>
     </div>
     <br>
-    <a class="btn_green" (click)="startGame()" *ngIf="isLobbyLeader">
+    <a href="javascript:" class="btn_green" (click)="startGame()" *ngIf="isLobbyLeader">
       <img src="assets/images/play.svg" width="20px" style="padding-right: 20px;" />
       Spiel starten</a>
 

@@ -16,8 +16,7 @@ export class LayoutComponent implements OnInit {
 
   ngOnInit() {
     this.authService.getLoggedInUser$().subscribe(next => {
-        console.log(next);
-        this.User = next;
+      this.User = next;
     });
     this.authService.getCognitoUser().then(console.log).catch(console.warn);
   }

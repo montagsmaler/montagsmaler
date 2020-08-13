@@ -1,13 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import {
-  trigger,
-  query,
-  animateChild,
-  state,
-  style,
-  animate,
-  transition,
-} from '@angular/animations';
+import { trigger, query, animateChild, transition } from '@angular/animations';
 import { GameService } from 'src/app/api/ws/game';
 import { ActivatedRoute } from '@angular/router';
 import { map, filter, switchMap, first, tap } from 'rxjs/internal/operators';
@@ -25,11 +17,15 @@ import { Game } from 'src/app/api/ws/game/models';
   ],
 })
 export class GameComponent implements OnInit, OnDestroy {
-  boolCountdown: boolean = false;
-  counter: number = 3;
-  interval;
-  public readonly game$ = new Subject<Game>();
   private readonly gameSubscriptions = new Set<Subscription>();
+  public readonly game$ = new Subject<Game>();
+  public currentRound: number;
+  public currentWord: string;
+  boolCountdown = false;
+  roundOver = false;
+  gameOver = false;
+  counter = 3;
+  interval;
   gameId: string;
 
   constructor(private readonly gameService: GameService, private readonly activatedRoute: ActivatedRoute) {}
@@ -53,6 +49,31 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   private subscribeGameEvents() {
+    const gameStartedEventSub = this.gameService.getGameStartedEvent$().subscribe(console.log);
+    this.gameSubscriptions.add(gameStartedEventSub);
+    const newGameRoundEventSub = this.gameService.getNewGameRoundEvent$().subscribe(newGameRoundEvent => {
+      this.roundOver = false;
+      this.currentRound = newGameRoundEvent.round;
+      this.currentWord = newGameRoundEvent.noun;
+      console.log(newGameRoundEvent);
+    });
+    this.gameSubscriptions.add(newGameRoundEventSub);
+    const gameImageAddedEventSub = this.gameService.getGameImageAddedEvent$().subscribe(console.log);
+    this.gameSubscriptions.add(gameImageAddedEventSub);
+    const imageShouldSubmitSub = this.gameService.getImageShouldSubmit$().subscribe(console.log);
+    this.gameSubscriptions.add(imageShouldSubmitSub);
+    const gameRoundOverEventSub = this.gameService.getGameRoundOverEvent$().subscribe(gameRoundOverEvent => {
+      this.roundOver = true;
+      this.currentWord = null;
+      console.log(gameRoundOverEvent);
+    });
+    this.gameSubscriptions.add(gameRoundOverEventSub);
+    const gameOverEventSub = this.gameService.getGameOverEvent$().subscribe(gameOverEvent => {
+      this.roundOver = false;
+      this.gameOver = true;
+      console.log(gameOverEvent);
+    });
+    this.gameSubscriptions.add(gameOverEventSub);
   }
 
   ngOnDestroy() {
@@ -68,7 +89,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.gameService.getSubmitImage$().pipe(
       first(),
     ).subscribe(image => {
-      this.gameService.publishImage({ imageBase64: image, gameId: this.gameId, forRound: 0 });
+      this.gameService.publishImage({ imageBase64: image, gameId: this.gameId, forRound: this.currentRound });
     });
     this.gameService.imageShouldSubmit();
   }
