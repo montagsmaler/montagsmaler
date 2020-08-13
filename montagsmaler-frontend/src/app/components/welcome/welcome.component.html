@@ -1,11 +1,15 @@
 <h1>Montagsmaler</h1>
 <div class="content">
-  <ng-container *ngIf="getLoginState(); else register">
-    <app-login (stateChanges)="setLoginState($event)"></app-login>
-  </ng-container>
-
-  <ng-template #register>
-    <app-register (stateChanges)="setLoginState($event)"></app-register>
-  </ng-template>
-
+  <div [ngSwitch]="getLoginState()">
+    <div *ngSwitchCase="welcomeState.LOGIN">
+      <app-login (stateChanges)="setLoginState($event)"></app-login>
+    </div>
+    <div *ngSwitchCase="welcomeState.REGISTER">
+      <app-register (stateChanges)="setLoginState($event)"></app-register>
+    </div>
+    <div *ngSwitchCase="welcomeState.VERIFY">
+      <app-verify (stateChanges)="setLoginState($event)"></app-verify>
+    </div>
+    <div *ngSwitchDefault>output2</div>
+  </div>
 </div>

@@ -1,0 +1,26 @@
+<div class="content">
+
+  <ng-container *ngIf="confirmationSuccess;else standard"><h2>Ihre Account wurde bestätigt!</h2></ng-container>
+  <ng-template #standard><h2>Überprüfen Sie ihre Email</h2></ng-template>
+
+  <form [formGroup]="confirmationForm" (ngSubmit)="onSubmit(confirmationForm.value)">
+
+    <div class="form_item">
+      <input id="name" type="text" formControlName="name" placeholder="Username">
+    </div>
+
+    <div class="form_item">
+      <input id="confirmation" type="text" formControlName="confirmation" placeholder="Bestätigungscode">
+    </div>
+
+    <button class="form_item btn_green" type="submit">Verifizieren</button>
+
+  </form>
+
+  <div id="switch">
+  <a id="btn_switch" (click)="switch()">
+    Zum Login
+  </a>
+</div>
+
+</div>
