@@ -8,6 +8,8 @@ import { Player, Lobby, LobbyEvent } from '../lobby/models';
 import { GameConfig, Game, GameEvent } from '../game-round/models';
 import { ImageService } from '../image';
 
+const IMAGE = 'image:';
+
 @Injectable()
 export class GameService {
 	constructor(
@@ -41,7 +43,7 @@ export class GameService {
 		try {
 			const lobby = await this.lobbyService.getLobby(lobbyId);
 			if (lobby.getLeader().id !== initPlayer.id) throw new Error('Player is not authorized to start the lobby.');
-			[game, events] = await this.gameRoundService.initGame(lobby, gameConfig.roundDuration, gameConfig.rounds);
+			[game, events] = await this.gameRoundService.initGame(initPlayer, lobby, gameConfig.roundDuration, gameConfig.rounds);
 			await this.lobbyService.consumeLobby(lobbyId, initPlayer, game);
 			return [game, events];
 		} catch (err) {
@@ -63,7 +65,7 @@ export class GameService {
 	}
 
 	public async tryPublishImage(gameId: string, player: Player, imageBase64: string, forRound: number): Promise<boolean> {
-		const lock = await this.lockService.lockRessource(gameId);
+		const lock = await this.lockService.lockRessource(IMAGE + player.id);
 		try {
 			const canPublish = await this.gameStateService.canPublishImage(gameId, player.id, forRound);
 			if (canPublish.accepted) {
