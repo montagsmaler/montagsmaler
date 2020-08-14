@@ -5,7 +5,6 @@ import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { first, filter, tap } from 'rxjs/internal/operators';
 import { LobbyJoinRequest, LobbyLeaveRequest, IGameInitRequest, GameInitRequest } from '../models/requests';
 import { LobbyPlayerLeftEvent, LobbyPlayerJoinedEvent, LobbyConsumedEvent } from '../models/events';
-import { GameService } from '../../game';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +17,7 @@ export class LobbyService {
   private lobbyPlayerJoinedSub: Subscription;
   private lobbyPlayerLeftSub: Subscription;
 
-  constructor(private readonly wsClient: WsClientService, private readonly gameService: GameService) { }
+  constructor(private readonly wsClient: WsClientService) { }
 
   private connect(): void {
     if (!this.lobbyConnection) {

@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { map, filter, switchMap, first, tap } from 'rxjs/internal/operators';
 import { Subscription, Subject, from, Observable } from 'rxjs';
 import { Game } from 'src/app/api/ws/game/models';
+import { AuthService, User } from 'src/app/api/http/auth';
 
 @Component({
   selector: 'app-game',
@@ -21,6 +22,7 @@ export class GameComponent implements OnInit, OnDestroy {
   public readonly game$ = new Subject<Game>();
   public currentRound: number;
   public currentWord: string;
+  public currentPlayer: User;
   boolCountdown = false;
   roundOver = false;
   gameOver = false;
@@ -28,10 +30,20 @@ export class GameComponent implements OnInit, OnDestroy {
   interval;
   gameId: string;
 
-  constructor(private readonly gameService: GameService, private readonly activatedRoute: ActivatedRoute) {}
+  constructor(
+    private readonly gameService: GameService,
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly authService: AuthService
+    ) {}
 
   ngOnInit() {
-    const gameId$: Observable<string> = this.activatedRoute.params.pipe(
+    const gameId$: Observable<string> = this.authService.getLoggedInUser$().pipe(
+      filter(user => (user) ? true : false),
+      first(),
+      switchMap(user => {
+        this.currentPlayer = user;
+        return this.activatedRoute.params;
+      }),
       map(params => params.gameId),
       filter(id => (id) ? true : false),
       first(),
@@ -42,14 +54,16 @@ export class GameComponent implements OnInit, OnDestroy {
       switchMap(() => this.gameService.getGame$()),
       first(),
     ).subscribe(game => {
-      this.startGame();
       this.game$.next(game);
       this.subscribeGameEvents();
     });
   }
 
   private subscribeGameEvents() {
-    const gameStartedEventSub = this.gameService.getGameStartedEvent$().subscribe(console.log);
+    const gameStartedEventSub = this.gameService.getGameStartedEvent$().subscribe(gameStartedEvent => {
+      this.startGame();
+      console.log(gameStartedEvent);
+    });
     this.gameSubscriptions.add(gameStartedEventSub);
     const newGameRoundEventSub = this.gameService.getNewGameRoundEvent$().subscribe(newGameRoundEvent => {
       this.roundOver = false;
