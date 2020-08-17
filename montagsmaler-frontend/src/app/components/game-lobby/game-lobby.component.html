@@ -3,8 +3,13 @@
     <h1>Alle start klar?</h1>
     <br>
     <div class class="players">
-      <div class="comopetitors" *ngFor="let player of lobby.members">
-        <app-player-item name="{{player.name}}" [empty]="false" playerId="{{player.id}}"></app-player-item>
+      <div class="comopetitors" >
+        <div *ngFor="let player of lobby.members">
+          <app-player-item name="{{player.name}}" [empty]="false" playerId="{{player.id}}"></app-player-item>
+        </div>
+        <!-- <div *ngFor="let player of lobby.members">
+          <app-player-item name="{{player.name}}" [empty]="false" playerId="{{player.id}}"></app-player-item>
+        </div> -->
       </div>
     </div>
     <br>
