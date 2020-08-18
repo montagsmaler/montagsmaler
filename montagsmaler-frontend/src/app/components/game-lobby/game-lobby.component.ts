@@ -2,12 +2,13 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { LobbyService } from 'src/app/api/ws/lobby';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { ActivatedRoute, Router } from '@angular/router';
-import { first, filter, map, switchMap } from 'rxjs/internal/operators';
+import { map, switchMap } from 'rxjs/internal/operators';
 import { Observable, from, of, Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Lobby } from 'src/app/api/ws/lobby/models';
 import { AuthService, User } from 'src/app/api/http/auth';
 import { copyToClipboard } from 'src/app/utility/utility';
+import { firstNonNil } from 'src/app/utility/rxjs/operator';
 
 @Component({
   selector: 'app-game-home',
@@ -43,15 +44,13 @@ export class GameLobbyComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const lobbyId$: Observable<string> = this.authService.getLoggedInUser$().pipe(
-      filter(user => (user) ? true : false),
-      first(),
+      firstNonNil(),
       switchMap(user => {
         this.user = user;
         return this.activatedRoute.params;
       }),
       map(params => params.lobbyId),
-      filter(id => (id) ? true : false),
-      first(),
+      firstNonNil(),
     );
     const lobby = this.lobbyService.getLobby();
     lobbyId$

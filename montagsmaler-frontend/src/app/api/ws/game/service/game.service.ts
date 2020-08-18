@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { WsClientService, IWsConnection } from '../../ws-client';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Game, GameEvents } from '../models';
-import { filter, first, tap } from 'rxjs/internal/operators';
+import { first, tap } from 'rxjs/internal/operators';
 import { GameImagePublishRequest, IGameImagePublishRequest, GameJoinRequest } from '../models/requests';
 import { GameImageAddedEvent, GameImagesShouldPublishEvent, GameRoundOverEvent, NewGameRoundEvent, GameStartedEvent, GameOverEvent } from '../models/events';
+import { firstNonNil } from 'src/app/utility/rxjs/operator';
 
 @Injectable({
   providedIn: 'root'
@@ -43,8 +44,7 @@ export class GameService {
 
   public getGame$(): Observable<Game> {
     return this.game$.pipe(
-      filter(game => (game) ? true : false),
-      first(),
+      firstNonNil(),
     );
   }
 
