@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { WsClientService, IWsConnection } from '../../ws-client';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Game, GameEvents } from '../models';
-import { filter, first, tap } from 'rxjs/internal/operators';
+import { first, tap } from 'rxjs/internal/operators';
 import { GameImagePublishRequest, IGameImagePublishRequest, GameJoinRequest } from '../models/requests';
 import { GameImageAddedEvent, GameImagesShouldPublishEvent, GameRoundOverEvent, NewGameRoundEvent, GameStartedEvent, GameOverEvent } from '../models/events';
+import { firstNonNil } from 'src/app/utility/rxjs/operator';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,26 @@ export class GameService {
   private readonly namespace = 'game';
   private gameConnection: IWsConnection | null = null;
   private readonly game$ = new BehaviorSubject<Game | null>(null);
+  private readonly shouldSubmit = new Subject<boolean>();
+  private readonly submitImage = new Subject<string>();
 
   constructor(private readonly wsClient: WsClientService) { }
+
+  imageShouldSubmit(): void {
+    this.shouldSubmit.next(true);
+  }
+
+  getImageShouldSubmit$(): Observable<boolean> {
+    return this.shouldSubmit.asObservable();
+  }
+
+  setSubmitImage(image: string): void {
+    this.submitImage.next(image);
+  }
+
+  getSubmitImage$(): Observable<string> {
+    return this.submitImage;
+  }
 
   private connect(): void {
     if (!this.gameConnection) {
@@ -25,7 +44,7 @@ export class GameService {
 
   public getGame$(): Observable<Game> {
     return this.game$.pipe(
-      filter(game => (game) ? true : false),
+      firstNonNil(),
     );
   }
 

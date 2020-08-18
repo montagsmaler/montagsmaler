@@ -7,12 +7,14 @@ import { RegisterComponent } from './register/register.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from 'src/app/api/http';
 import { LobbyModule } from 'src/app/api/ws/lobby';
+import { VerifyComponent } from './verify/verify.component';
 
 @NgModule({
   declarations: [
     WelcomeComponent,
     LoginComponent,
     RegisterComponent,
+    VerifyComponent
   ],
   imports: [
     CommonModule,

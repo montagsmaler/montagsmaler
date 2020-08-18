@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { getRandomColor } from '../../../../utility/utility.js';
+import { getRandomColor, hashCodeFromString } from '../../../utility/utility.js';
 
 
 @Component({
@@ -16,7 +16,7 @@ export class PlayerItemComponent implements OnInit {
 
   ngOnInit() {}
 
-  getRandomColor(inputNumber: number) {
-    return getRandomColor(inputNumber);
+  getRandomColor(uuid: string) {
+    return getRandomColor(hashCodeFromString(uuid));
   }
 }

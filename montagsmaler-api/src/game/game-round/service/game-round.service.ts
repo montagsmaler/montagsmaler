@@ -1,19 +1,21 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { sleepRange, HOUR_IN_SECONDS, sleep } from '../../../shared/helper';
 import { Observable } from 'rxjs';
-import { PubSubService, KeyValueService, IdService } from '../../../shared/redis';
+import { PubSubService, KeyValueService, IdService, LockService } from '../../../shared/redis';
 import { Lobby, Player } from '../../lobby/models';
 import { Game, GameStartedEvent, NewGameRoundEvent, GameImagesShouldPublishEvent, GameRoundOverEvent, GameOverEvent, GameEvent, GameEvents, GameImageAddedEvent } from '../models';
 import { ImageService } from '../../image/service/image.service';
 import { takeWhile } from 'rxjs/internal/operators';
 import { RekognitionNounService } from '../../rekognition-noun';
+import { Lock } from 'redlock';
 
 const GAME = 'game:';
+const PLAYER = 'player:';
 
 @Injectable()
 export class GameRoundService {
 	private readonly WAIT_TIME_TO_GAME_START = this.SECOND_IN_MILLISECONDS * 10;
-	private readonly WAIT_TIME_BETWEEN_ROUND = this.SECOND_IN_MILLISECONDS * 2;
+	private readonly WAIT_TIME_BETWEEN_ROUND = this.SECOND_IN_MILLISECONDS * 3;
 	private readonly WAIT_UNTIL_IMAGE_IS_PUBLISHED = this.SECOND_IN_MILLISECONDS * 5;
 	private readonly WAIT_TO_DELETE_GAME = this.SECOND_IN_MILLISECONDS * 60;
 
@@ -22,19 +24,25 @@ export class GameRoundService {
 		private readonly keyValueService: KeyValueService,
 		private readonly idService: IdService,
 		private readonly nounService: RekognitionNounService,
+		private readonly lockService: LockService,
 		@Inject(forwardRef(() => ImageService)) private readonly imageService: ImageService,
 		@Inject('SECOND_IN_MILLISECONDS') private readonly SECOND_IN_MILLISECONDS: number,
 	) { }
 
-	public async initGame(lobby: Lobby, duration: number, rounds: number): Promise<[Game, Observable<GameEvent>]> {
+	public async initGame(player: Player, lobby: Lobby, duration: number, rounds: number): Promise<[Game, Observable<GameEvent>]> {
 		const id = this.idService.getUUID();
+		let lock: Lock;
 		try {
 			const game = new Game(id, new Date().getTime(), lobby.getPlayers(), duration * this.SECOND_IN_MILLISECONDS, rounds);
+			const lock = await this.lockService.lockRessource(PLAYER + player.id, this.WAIT_TIME_BETWEEN_ROUND + this.WAIT_TIME_TO_GAME_START + game.duration + 10_000);
 			await this.setGame(id, game);
-			setTimeout(() => this.startGameLoop(game));
+			setTimeout(() => this.startGameLoop(game, lock));
 			const events = this.onGameEvent(id);
 			return [game, events];
 		} catch (err) {
+			if (lock && lock.value) {
+				await lock.unlock();
+			}
 			throw new Error('Failed to init Game');
 		}
 	}
@@ -46,7 +54,7 @@ export class GameRoundService {
 		return [game, this.onGameEvent(gameId)];
 	}
 
-	private async startGameLoop(game: Game): Promise<void> {
+	private async startGameLoop(game: Game, lock: Lock): Promise<void> {
 		try {
 			await sleep(this.WAIT_TIME_TO_GAME_START);
 			await this.pubGameEvent(game.id, new GameStartedEvent(await this.idService.getIncrementalID(), game));
@@ -65,9 +73,13 @@ export class GameRoundService {
 			}
 			const [id, scoreboard, images] = await Promise.all([this.idService.getIncrementalID(), this.getScoreboard(game.id), this.imageService.getImages(game.id)]);
 			await this.pubGameEvent(game.id, new GameOverEvent(id, game, scoreboard, images));
+			await lock.unlock();
 			await sleep(this.WAIT_TO_DELETE_GAME);
 			await this.deleteGame(game.id);
 		} catch (err) {
+			if (lock && lock.value) {
+				await lock.unlock();
+			}
 			throw new Error('Error in the gameloop.');
 		}
 	}

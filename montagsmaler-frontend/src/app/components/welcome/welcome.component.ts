@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { welcomeState } from 'src/app/models/welcomeState';
 
 @Component({
   selector: 'app-welcome',
@@ -7,7 +8,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class WelcomeComponent implements OnInit {
 
-  private loginState = true;
+  private loginState = welcomeState.LOGIN;
+  welcomeState = welcomeState;
 
   constructor() { }
 
@@ -18,8 +20,9 @@ export class WelcomeComponent implements OnInit {
     return this.loginState;
   }
 
-  setLoginState(state: boolean) {
+  setLoginState(state) {
     this.loginState = state;
+    console.log(this.getLoginState());
   }
 
 }

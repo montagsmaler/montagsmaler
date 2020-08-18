@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="28px" height="25px" viewBox="0 0 28 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group 2</title>
+    <defs>
+        <filter id="filter-1">
+            <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 1.000000 0"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
+        <g filter="url(#filter-1)" id="Group-2">
+            <g transform="translate(14.000000, 12.500000) scale(-1, 1) translate(-14.000000, -12.500000) translate(1.000000, 1.000000)">
+                <path d="M5.28456729,0.675446578 C10.3930816,0.675446578 15.5088606,0.413009391 20.6101094,0.675446578 C22.4892238,0.772118889 23.7339661,0.27245182 24.8911043,1.70235748 C25.7917233,2.81527575 24.8876172,4.3516207 24.7195296,5.7535637 C22.2745455,26.1460689 27.4241983,22.8342787 6.21042077,21.5371495" id="Path-42" stroke="#979797" stroke-width="2"></path>
+                <g id="Group-10" transform="translate(8.500000, 11.191328) scale(-1, 1) translate(-8.500000, -11.191328) translate(0.000000, 5.191328)" stroke="#979797" stroke-width="2">
+                    <polyline id="Path-43" points="0.0422558259 6.00446584 6.88186767 6.00446584 14.0398829 6.00446584 15.4015521 6.00446584"></polyline>
+                    <path d="M10.6788151,0.897368303 C19.5325992,8.05107431 17.4367347,4.11706495 9.01888615,11.1429547" id="Path-44"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,3 +1,18 @@
+<div class="header">
+  <div class = "box" *ngIf="User;else noUser">
+    <div class="element"><span style="font-size: 12px; line-height: 20px;">Eingeloggt als </span><br>{{User.name}}</div>
+    <a class="element btn_round_gray flex_center_column" (click)="logout()">
+      <img src="assets/images/logout.svg">
+    </a>
+  </div>
+</div>
+
+<ng-template #noUser >
+    <div class = "box">
+      <div class="element" style="font-size: 12px; line-height: 20px;">Nicht Eingeloggt</div>
+    </div>
+</ng-template>
+
 <div class="content">
   <router-outlet></router-outlet>
   <div class="footer">

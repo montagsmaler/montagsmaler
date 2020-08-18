@@ -1,25 +1,29 @@
-<h1>Male ein Pferd</h1>
-<span (click)="boolGameStarted = false; boolCountdown = true;">Start</span>
+<h1 *ngIf="currentWord">Male ein {{currentWord}}</h1>
+<h1 style="color: red" *ngIf="roundOver">ROUND OVER</h1>
+<h1 *ngIf="gameOver"><strong>GAME OVER</strong></h1>
+<p class="flex_center_column">Runde {{currentRound ? currentRound : "..."}} von 3</p>
+<!-- <span (click)="boolGameStarted = false; boolCountdown = true;">Start</span> -->
 <div class="flex_center_column">
   <app-draw-canvas style="position: relative; left: 30px;"></app-draw-canvas>
-  <p>Du hast noch: <span class="time-left">30:00</span> Sekunden Zeit</p>
-  <p (click)="showCountdown($event)" class="btn_green flex_center_column" style="flex-direction: row;">
+  <!-- <p>Du hast noch: <span class="time-left">30:00</span> Sekunden Zeit</p> -->
+  <a (click)="submitImage()" class="btn_green flex_center_column" style="flex-direction: row;">
     <img src="assets/images/check.svg" width="20px" style="padding-right: 20px;" />
-    Fertig</p>
+    Fertig</a>
 </div>
 
-
-
-
-
-
-<app-countdown *ngIf="boolCountdown" @ngIfAnimation>
+<app-countdown *ngIf="showCountdown" @ngIfAnimation>
+  <div *ngIf="!gameOver">
     <h1 class="h1-counter">Mach dich bereit!</h1>
     <h1 class="counter h1-counter">{{counter}}</h1>
+  </div>
+  <div *ngIf="gameOver">
+    <h1 class="h1-counter" style="color: red">ROUND OVER</h1>
+  </div>
 </app-countdown>
 
-<app-wait-for-players *ngIf="!boolGameStarted">
-  <p (click)="startGame($event)">close</p>
-</app-wait-for-players>
+<app-loading-screen *ngIf="!gameStarted">
+  <h1 class="h1-counter">Es lädt ...</h1>
+</app-loading-screen>
+
 
 

@@ -4,17 +4,15 @@ import { RouterModule } from '@angular/router';
 import { GameComponent } from './game.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CountdownComponent } from './countdown/countdown.component';
-import { WaitForPlayersComponent } from './wait-for-players/wait-for-players.component';
-import { PlayerItemComponent } from './wait-for-players/player-item/player-item.component';
 import { DrawCanvasComponent } from './draw-canvas/draw-canvas.component';
+import { LoadingScreenComponent } from './loading-screen/loading-screen.component';
 
 @NgModule({
   declarations: [
     GameComponent,
     CountdownComponent,
-    WaitForPlayersComponent,
-    PlayerItemComponent,
     DrawCanvasComponent,
+    LoadingScreenComponent,
   ],
   imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
 })

@@ -54,6 +54,7 @@ export class AuthService {
       await this.http.post(`${this.baseUrlAuth}/logout`, {}).toPromise();
       this.setLoggedInUser(null);
       this.setAccessToken(null);
+      this.router.navigate(['welcome']);
     } catch (err) {
       throw err;
     }
@@ -89,7 +90,7 @@ export class AuthService {
   }
 
   /**
-   * Testroute
+   * returns the current logged in user
    */
   public async getCognitoUser(): Promise<any> {
     try {

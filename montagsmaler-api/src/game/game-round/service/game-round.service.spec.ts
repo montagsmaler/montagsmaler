@@ -3,7 +3,7 @@ import { GameRoundService } from './game-round.service';
 import { RedisModule, RedisClient } from '../../../shared/redis';
 import * as RedisMock from 'ioredis-mock';
 import { timeProvider } from './time.provider';
-import { Lobby } from '../../lobby/models';
+import { Lobby, Player } from '../../lobby/models';
 import { GameOverEvent, GameStartedEvent, NewGameRoundEvent, GameImagesShouldPublishEvent, GameRoundOverEvent } from '../models';
 import { forwardRef } from '@nestjs/common';
 import { ImageModule } from '../../../game/image';
@@ -15,6 +15,7 @@ describe('GameRoundService', () => {
 	const redisKeyValueMock = new RedisMock();
 	const redisSubMock = new RedisMock();
 	const redisPubMock = redisSubMock.createConnectedClient();
+	const player = new Player('1245', 'hans');
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -37,9 +38,9 @@ describe('GameRoundService', () => {
 	});
 
 	it('should create game and send gameloop events in correct oder', async (done) => {
-		const [game, events] = await service.initGame(new Lobby('1234', new Date().getTime(), []), 1, 3);
+		const [game, events] = await service.initGame(player, new Lobby('1234', new Date().getTime(), []), 10, 3);
 		expect(game).toBeDefined();
-		expect(game.duration).toEqual(3);
+		expect(game.duration).toEqual(30);
 		expect(events).toBeDefined();
 	
 		let eventCount = 0;

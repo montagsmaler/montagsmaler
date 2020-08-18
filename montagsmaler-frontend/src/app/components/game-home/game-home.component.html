@@ -1,0 +1,10 @@
+<h1>Montagsmaler</h1>
+<p>
+  Schaffst du es besser zu malen, als deine Mitspieler? <br>Nimm die Herausforderung
+  an und tritt gegen deine Freunde an!
+</p>
+
+<div class="container">
+    <app-lobby-item *ngFor="let game of games" [game]="game"></app-lobby-item>
+    <app-create-lobby></app-create-lobby>
+</div>

@@ -1,23 +1,71 @@
-p {
-  text-align: center;
+.popup {
+  background-color: #F6F6F6;
+  top: 10vh;
+  left: 20vw;
+  z-index: 30;
+  padding: 50px 80px 50px 80px;
+
+  border-radius: 50px;
+  -webkit-box-shadow: 2px 10px 79px -31px rgba(0,0,0,0.64);
+  -moz-box-shadow: 2px 10px 79px -31px rgba(0,0,0,0.64);
+  box-shadow: 2px 10px 79px -31px rgba(0,0,0,0.64);
 }
 
-
-.columns {
-  padding: 6rem 0 3rem 0;
-  -webkit-columns: 2 300px;
-  -moz-columns: 2 300px;
-  columns: 2 300px;
-
-  -webkit-column-gap: 6rem;
-  -moz-column-gap: 6rem;
-  column-gap: 6rem;
+.background {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  background-color: #FFEC5C;
 }
 
-.container {
+.link_background {
+  height: 50px;
+  border-radius: 25px 0 0 25px;
+  background-color: white;
+  padding: 0 25px 0 25px;
+
+  -moz-box-shadow:    inset 2px 2px 0px #D3D3D3;
+  -webkit-box-shadow: inset 2px 2px 0px #D3D3D3;
+  box-shadow:         inset 2px 2px 0px #D3D3D3;
+}
+
+.btn_copy {
+  background-color: #6E6E6E;
+  height: 15px;
+  padding: 17.5px;
+  border-radius:  0 25px 25px 0;
+
+  box-shadow: 0px 3px #515050;
+  position: relative;
+  bottom: 3px;
+}
+
+.btn_copy:active {
+  bottom: 0;
+  box-shadow: none;
+}
+
+h1 {
+  margin-top: 40px;
+}
+
+.comopetitors {
+  display: grid;
+  grid-template-columns: repeat(3, 150px);
+}
+
+.players {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn_green {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
 }
-
