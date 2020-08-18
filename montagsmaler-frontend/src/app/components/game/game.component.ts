@@ -85,8 +85,11 @@ export class GameComponent implements OnInit, OnDestroy {
     const gameImageAddedEventSub = this.gameService.getGameImageAddedEvent$().subscribe(console.log);
     this.gameSubscriptions.add(gameImageAddedEventSub);
 
-    const imageShouldSubmitSub = this.gameService.getImageShouldSubmit$().subscribe(console.log);
-    this.gameSubscriptions.add(imageShouldSubmitSub);
+    const gameImagesShouldPublishEvent = this.gameService.getGameImagesShouldPublishEvent$().subscribe(imageSubmitEvent => {
+      this.submitImage();
+      console.log(imageSubmitEvent);
+    });
+    this.gameSubscriptions.add(gameImagesShouldPublishEvent);
 
     const gameRoundOverEventSub = this.gameService.getGameRoundOverEvent$().subscribe(gameRoundOverEvent => {
       this.gameStarted = true;
