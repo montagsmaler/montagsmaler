@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { trigger, query, animateChild, transition } from '@angular/animations';
 import { GameService } from 'src/app/api/ws/game';
 import { ActivatedRoute } from '@angular/router';
@@ -6,6 +6,7 @@ import { map, filter, switchMap, first, tap } from 'rxjs/internal/operators';
 import { Subscription, Subject, from, Observable } from 'rxjs';
 import { Game } from 'src/app/api/ws/game/models';
 import { AuthService, User } from 'src/app/api/http/auth';
+import { DrawCanvasComponent } from './draw-canvas/draw-canvas.component';
 
 @Component({
   selector: 'app-game',
@@ -18,6 +19,8 @@ import { AuthService, User } from 'src/app/api/http/auth';
   ],
 })
 export class GameComponent implements OnInit, OnDestroy {
+  @ViewChild(DrawCanvasComponent, { static: false }) child;
+
   private readonly gameSubscriptions = new Set<Subscription>();
   public readonly game$ = new Subject<Game>();
   public currentRound: number;
@@ -63,12 +66,16 @@ export class GameComponent implements OnInit, OnDestroy {
     const gameStartedEventSub = this.gameService.getGameStartedEvent$().subscribe(gameStartedEvent => {
       this.startGame();
       console.log(gameStartedEvent);
+      console.log("Das spiel wurde jetzt erst gestartet");
+
     });
     this.gameSubscriptions.add(gameStartedEventSub);
     const newGameRoundEventSub = this.gameService.getNewGameRoundEvent$().subscribe(newGameRoundEvent => {
       this.roundOver = false;
       this.currentRound = newGameRoundEvent.round;
       this.currentWord = newGameRoundEvent.noun;
+      console.log("Hier sollte das Canvas gelöscht werden");
+      this.child.clear();
       console.log(newGameRoundEvent);
     });
     this.gameSubscriptions.add(newGameRoundEventSub);
@@ -79,6 +86,7 @@ export class GameComponent implements OnInit, OnDestroy {
     const gameRoundOverEventSub = this.gameService.getGameRoundOverEvent$().subscribe(gameRoundOverEvent => {
       this.roundOver = true;
       this.currentWord = null;
+      console.log("Hier sollte der Countdown starten");
       console.log(gameRoundOverEvent);
     });
     this.gameSubscriptions.add(gameRoundOverEventSub);
