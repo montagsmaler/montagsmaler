@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { WsClientService, IWsConnection } from '../../ws-client';
 import { LobbyEvents, Lobby } from '../models';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-import { first, filter, tap } from 'rxjs/internal/operators';
+import { first, tap } from 'rxjs/internal/operators';
 import { LobbyJoinRequest, LobbyLeaveRequest, IGameInitRequest, GameInitRequest } from '../models/requests';
 import { LobbyPlayerLeftEvent, LobbyPlayerJoinedEvent, LobbyConsumedEvent } from '../models/events';
+import { filterNil } from 'src/app/utility/rxjs/operator';
 
 @Injectable({
   providedIn: 'root'
@@ -79,7 +80,7 @@ export class LobbyService {
 
   public getLobby$(): Observable<Lobby> {
     return this.lobby$.pipe(
-      filter(lobby => (lobby) ? true : false),
+      filterNil(),
     );
   }
 

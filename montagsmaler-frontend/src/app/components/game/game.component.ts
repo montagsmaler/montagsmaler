@@ -2,10 +2,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { trigger, query, animateChild, transition } from '@angular/animations';
 import { GameService } from 'src/app/api/ws/game';
 import { ActivatedRoute } from '@angular/router';
-import { map, filter, switchMap, first, tap } from 'rxjs/internal/operators';
+import { map, switchMap, first, tap } from 'rxjs/internal/operators';
 import { Subscription, Subject, from, Observable } from 'rxjs';
 import { Game } from 'src/app/api/ws/game/models';
 import { AuthService, User } from 'src/app/api/http/auth';
+import { firstNonNil } from 'src/app/utility/rxjs/operator';
 
 @Component({
   selector: 'app-game',
@@ -38,15 +39,13 @@ export class GameComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const gameId$: Observable<string> = this.authService.getLoggedInUser$().pipe(
-      filter(user => (user) ? true : false),
-      first(),
+      firstNonNil(),
       switchMap(user => {
         this.currentPlayer = user;
         return this.activatedRoute.params;
       }),
       map(params => params.gameId),
-      filter(id => (id) ? true : false),
-      first(),
+      firstNonNil(),
     );
     gameId$.pipe(
       tap(id => this.gameId = id),
