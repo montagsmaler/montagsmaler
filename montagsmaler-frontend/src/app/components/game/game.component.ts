@@ -19,16 +19,17 @@ import { DrawCanvasComponent } from './draw-canvas/draw-canvas.component';
   ],
 })
 export class GameComponent implements OnInit, OnDestroy {
-  @ViewChild(DrawCanvasComponent, { static: false }) child;
+  @ViewChild(DrawCanvasComponent, { static: false }) canvas;
 
   private readonly gameSubscriptions = new Set<Subscription>();
   public readonly game$ = new Subject<Game>();
   public currentRound: number;
   public currentWord: string;
   public currentPlayer: User;
-  boolCountdown = false;
+  showCountdown = true;
   roundOver = false;
   gameOver = false;
+  gameStarted = false;
   counter = 3;
   interval;
   gameId: string;
@@ -64,33 +65,42 @@ export class GameComponent implements OnInit, OnDestroy {
 
   private subscribeGameEvents() {
     const gameStartedEventSub = this.gameService.getGameStartedEvent$().subscribe(gameStartedEvent => {
-      this.startGame();
+      this.startCountdown();
+      this.gameStarted = true;
       console.log(gameStartedEvent);
-      console.log("Das spiel wurde jetzt erst gestartet");
-
     });
     this.gameSubscriptions.add(gameStartedEventSub);
+
     const newGameRoundEventSub = this.gameService.getNewGameRoundEvent$().subscribe(newGameRoundEvent => {
+      this.gameStarted = true;
+
       this.roundOver = false;
       this.currentRound = newGameRoundEvent.round;
       this.currentWord = newGameRoundEvent.noun;
-      console.log("Hier sollte das Canvas gelöscht werden");
-      this.child.clear();
+      this.canvas.clear();
       console.log(newGameRoundEvent);
     });
     this.gameSubscriptions.add(newGameRoundEventSub);
+
     const gameImageAddedEventSub = this.gameService.getGameImageAddedEvent$().subscribe(console.log);
     this.gameSubscriptions.add(gameImageAddedEventSub);
+
     const imageShouldSubmitSub = this.gameService.getImageShouldSubmit$().subscribe(console.log);
     this.gameSubscriptions.add(imageShouldSubmitSub);
+
     const gameRoundOverEventSub = this.gameService.getGameRoundOverEvent$().subscribe(gameRoundOverEvent => {
+      this.gameStarted = true;
+
       this.roundOver = true;
       this.currentWord = null;
-      console.log("Hier sollte der Countdown starten");
+      this.startCountdown();
       console.log(gameRoundOverEvent);
     });
     this.gameSubscriptions.add(gameRoundOverEventSub);
+
     const gameOverEventSub = this.gameService.getGameOverEvent$().subscribe(gameOverEvent => {
+      this.gameStarted = true;
+
       this.roundOver = false;
       this.gameOver = true;
       console.log(gameOverEvent);
@@ -117,19 +127,16 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   startCountdown() {
+    this.showCountdown = true;
+
     this.counter = 3;
     this.interval = setInterval(() => {
       if (this.counter > 0) {
         this.counter--;
       } else {
-        this.boolCountdown = false;
+        this.showCountdown = false;
         clearInterval(this.interval);
       }
     }, 1000);
-  }
-
-  startGame() {
-    this.boolCountdown = true;
-    this.startCountdown();
   }
 }
