@@ -1,9 +1,9 @@
 <div class="background flex_center_column">
 <div class="icon-background flex_center_column" [ngStyle]="{'backgroundColor' : getRandomColor(game)}">
-    <img src="assets/images/{{getRandomImage(game)}}.svg">
+    <img src="assets/images/{{game % 2 == 0 ? 'water' : 'sun'}}.svg">
   </div>
 
-  <p class="title">Sonnengruppe</p>
+  <p class="title">{{game % 2 == 0 ? "Wassergruppe" : "Sonnengruppe"}}</p>
   <p class="subtitle">noch {{game}} {{game == 1 ? "Platz frei" : "freie Plätze" }}</p>
 </div>
 

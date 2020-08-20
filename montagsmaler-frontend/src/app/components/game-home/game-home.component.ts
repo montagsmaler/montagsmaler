@@ -7,7 +7,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GameHomeComponent implements OnInit {
 
-  games = [0, 1, 2, 3, 4];
+  games = [1, 2];
   constructor() { }
 
   ngOnInit() {
