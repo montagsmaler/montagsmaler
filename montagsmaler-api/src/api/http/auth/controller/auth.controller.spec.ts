@@ -5,6 +5,9 @@ import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../service/auth.service';
 import { AuthServiceMock } from '../../../../../test/auth/auth.service.mock';
 
+/**
+ * further testing in the corresponding e2e test
+ */
 describe('Auth Controller', () => {
 	let controller: AuthController;
 	let authService: AuthServiceMock;

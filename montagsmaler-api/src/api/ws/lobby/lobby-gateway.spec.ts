@@ -7,6 +7,9 @@ import { AuthModule } from '../../http/auth/auth.module';
 import { ValidationModule } from '../../../shared/validation';
 import { CognitoUserPool } from 'amazon-cognito-identity-js';
 
+/**
+ * further testing of gateway in the e2e test
+ */
 describe('LobbyGateway', () => {
 	let gateway: LobbyGateway;
 	const redisKeyValueMock = new RedisMock();
