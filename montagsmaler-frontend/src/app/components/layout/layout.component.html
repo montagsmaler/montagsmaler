@@ -1,8 +1,16 @@
 <div class="header">
+  <div class="box-right" *ngIf="User">
+
+  </div>
+
+
   <div class = "box" *ngIf="User;else noUser">
     <div class="element"><span style="font-size: 12px; line-height: 20px;">Eingeloggt als </span><br>{{User.name}}</div>
     <a class="element btn_round_gray flex_center_column" (click)="logout()">
       <img src="assets/images/logout.svg">
+    </a>
+    <a routerLink="/home" class="element btn_round_gray flex_center_column">
+      <img src="assets/images/home.svg">
     </a>
   </div>
 </div>

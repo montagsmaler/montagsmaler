@@ -5,9 +5,9 @@ export const getRandomColor = (inputNumber: number): string => {
       return '#00D5B9';
     case 1:
       return '#E2B236';
-    case 2:
-      return '#E1325B';
     case 3:
+      return '#E1325B';
+    case 2:
       return '#028DCB';
     case 4:
       return '#F47E4A';
