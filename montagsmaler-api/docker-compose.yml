@@ -1,27 +1,29 @@
 version: '2'
 services:
-	Redis:
-		container_name: Redis
-		image: redis
-		restart: always
-		ports: '6379:6379'
-		networks:
-			- backend
+  Redis:
+    container_name: Redis
+    image: redis
+    restart: always
+    ports: '6379:6379'
+    networks:
+      - backend
 		
-	MontagsMalerApi:
-		container_name: MontagsMalerApi
-		image: montagsmaler-api
-		build:
-			dockerfile: Dockerfile
-			context: .
-		restart: always
-		ports:
-			- '80:80'
-			- '443:443'
-		depends_on:
-			- 'Redis'
-		networks:
-			- backend
+  MontagsMalerApi:
+    container_name: MontagsMalerApi
+    image: montagsmaler-api
+    build:
+      dockerfile: Dockerfile
+      context: .
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    env_file:
+      - ./production.env
+    depends_on:
+      - 'Redis'
+    networks:
+      - backend
 
 networks:
-	backend:
+  backend:
