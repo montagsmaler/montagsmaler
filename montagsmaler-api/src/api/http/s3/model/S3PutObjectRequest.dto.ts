@@ -21,4 +21,9 @@ export class S3PutObjectRequestDto {
 	@IsString()
 	@IsNotEmpty()
 	ContentType: string;
+
+	
+	@IsString()
+	@IsNotEmpty()
+	ACL: string;
 }
