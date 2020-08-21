@@ -4,6 +4,18 @@
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
+      "name": "montagsmaler-redis",
+      "image": "redis",
+      "portMappings": [
+        {
+          "containerPort": 6379,
+          "hostPort": 6379,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true
+    },
+    {
       "name": "montagasmaler-api",
       "image": "323793774129.dkr.ecr.us-east-1.amazonaws.com/montagsmaler:latest",
       "portMappings": [
@@ -11,9 +23,54 @@
           "containerPort": 80,
           "hostPort": 80,
           "protocol": "tcp"
+        },
+        {
+          "containerPort": 443,
+          "hostPort": 443,
+          "protocol": "tcp"
         }
       ],
-      "essential": true
+      "essential": true,
+      "secrets": [
+        {
+          "name": "AWS_ACCESS_KEY_ID",
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:953721827634:secret:AWS_ACCESS_KEY_ID-0x8tQQ"
+        },
+        {
+          "name": "AWS_SECRET_ACCESS_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:953721827634:secret:AWS_SECRET_ACCESS_KEY-QHRftL"
+        },
+        {
+          "name": "AWS_SESSION_TOKEN",
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:953721827634:secret:AWS_SECRET_ACCESS_KEY-QHRftL"
+        }
+      ],
+      "environment": [
+        {
+          "name": "REDIS_HOST",
+          "value": "montagsmaler-redis"
+        },
+        {
+          "name": "AWS_REGION",
+          "value": "us-east-1"
+        },
+        {
+          "name": "LISTENER_PORT",
+          "value": 80
+        },
+        {
+          "name": "USER_POOL_ID",
+          "value": "us-east-1_LKnyH8xzJ"
+        },
+        {
+          "name": "CLIENT_ID",
+          "value": "imrcgq4gedp29idmtvaq97nsv"
+        },
+        {
+          "name": "AWS_S3_BUCKET",
+          "value": "dev4cloudmontagsmaler"
+        }
+      ]
     }
   ],
   "requiresCompatibilities": ["FARGATE"],
