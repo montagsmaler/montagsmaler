@@ -9,8 +9,9 @@ import { RecognitionService } from '../../../api/http/recognition';
 import { ConfigService } from '@nestjs/config'
 
 const CONTENT_ENCODING = 'base64';
-const CONTENT_TYPE = 'image/png';
-const FILE_EXT = 'png';
+const CONTENT_TYPE = 'image/jpeg';
+const FILE_EXT = 'jpg';
+const CANNED_ACL = 'public-read'
 
 @Injectable()
 export class ImageService {
@@ -36,6 +37,7 @@ export class ImageService {
 					Body: imageBase64, 
 					ContentEncoding: CONTENT_ENCODING,
 					ContentType: CONTENT_TYPE,
+					ACL: CANNED_ACL,
 				}
 			);
 			const labels = (await this.rekognitionService.recognize(
