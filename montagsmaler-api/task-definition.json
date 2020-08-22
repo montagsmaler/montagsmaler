@@ -1,6 +1,6 @@
 {
   "family": "montagsmaler",
-  "executionRoleArn": "arn:aws:iam::323793774129:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::936738124201:role/ecsTaskExecutionRole",
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
