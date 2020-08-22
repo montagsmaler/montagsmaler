@@ -34,7 +34,7 @@
       "environment": [
         {
           "name": "REDIS_HOST",
-          "value": "montagsmaler-redis"
+          "value": "127.0.0.1"
         },
         {
           "name": "LISTENER_PORT",
