@@ -51,6 +51,22 @@
         {
           "name": "AWS_S3_BUCKET",
           "value": "dev4cloudmontagsmalerlucas"
+        },
+        {
+            "name": "AWS_REGION",
+            "value": "<aws_region>"
+        },
+        {
+            "name": "AWS_ACCESS_KEY_ID",
+            "value": "<aws_access_key_id>"
+        },
+        {
+            "name": "AWS_SECRET_ACCESS_KEY",
+            "value": "<aws_secret_access_key>"
+        },
+        {
+            "name": "AWS_SESSION_TOKEN",
+            "value": "<aws_session_token>"
         }
       ]
     }
