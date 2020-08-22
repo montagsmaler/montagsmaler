@@ -16,7 +16,7 @@
       "essential": true
     },
     {
-      "name": "montagasmaler-api",
+      "name": "montagsmaler-api",
       "image": "323793774129.dkr.ecr.us-east-1.amazonaws.com/montagsmaler:latest",
       "portMappings": [
         {
