@@ -37,10 +37,6 @@
           "value": "montagsmaler-redis"
         },
         {
-          "name": "AWS_REGION",
-          "value": "us-east-1"
-        },
-        {
           "name": "LISTENER_PORT",
           "value": "80"
         },
@@ -55,18 +51,6 @@
         {
           "name": "AWS_S3_BUCKET",
           "value": "dev4cloudmontagsmalerlucas"
-        },
-        {
-          "name": "AWS_ACCESS_KEY_ID",
-          "value": "ASIA5UGPROGUSWVT26EM"
-        },
-        {
-          "name": "AWS_SECRET_ACCESS_KEY",
-          "value": "QITaB0kaeumUu3dXOHrn3Jf4ERfPgfV76PfLMIDB"
-        },
-        {
-          "name": "AWS_SESSION_TOKEN",
-          "value": "FwoGZXIvYXdzEJv//////////wEaDB36VcL+3lTk5qnOrCLFAV+bW0b6x3sK1Vs5RZ1Vm7Rvofkrrp+ccyDFJvXbv0CjHsVbdHEKZCBhrd43DcTOmdfJabHP89tfhIeUwRCeYTV527zdMArklz6yEUYzKaG9Yk1DdoSrGIRhsbZnqGbZ6E8Xxe5gWuqxN6xbFo5ws+mKYqKZkCgdKdQMRmqYcTj2QVFP9d4Bf64SoMl12MHL1EwF22M+AUaAd7Nc2PCByZ9ImZSMZSARKszTS8onbpzmtRbIXWrXnJ5dkfgbky+6a+zo5Nx7KNjag/oFMi0WeCTaGZ06x3kIUR8LUiXP3CzxVM7u762189XKog69Y1csJhNqAMSj90FEQmo="
         }
       ]
     }
