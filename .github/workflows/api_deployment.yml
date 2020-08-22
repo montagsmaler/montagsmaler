@@ -91,11 +91,19 @@ jobs:
           sed -i --expression "s@<aws_secret_access_key>@$AWS_SECRET_ACCESS_KEY@" montagsmaler-api/task-definition.json
           sed -i --expression "s@<aws_session_token>@$AWS_SESSION_TOKEN@" montagsmaler-api/task-definition.json
           sed -i --expression "s@<aws_region>@$AWS_REGION@" montagsmaler-api/task-definition.json
+          sed -i --expression "s@<aws_task_execution_role>@$AWS_TASK_EXECUTION_ROLE@" montagsmaler-api/task-definition.json
+          sed -i --expression "s@<aws_s3_bucket>@$AWS_S3_BUCKET@" montagsmaler-api/task-definition.json
+          sed -i --expression "s@<user_pool_id>@$USER_POOL_ID@" montagsmaler-api/task-definition.json
+          sed -i --expression "s@<client_id>@$CLIENT_ID@" montagsmaler-api/task-definition.json
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           AWS_REGION: us-east-1
+          AWS_TASK_EXECUTION_ROLE: ${{ secrets.AWS_TASK_EXECUTION_ROLE }}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          USER_POOL_ID: ${{ secrets.USER_POOL_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
     
       - name: Render API Container
         id: render-api

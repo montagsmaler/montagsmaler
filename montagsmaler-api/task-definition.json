@@ -1,6 +1,6 @@
 {
   "family": "montagsmaler",
-  "executionRoleArn": "arn:aws:iam::936738124201:role/ecsTaskExecutionRole",
+  "executionRoleArn": "<aws_task_execution_role>",
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
@@ -42,15 +42,15 @@
         },
         {
           "name": "USER_POOL_ID",
-          "value": "us-east-1_LKnyH8xzJ"
+          "value": "<user_pool_id>"
         },
         {
           "name": "CLIENT_ID",
-          "value": "imrcgq4gedp29idmtvaq97nsv"
+          "value": "<client_id>"
         },
         {
           "name": "AWS_S3_BUCKET",
-          "value": "dev4cloudmontagsmalerlucas"
+          "value": "<aws_s3_bucket>"
         },
         {
             "name": "AWS_REGION",
