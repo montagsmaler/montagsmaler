@@ -42,7 +42,7 @@
         },
         {
           "name": "LISTENER_PORT",
-          "value": 80
+          "value": "80"
         },
         {
           "name": "USER_POOL_ID",
