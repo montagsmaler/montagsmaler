@@ -34,15 +34,15 @@
       "secrets": [
         {
           "name": "AWS_ACCESS_KEY_ID",
-          "valueFrom": "arn:aws:secretsmanager:eu-west-1:953721827634:secret:AWS_ACCESS_KEY_ID-0x8tQQ"
+          "value": "ASIA5UGPROGUSWVT26EM"
         },
         {
           "name": "AWS_SECRET_ACCESS_KEY",
-          "valueFrom": "arn:aws:secretsmanager:eu-west-1:953721827634:secret:AWS_SECRET_ACCESS_KEY-QHRftL"
+          "value": "QITaB0kaeumUu3dXOHrn3Jf4ERfPgfV76PfLMIDB"
         },
         {
           "name": "AWS_SESSION_TOKEN",
-          "valueFrom": "arn:aws:secretsmanager:eu-west-1:953721827634:secret:AWS_SECRET_ACCESS_KEY-QHRftL"
+          "value": "FwoGZXIvYXdzEJv//////////wEaDB36VcL+3lTk5qnOrCLFAV+bW0b6x3sK1Vs5RZ1Vm7Rvofkrrp+ccyDFJvXbv0CjHsVbdHEKZCBhrd43DcTOmdfJabHP89tfhIeUwRCeYTV527zdMArklz6yEUYzKaG9Yk1DdoSrGIRhsbZnqGbZ6E8Xxe5gWuqxN6xbFo5ws+mKYqKZkCgdKdQMRmqYcTj2QVFP9d4Bf64SoMl12MHL1EwF22M+AUaAd7Nc2PCByZ9ImZSMZSARKszTS8onbpzmtRbIXWrXnJ5dkfgbky+6a+zo5Nx7KNjag/oFMi0WeCTaGZ06x3kIUR8LUiXP3CzxVM7u762189XKog69Y1csJhNqAMSj90FEQmo="
         }
       ],
       "environment": [
@@ -68,7 +68,7 @@
         },
         {
           "name": "AWS_S3_BUCKET",
-          "value": "dev4cloudmontagsmaler"
+          "value": "dev4cloudmontagsmalerlucas"
         }
       ]
     }
