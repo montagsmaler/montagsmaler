@@ -87,10 +87,10 @@ jobs:
     
       - name: Add secrets to Task Definition
         run: |
-          sed -i "s/<aws_access_key_id>/$AWS_ACCESS_KEY_ID/g" montagsmaler-api/task-definition.json
-          sed -i "s/<aws_secret_access_key>/$AWS_SECRET_ACCESS_KEY/g" montagsmaler-api/task-definition.json
-          sed -i "s/<aws_session_token>/$AWS_SESSION_TOKEN/g" montagsmaler-api/task-definition.json
-          sed -i "s/<aws_region>/$AWS_REGION/g" montagsmaler-api/task-definition.json
+          sed --expression "s@<aws_access_key_id>@$AWS_ACCESS_KEY_ID@" montagsmaler-api/task-definition.json
+          sed --expression "s@<aws_secret_access_key>@$AWS_SECRET_ACCESS_KEY@" montagsmaler-api/task-definition.json
+          sed --expression "s@<aws_session_token>@$AWS_SESSION_TOKEN@" montagsmaler-api/task-definition.json
+          sed --expression "s@<aws_region>@$AWS_REGION@" montagsmaler-api/task-definition.json
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
