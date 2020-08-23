@@ -5,6 +5,6 @@ export class ApiController {
 
 	@Get()
 	healthCheck(): string {
-		return 'SUCCESS';
+		return 'HEALTHCHECK: SUCCESS';
 	}
 }

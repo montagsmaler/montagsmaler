@@ -117,7 +117,7 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.render-api.outputs.task-definition }}
-          service: montagsmaler-service
+          service: montagsmaler-servicelb
           cluster: montagsmaler
           wait-for-service-stability: true
       #Until here it works.
