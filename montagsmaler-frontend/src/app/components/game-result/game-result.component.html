@@ -1,16 +1,23 @@
 <h1>Eure Kunstwerke:</h1>
-<p class="flex_center_column">Runde 1 von {{rounds}}</p>
-
-<!-- <ngu-carousel #myCarousel [inputs]="carouselTileConfig" [dataSource]="images">
-  <ngu-tile *nguCarouselDef="let image; let i = index; let ani = animate">
-    <div class="images" style="flex-direction: row;">
-      <app-result-image imageUrl="{{image.imageUrl}}" name="{{image.player.name}}" score="{{image.score}}"></app-result-image>
+  <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig" (init)="slickInit($event)"
+    (breakpoint)="breakpoint($event)" (afterChange)="afterChange($event)" (beforeChange)="beforeChange($event)">
+    <div ngxSlickItem *ngFor="let slide of images" class="slide">
+      <p class="flex_center_column">Runde 1 von {{rounds}}</p>
+      <div class="images" style="flex-direction: row;">
+        <app-result-image imageUrl="{{images[0].imageUrl}}" name="{{images[0].player.name}}" score="{{images[0].score}}">
+        </app-result-image>
+        <app-result-image imageUrl="{{images[0].imageUrl}}" name="{{images[0].player.name}}" score="{{images[0].score}}">
+        </app-result-image>
+        <app-result-image imageUrl="{{images[0].imageUrl}}" name="{{images[0].player.name}}" score="{{images[0].score}}">
+        </app-result-image>
+        <app-result-image imageUrl="{{images[0].imageUrl}}" name="{{images[0].player.name}}" score="{{images[0].score}}">
+      </app-result-image>
     </div>
+  </div>
+  </ngx-slick-carousel>
 
-  </ngu-tile>
-
-  <button NguCarouselPrev>&lt;</button>
-  <button NguCarouselNext>&gt;</button>
-</ngu-carousel> -->
+  <button (click)="addSlide()">Add</button>
+  <button (click)="removeSlide()">Remove</button>
+  <!-- <button (click)="slickModal.slickGoTo(2)">slickGoto 2</button> -->
 
 
