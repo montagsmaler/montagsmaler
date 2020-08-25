@@ -5,9 +5,8 @@ import { RouterModule } from '@angular/router';
 import { WelcomeModule } from './welcome/welcome.module';
 import { GameHomeModule } from './game-home/game-home.module';
 import { GameModule } from './game/game.module';
-import { GameComponent } from './game/game.component';
-import { GameLobbyComponent } from './game-lobby/game-lobby.component';
 import { GameLobbyModule } from './game-lobby/game-lobby.module';
+import { GameResultModule } from './game-result/game-result.module';
 
 @NgModule({
   declarations: [LayoutComponent],
@@ -17,7 +16,8 @@ import { GameLobbyModule } from './game-lobby/game-lobby.module';
     WelcomeModule,
     GameHomeModule,
     GameModule,
-    GameLobbyModule
+    GameLobbyModule,
+    GameResultModule,
   ]
 })
 export class CompontentsModule {}
