@@ -12,9 +12,24 @@ const hel = helmet as any;
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 
-	const port = app.get<ConfigService>(ConfigService).get<string>('LISTENER_PORT');
+	const config = app.get<ConfigService>(ConfigService);
 
-	app.enableCors({ origin: true, credentials: true });
+	const origins: string[] = [
+		'APPLICATION_ORIGIN',
+		'APPLICATION_ORIGIN_DEVELOPMENT',
+	].reduce((origins, key) => {
+		const origin = config.get<string>(key);
+		if (origin) {
+			origins.push(origin);
+		}
+		return origins;
+	}, []);
+
+	app.enableCors({
+		origin: (origins.length > 0) ? origins : true,
+		credentials: true,
+	});
+
 	app.use(
 		rateLimit({
 			windowMs: 15 * 60 * 1000,
@@ -26,6 +41,7 @@ async function bootstrap() {
 	app.use(bodyParser.json({ limit: '50mb' }));
 	app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
+	const port = config.get<string>('LISTENER_PORT');
 	await app.listen(port);
 
 	new Logger('NestApplication').log(`HTTP Server listening on port ${port}`);
