@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import {
   trigger,
   state,
@@ -25,6 +25,8 @@ import {
   ],
 })
 export class CountdownComponent implements OnInit {
+  @Input() gameOver: boolean;
+
   constructor() {}
 
   ngOnInit() {}

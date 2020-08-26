@@ -10,12 +10,12 @@ import { DrawCanvasComponent } from './draw-canvas/draw-canvas.component';
 import { firstNonNil } from 'src/app/utility/rxjs/operator';
 
 @Component({
-  selector: "app-game",
-  templateUrl: "./game.component.html",
-  styleUrls: ["./game.component.scss"],
+  selector: 'app-game',
+  templateUrl: './game.component.html',
+  styleUrls: ['./game.component.scss'],
   animations: [
-    trigger("ngIfAnimation", [
-      transition(":enter, :leave", [query("@*", animateChild())]),
+    trigger('ngIfAnimation', [
+      transition(':enter, :leave', [query('@*', animateChild())]),
     ]),
   ],
 })
@@ -124,7 +124,16 @@ export class GameComponent implements OnInit, OnDestroy {
         this.gameOver = true;
         console.log(gameOverEvent);
 
-        this.router.navigate(['/result/', this.gameId], {state: {data: gameOverEvent.images }});
+        this.counter = 3;
+        this.interval = setInterval(() => {
+          if (this.counter > 0) {
+            this.counter--;
+          } else {
+            this.router.navigate(['/result/', this.gameId], {state: { data: gameOverEvent.images },});
+            clearInterval(this.interval);
+          }
+        }, 1000);
+
       });
     this.gameSubscriptions.add(gameOverEventSub);
   }
