@@ -179,7 +179,26 @@ export class DrawCanvasComponent implements AfterViewInit, OnDestroy {
 
   getImage() {
     const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
-    return canvasEl.toDataURL();
+
+    const newCanvas = document.createElement('canvas');
+    const cx = newCanvas.getContext('2d');
+    newCanvas.width = this.width;
+    newCanvas.height = this.height;
+    const dataCx = this.cx.getImageData(0, 0, this.width, this.height);
+    cx.putImageData(dataCx, 0, 0);
+    const imgData = cx.getImageData(0, 0, canvasEl.width, canvasEl.height);
+    const data = imgData.data;
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] < 255) {
+          data[i] = 255 - data[i];
+          data[i + 1] = 255 - data[i + 1];
+          data[i + 2] = 255 - data[i + 2];
+          data[i + 3] = 255 - data[i + 3];
+        }
+    }
+    cx.putImageData(imgData, 0, 0);
+
+    return newCanvas.toDataURL('image/jpeg');
   }
 
   downloadImage() {
