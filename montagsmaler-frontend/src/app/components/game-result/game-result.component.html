@@ -1,23 +1,14 @@
 <h1>Eure Kunstwerke:</h1>
   <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig" (init)="slickInit($event)"
     (breakpoint)="breakpoint($event)" (afterChange)="afterChange($event)" (beforeChange)="beforeChange($event)">
-    <div ngxSlickItem *ngFor="let slide of images" class="slide">
-      <p class="flex_center_column">Runde 1 von {{rounds}}</p>
+    <div ngxSlickItem *ngFor="let round of imagesPerRound index as i" class="slide">
+      <p class="flex_center_column">Runde {{i + 1}} von {{rounds}}</p>
       <div class="images" style="flex-direction: row;">
-        <app-result-image imageUrl="{{images[0].imageUrl}}" name="{{images[0].player.name}}" score="{{images[0].score}}">
+        <app-result-image *ngFor="let image of round" imageUrl="{{image.imageUrl}}" name="{{image.player.name}}" score="{{image.score}}">
         </app-result-image>
-        <app-result-image imageUrl="{{images[0].imageUrl}}" name="{{images[0].player.name}}" score="{{images[0].score}}">
-        </app-result-image>
-        <app-result-image imageUrl="{{images[0].imageUrl}}" name="{{images[0].player.name}}" score="{{images[0].score}}">
-        </app-result-image>
-        <app-result-image imageUrl="{{images[0].imageUrl}}" name="{{images[0].player.name}}" score="{{images[0].score}}">
-      </app-result-image>
+
     </div>
   </div>
   </ngx-slick-carousel>
-
-  <button (click)="addSlide()">Add</button>
-  <button (click)="removeSlide()">Remove</button>
-  <!-- <button (click)="slickModal.slickGoTo(2)">slickGoto 2</button> -->
 
 

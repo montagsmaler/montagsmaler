@@ -26,8 +26,6 @@
     "class-validator": "^0.12.2",
     "http-status-codes": "^1.4.0",
     "jquery": "^3.5.1",
-    "ng2-page-slider": "^0.10.1",
-    "ngx-simple-slider": "^1.2.0",
     "ngx-slick-carousel": "^0.5.1",
     "rxjs": "~6.4.0",
     "slick-carousel": "^1.8.1",
