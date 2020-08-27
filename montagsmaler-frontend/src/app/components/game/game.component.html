@@ -13,7 +13,6 @@
     <h1 class="counter h1-counter">{{counter}}</h1>
   </div>
   <div *ngIf="gameOver">
-    <h1 class="h1-counter">GAME OVER</h1>
     <h1 class="h1-counter">Bereit für eure Kunstwerke?</h1>
   </div>
 </app-countdown>
@@ -21,6 +20,11 @@
 <app-loading-screen *ngIf="!gameStarted">
   <h1 class="h1-counter">Es lädt ...</h1>
 </app-loading-screen>
+
+<div class="toast-container">
+  <app-toast @ngIfAnimation *ngFor="let toast of toasts" text="{{toast.text}}"></app-toast>
+</div>
+
 
 
 

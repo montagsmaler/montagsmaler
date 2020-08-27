@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { trigger, query, animateChild, transition } from '@angular/animations';
+import { trigger, query, animateChild, transition, state, style, animate } from '@angular/animations';
 import { GameService } from 'src/app/api/ws/game';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, switchMap, first, tap } from 'rxjs/internal/operators';
@@ -8,6 +8,7 @@ import { Game } from 'src/app/api/ws/game/models';
 import { AuthService, User } from 'src/app/api/http/auth';
 import { DrawCanvasComponent } from './draw-canvas/draw-canvas.component';
 import { firstNonNil } from 'src/app/utility/rxjs/operator';
+import { ToastData } from './toast/toast.component';
 
 @Component({
   selector: 'app-game',
@@ -17,6 +18,23 @@ import { firstNonNil } from 'src/app/utility/rxjs/operator';
     trigger('ngIfAnimation', [
       transition(':enter, :leave', [query('@*', animateChild())]),
     ]),
+    // trigger('flyInOut', [
+    //   state('in', style({ transform: 'translateX(0)' })),
+    //   transition('void => *', [
+    //     style({ transform: 'translateX(-100%)' }),
+    //     animate(100),
+    //   ]),
+    //   transition('* => void', [
+    //     animate(100, style({ transform: 'translateX(100%)' })),
+    //   ]),
+    // ]),
+    // trigger('myInsertRemoveTrigger', [
+    //   transition(':enter', [
+    //     style({ opacity: 0 }),
+    //     animate('100ms', style({ opacity: 1 })),
+    //   ]),
+    //   transition(':leave', [animate('100ms', style({ opacity: 0 }))]),
+    // ]),
   ],
 })
 export class GameComponent implements OnInit, OnDestroy {
@@ -34,6 +52,7 @@ export class GameComponent implements OnInit, OnDestroy {
   counter = 3;
   interval;
   gameId: string;
+  toasts: [ToastData];
 
   constructor(
     private readonly gameService: GameService,
@@ -86,13 +105,22 @@ export class GameComponent implements OnInit, OnDestroy {
         this.currentRound = newGameRoundEvent.round;
         this.currentWord = newGameRoundEvent.noun;
         this.canvas.clear();
+        console.log(this.toasts);
+
         console.log(newGameRoundEvent);
       });
     this.gameSubscriptions.add(newGameRoundEventSub);
 
     const gameImageAddedEventSub = this.gameService
       .getGameImageAddedEvent$()
-      .subscribe(console.log);
+      .subscribe((gameImageAddedEvent) => {
+        this.showToast({
+          text:
+            gameImageAddedEvent.image.player.name +
+            ' hat bereits sein Bild gepostet',
+        });
+        console.log(gameImageAddedEvent);
+      });
     this.gameSubscriptions.add(gameImageAddedEventSub);
 
     const gameImagesShouldPublishEvent = this.gameService
@@ -124,16 +152,13 @@ export class GameComponent implements OnInit, OnDestroy {
         this.gameOver = true;
         console.log(gameOverEvent);
 
-        this.counter = 3;
-        this.interval = setInterval(() => {
-          if (this.counter > 0) {
-            this.counter--;
-          } else {
-            this.router.navigate(['/result/', this.gameId], {state: { data: gameOverEvent.images },});
-            clearInterval(this.interval);
-          }
-        }, 1000);
-
+        setTimeout(
+          () =>
+            this.router.navigate(['/result/', this.gameId], {
+              state: { data: gameOverEvent.images },
+            }),
+          3000
+        );
       });
     this.gameSubscriptions.add(gameOverEventSub);
   }
@@ -147,6 +172,16 @@ export class GameComponent implements OnInit, OnDestroy {
     this.gameSubscriptions.forEach((subscription) =>
       subscription.unsubscribe()
     );
+  }
+
+  showToast(data: ToastData) {
+    if (this.toasts === undefined) {
+      this.toasts = [data];
+    } else {
+      this.toasts.push(data);
+    }
+
+    setTimeout(() => this.toasts.shift(), 5000);
   }
 
   submitImage() {

@@ -1,11 +1,25 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { SlickCarouselComponent } from 'ngx-slick-carousel';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
-  selector: "app-game-result",
-  templateUrl: "./game-result.component.html",
-  styleUrls: ["./game-result.component.scss"],
+  selector: 'app-game-result',
+  templateUrl: './game-result.component.html',
+  styleUrls: ['./game-result.component.scss'],
+  animations: [
+    trigger('enterAnimation', [
+      transition(':enter', [
+        style({ opacity: 0.3 }),
+        animate('400ms ease-in', style({ opacity: 1 })),
+      ]),
+      transition(':leave', [
+        style({ opacity: 1 }),
+        animate('400ms', style({ opacity: 0 })),
+      ]),
+    ]),
+  ]
 })
+
 export class GameResultComponent implements OnInit {
   images;
   rounds = 0;
@@ -15,11 +29,11 @@ export class GameResultComponent implements OnInit {
     slidesToScroll: 1,
     infinite: false,
     arrow: false,
-    nextArrow: "<div></div>",
-    prevArrow: "<div></div>",
+    nextArrow: '<div></div>',
+    prevArrow: '<div></div>',
   };
 
-  @ViewChild("slickModal", { static: true }) slickModal: SlickCarouselComponent;
+  @ViewChild('slickModal', { static: true }) slickModal: SlickCarouselComponent;
 
   constructor() {}
 
@@ -68,9 +82,5 @@ export class GameResultComponent implements OnInit {
       }
     });
     return maxRound;
-  }
-
-  getImagesPerRound() {
-    // var imagesPer
   }
 }
