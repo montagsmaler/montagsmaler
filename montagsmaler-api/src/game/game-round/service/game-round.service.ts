@@ -31,18 +31,19 @@ export class GameRoundService {
 
 	public async initGame(player: Player, lobby: Lobby, duration: number, rounds: number): Promise<[Game, Observable<GameEvent>]> {
 		const id = this.idService.getUUID();
-		let lock: Lock;
 		try {
-			const game = new Game(id, new Date().getTime(), lobby.getPlayers(), duration * this.SECOND_IN_MILLISECONDS, rounds);
-			const lock = await this.lockService.lockRessource(PLAYER + player.id, this.WAIT_TIME_BETWEEN_ROUND + this.WAIT_TIME_TO_GAME_START + game.duration + 10_000);
+            const game = new Game(id, new Date().getTime(), lobby.getPlayers(), duration * this.SECOND_IN_MILLISECONDS, rounds);
+            const playerRunningGames = await this.keyValueService.getInt(GAME + PLAYER + player.id);
+            if (playerRunningGames > 0) {
+                throw new Error('Player already has a running game.');
+            } else {
+                await this.keyValueService.setInt(GAME + PLAYER + player.id, playerRunningGames + 1, this.WAIT_TIME_BETWEEN_ROUND + this.WAIT_TIME_TO_GAME_START + game.duration + 10_000)
+            }
 			await this.setGame(id, game);
-			setTimeout(() => this.startGameLoop(game, lock));
+			setTimeout(() => this.startGameLoop(game, player.id));
 			const events = this.onGameEvent(id);
 			return [game, events];
 		} catch (err) {
-			if (lock && lock.value) {
-				await lock.unlock();
-			}
 			throw new Error('Failed to init Game');
 		}
 	}
@@ -54,7 +55,7 @@ export class GameRoundService {
 		return [game, this.onGameEvent(gameId)];
 	}
 
-	private async startGameLoop(game: Game, lock: Lock): Promise<void> {
+	private async startGameLoop(game: Game, playerId: string): Promise<void> {
 		try {
 			await sleep(this.WAIT_TIME_TO_GAME_START);
 			await this.pubGameEvent(game.id, new GameStartedEvent(await this.idService.getIncrementalID(), game));
@@ -70,16 +71,18 @@ export class GameRoundService {
 					await sleep(this.WAIT_TIME_BETWEEN_ROUND);
 					await this.pubGameEvent(game.id, new NewGameRoundEvent(await this.idService.getIncrementalID(), game, this.nounService.next(), newRoundIndex, new Date().getTime()));
 				}
-			}
+            }
 			const [id, scoreboard, images] = await Promise.all([this.idService.getIncrementalID(), this.getScoreboard(game.id), this.imageService.getImages(game.id)]);
-			await this.pubGameEvent(game.id, new GameOverEvent(id, game, scoreboard, images));
-			await lock.unlock();
+            await this.pubGameEvent(game.id, new GameOverEvent(id, game, scoreboard, images));
+            try {
+                await this.keyValueService.delete(GAME + PLAYER + playerId);
+            } catch (err) { }
 			await sleep(this.WAIT_TO_DELETE_GAME);
 			await this.deleteGame(game.id);
 		} catch (err) {
-			if (lock && lock.value) {
-				await lock.unlock();
-			}
+			try {
+                await this.keyValueService.delete(GAME + PLAYER + playerId);
+            } catch (err) { }
 			throw new Error('Error in the gameloop.');
 		}
 	}

@@ -63,15 +63,16 @@ export class KeyValueService {
 
 	public async getInt(key: string): Promise<number> {
 		try {
-			return parseInt(await this.redisKeyValue.get(key), 10);
+            const value = await this.redisKeyValue.get(key);
+			return (value) ? parseInt(value, 10) : 0;
 		} catch (err) {
 			throw new Error(`No intvalue found for key "${key}".`);
 		}
 	}
 
-	public async setInt(key: string, int: number): Promise<void> {
+	public async setInt(key: string, int: number, expireInSeconds?: number): Promise<void> {
 		try {
-			const result = await this.redisKeyValue.set(key, int);
+			const result = (expireInSeconds) ? await this.redisKeyValue.set(key, int, 'ex', expireInSeconds) : await this.redisKeyValue.set(key, int);
 			if (result !== 'OK') {
 				throw new Error();
 			}
