@@ -1,0 +1,21 @@
+.result-image {
+  background-image: url('../../../../assets/images/canvas.svg');
+  background-repeat: no-repeat;
+  background-size: 290px 230px;
+  padding: 15px;
+  width: 260px;
+  height: 200px;
+}
+
+.wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px 30px 30px 30px;
+}
+
+.name {
+  font-weight: bold;
+}

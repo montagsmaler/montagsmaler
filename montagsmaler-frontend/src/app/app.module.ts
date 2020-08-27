@@ -7,19 +7,18 @@ import { CompontentsModule } from './components/compontents.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { authInterceptorProvider } from './api/http/auth';
 
+
+
+
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     CompontentsModule,
     BrowserAnimationsModule,
   ],
-  providers: [
-    authInterceptorProvider,
-  ],
-  bootstrap: [AppComponent]
+  providers: [authInterceptorProvider],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

@@ -1,0 +1,30 @@
+.images {
+  display: grid;
+  grid-template-columns: repeat(2, 50%);
+  width: 100%;
+}
+
+.container {
+
+  // display: flex;
+  // flex-direction: row;
+}
+
+#slider {
+  width: 100%
+}
+
+.button-left {
+  position: fixed;
+  top: 40vh;
+  z-index: 20;
+  left: 150px;
+}
+
+.button-right {
+  position: fixed;
+  top: 40vh;
+  z-index: 20;
+  left: calc(100vw - 150px - 50px);
+}
+
