@@ -45,9 +45,11 @@ export class GameComponent implements OnInit, OnDestroy {
   public currentRound: number;
   public currentWord: string;
   public currentPlayer: User;
+  showCurtain = true;
   showCountdown = true;
   roundOver = false;
   gameOver = false;
+  imageSubmitted = false;
   gameStarted = false;
   counter = 3;
   interval;
@@ -149,6 +151,7 @@ export class GameComponent implements OnInit, OnDestroy {
         this.gameStarted = true;
 
         this.roundOver = false;
+        this.showCountdown = false;
         this.gameOver = true;
         console.log(gameOverEvent);
 
@@ -184,6 +187,14 @@ export class GameComponent implements OnInit, OnDestroy {
     setTimeout(() => this.toasts.shift(), 5000);
   }
 
+  shouldSubmitImage() {
+      this.showCountdown = false;
+      this.imageSubmitted = true;
+      this.showCurtain = true;
+
+      this.submitImage();
+  }
+
   submitImage() {
     this.gameService
       .getSubmitImage$()
@@ -200,13 +211,15 @@ export class GameComponent implements OnInit, OnDestroy {
 
   startCountdown() {
     this.showCountdown = true;
+    this.showCurtain = true;
+    this.imageSubmitted = false;
 
     this.counter = 3;
     this.interval = setInterval(() => {
       if (this.counter > 0) {
         this.counter--;
       } else {
-        this.showCountdown = false;
+        this.showCurtain = false;
         clearInterval(this.interval);
       }
     }, 1000);

@@ -2,18 +2,22 @@
 <p class="flex_center_column">Runde {{currentRound ? currentRound : "..."}} von 3</p>
 <div class="flex_center_column">
   <app-draw-canvas style="position: relative; left: 30px;"></app-draw-canvas>
-  <a (click)="submitImage()" class="btn_green flex_center_column" style="flex-direction: row;">
+  <a (click)="shouldSubmitImage()" class="btn_green flex_center_column" style="flex-direction: row;">
     <img src="assets/images/check.svg" width="20px" style="padding-right: 20px;" />
     Fertig</a>
 </div>
 
-<app-countdown *ngIf="showCountdown" @ngIfAnimation>
-  <div *ngIf="!gameOver">
+<app-countdown *ngIf="showCurtain" @ngIfAnimation>
+  <div *ngIf="showCountdown">
     <h1 class="h1-counter">Mach dich bereit!</h1>
     <h1 class="counter h1-counter">{{counter}}</h1>
   </div>
   <div *ngIf="gameOver">
     <h1 class="h1-counter">Bereit für eure Kunstwerke?</h1>
+  </div>
+  <div *ngIf="imageSubmitted" class="flex_center_column">
+    <h1 class="h1-counter">Sehr gut!</h1>
+    <p>Dein Bild wurde abgeschickt. Lass uns nun kurz auf die Anderen warten...</p>
   </div>
 </app-countdown>
 
