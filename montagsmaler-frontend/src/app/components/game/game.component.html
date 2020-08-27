@@ -7,13 +7,13 @@
     Fertig</a>
 </div>
 
-<app-countdown [gameOver]="gameOver" *ngIf="showCountdown" @ngIfAnimation>
+<app-countdown *ngIf="showCountdown" @ngIfAnimation>
   <div *ngIf="!gameOver">
     <h1 class="h1-counter">Mach dich bereit!</h1>
     <h1 class="counter h1-counter">{{counter}}</h1>
   </div>
   <div *ngIf="gameOver">
-    <h1 class="h1-counter" style="color: white">GAME OVER</h1>
+    <h1 class="h1-counter">GAME OVER</h1>
     <h1 class="h1-counter">Bereit für eure Kunstwerke?</h1>
   </div>
 </app-countdown>

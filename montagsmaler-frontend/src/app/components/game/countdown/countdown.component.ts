@@ -25,8 +25,6 @@ import {
   ],
 })
 export class CountdownComponent implements OnInit {
-  @Input() gameOver: boolean;
-
   constructor() {}
 
   ngOnInit() {}

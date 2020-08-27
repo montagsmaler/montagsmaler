@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="41px" height="39px" viewBox="0 0 41 39" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group</title>
+    <defs>
+        <filter id="filter-1">
+            <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 1.000000 0"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
+        <g id="Group" transform="translate(-1246.000000, -492.000000)" filter="url(#filter-1)">
+            <g transform="translate(1266.500000, 512.000000) scale(-1, 1) translate(-1266.500000, -512.000000) translate(1248.500000, 494.000000)">
+                <g id="Group-5" transform="translate(18.000000, 17.868595) rotate(36.000000) translate(-18.000000, -17.868595) translate(4.500000, 6.368595)" stroke="#000000" stroke-width="2">
+                    <path d="M26.2956748,2 C19.4331002,4.43404798 7.63583602,12.7911094 1,17.5418154" id="Path-24"></path>
+                    <path d="M2.26305937,2.22610724 C2.26305937,33.0998132 -0.438999974,15.1462934 17.1520667,17.1726566" id="Path-26" transform="translate(9.632945, 11.385756) rotate(15.000000) translate(-9.632945, -11.385756) "></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

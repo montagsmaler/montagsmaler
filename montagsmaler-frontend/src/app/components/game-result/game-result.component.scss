@@ -5,19 +5,26 @@
 }
 
 .container {
-  display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  width: 100vw;
 
-
-  .images {
-    flex: 0 0 auto;
-    width: 900px;
-  }
+  // display: flex;
+  // flex-direction: row;
 }
 
-.slider {
-  width: 100%;
-  height: 1200px;
+#slider {
+  width: 100%
 }
+
+.button-left {
+  position: fixed;
+  top: 40vh;
+  z-index: 20;
+  left: 150px;
+}
+
+.button-right {
+  position: fixed;
+  top: 40vh;
+  z-index: 20;
+  left: calc(100vw - 150px - 50px);
+}
+

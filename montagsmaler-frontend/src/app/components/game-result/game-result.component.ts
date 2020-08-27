@@ -1,7 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { PageSliderModule } from "ng2-page-slider";
-
-
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { SlickCarouselComponent } from 'ngx-slick-carousel';
 
 @Component({
   selector: "app-game-result",
@@ -12,7 +10,16 @@ export class GameResultComponent implements OnInit {
   images;
   rounds = 0;
   imagesPerRound = [];
-  slideConfig = { slidesToShow: 1, slidesToScroll: 1 };
+  slideConfig = {
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    infinite: false,
+    arrow: false,
+    nextArrow: "<div></div>",
+    prevArrow: "<div></div>",
+  };
+
+  @ViewChild("slickModal", { static: true }) slickModal: SlickCarouselComponent;
 
   constructor() {}
 
@@ -20,7 +27,7 @@ export class GameResultComponent implements OnInit {
     this.images = history.state.data;
     this.rounds = this.getMaxRound();
 
-    for (let i = 1; (i <= this.rounds); i++) {
+    for (let i = 1; i <= this.rounds; i++) {
       this.imagesPerRound[i - 1] = [];
       console.log(i);
       this.images.forEach((image) => {
@@ -32,24 +39,25 @@ export class GameResultComponent implements OnInit {
     console.log(this.imagesPerRound);
   }
 
-  getIndexOfRound(round) {
-
-  }
+  getIndexOfRound(round) {}
 
   addSlide() {}
 
   removeSlide() {}
 
-  slickInit(e) {
-  }
+  slickInit(e) {}
 
-  breakpoint(e) {
-  }
+  breakpoint(e) {}
 
-  afterChange(e) {
-  }
+  afterChange(e) {}
 
-  beforeChange(e) {
+  beforeChange(e) {}
+
+  next() {
+    this.slickModal.slickNext();
+  }
+  prev() {
+    this.slickModal.slickPrev();
   }
 
   getMaxRound() {
