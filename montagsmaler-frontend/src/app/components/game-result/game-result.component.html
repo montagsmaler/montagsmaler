@@ -1,0 +1,21 @@
+<h1>Eure Kunstwerke:</h1>
+
+<div class="container">
+<img src="assets/images/left.svg" class="btn_round_gray button-left" (click)="prev()">
+
+<ngx-slick-carousel #slider class="carousel" #slickModal="slick-carousel" [config]="slideConfig" (init)="slickInit($event)"
+    (breakpoint)="breakpoint($event)" (afterChange)="afterChange($event)" (beforeChange)="beforeChange($event)">
+    <div ngxSlickItem *ngFor="let round of imagesPerRound index as i" class="slide">
+      <p class="flex_center_column">Runde {{i + 1}} von {{rounds}}</p>
+      <div class="images" style="flex-direction: row;">
+        <app-result-image *ngFor="let image of round" imageUrl="{{image.imageUrl}}" name="{{image.player.name}}" score="{{image.score}}">
+        </app-result-image>
+
+    </div>
+  </div>
+  </ngx-slick-carousel>
+
+<img src="assets/images/right.svg" class="btn_round_gray button-right" (click)="next()">
+</div>
+
+

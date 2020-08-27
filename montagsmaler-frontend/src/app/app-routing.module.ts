@@ -5,6 +5,7 @@ import { WelcomeComponent } from './components/welcome/welcome.component';
 import { GameLobbyComponent } from './components/game-lobby/game-lobby.component';
 import { GameComponent } from './components/game/game.component';
 import { GameHomeComponent } from './components/game-home/game-home.component';
+import { GameResultComponent } from './components/game-result/game-result.component';
 
 const routes: Routes = [
   {
@@ -26,6 +27,7 @@ const routes: Routes = [
         path: 'game/:gameId',
         component: GameComponent,
       },
+      { path: 'result/:gameId', component: GameResultComponent }
     ],
   },
 ];
