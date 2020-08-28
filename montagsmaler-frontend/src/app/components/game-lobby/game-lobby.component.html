@@ -7,6 +7,11 @@
         <div *ngFor="let player of lobby.members">
           <app-player-item name="{{player.name}}" [empty]="false" playerId="{{player.id}}"></app-player-item>
         </div>
+        <div *ngFor="let item of [].constructor(5 - lobby.members.length)">
+          <app-player-item name="" [empty]="true" playerId=""></app-player-item>
+
+        </div>
+
         <!-- <div *ngFor="let player of lobby.members">
           <app-player-item name="{{player.name}}" [empty]="false" playerId="{{player.id}}"></app-player-item>
         </div> -->
@@ -16,10 +21,11 @@
     <p>Teile den Link, um Mitspieler einzuladen</p>
     <div class="flex_center_column" style="flex-direction: row;">
       <div class="link_background flex_center_column" style="flex-direction: row;">
-        <a href="javascript:">{{lobbyUrl}}</a>
+        <a class="link" href="javascript:">{{lobbyUrl}}</a>
       </div>
       <a href="javascript:" (click)="copyLobbyUrlToClipboard()"><img class="btn_copy" src="assets/images/copy.svg"></a>
     </div>
+    <br>
     <br>
     <a href="javascript:" class="btn_green" (click)="startGame()" *ngIf="isLobbyLeader">
       <img src="assets/images/play.svg" width="20px" style="padding-right: 20px;" />
