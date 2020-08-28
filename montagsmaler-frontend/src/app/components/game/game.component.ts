@@ -116,11 +116,9 @@ export class GameComponent implements OnInit, OnDestroy {
     const gameImageAddedEventSub = this.gameService
       .getGameImageAddedEvent$()
       .subscribe((gameImageAddedEvent) => {
-        this.showToast({
-          text:
-            gameImageAddedEvent.image.player.name +
-            ' hat bereits sein Bild gepostet',
-        });
+        if (gameImageAddedEvent.image.player.id !== this.currentPlayer.id) {
+          this.showToast({text: gameImageAddedEvent.image.player.name + " hat bereits sein Bild gepostet",});
+        }
         console.log(gameImageAddedEvent);
       });
     this.gameSubscriptions.add(gameImageAddedEventSub);
