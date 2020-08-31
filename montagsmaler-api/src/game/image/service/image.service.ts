@@ -7,6 +7,7 @@ import { Player } from '../../lobby/models';
 import { S3Service } from '../../../api/http/s3';
 import { RecognitionService } from '../../../api/http/recognition';
 import { ConfigService } from '@nestjs/config'
+import { similarities } from '../../../shared/helper/image.helper'
 
 const CONTENT_ENCODING = 'base64';
 const CONTENT_TYPE = 'image/jpeg';
@@ -50,9 +51,18 @@ export class ImageService {
 			let confidence = 0;
 			
 			if (labels) {
-				const expectedLabel = labels.find(label => label.Name === noun);
+				let expectedLabel = labels.find(label => label.Name === noun);
 				if (expectedLabel) {
 					confidence = expectedLabel.Confidence;
+				} else {
+					similarities.get(noun).forEach(value => {
+						expectedLabel = labels.find(label => label.Name === value);
+						if (expectedLabel) {
+							if(expectedLabel.Confidence > confidence){
+								confidence = expectedLabel.Confidence;
+							}
+						}
+					});
 				}
 			}
 
