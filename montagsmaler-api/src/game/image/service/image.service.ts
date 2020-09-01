@@ -49,6 +49,7 @@ export class ImageService {
 			)).Labels;
 
 			let confidence = 0;
+			let similarity = 1;
 			
 			if (labels) {
 				let expectedLabel = labels.find(label => label.Name === noun);
@@ -60,13 +61,14 @@ export class ImageService {
 						if (expectedLabel) {
 							if(expectedLabel.Confidence > confidence){
 								confidence = expectedLabel.Confidence;
+								similarity = value[1];
 							}
 						}
 					});
 				}
 			}
-
-			const image = new Image(uuid, new Date().getTime(), imageS3.Location, player, forRound, this.imageRating(confidence, timeToPublish));
+			console.log(confidence)
+			const image = new Image(uuid, new Date().getTime(), imageS3.Location, player, forRound, this.imageRating(confidence, timeToPublish, similarity));
 			await this.addImage(gameId, image);
 			return image;
 		} catch (err) {
@@ -75,8 +77,8 @@ export class ImageService {
 		}
 	}
 
-	private imageRating(rekognitionConfidence: number, timeToPublish: number): number {
-		return Math.floor((rekognitionConfidence * 1000) / timeToPublish);
+	private imageRating(rekognitionConfidence: number, timeToPublish: number, similarity: number): number {
+		return Math.floor(((rekognitionConfidence * similarity) * 1000) / timeToPublish);
 	}
 
 	private async getTimeToPublishAndNoun(gameId: string, round: number): Promise<[number, string]> {
