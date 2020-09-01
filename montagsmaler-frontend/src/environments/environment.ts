@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'http://montagsmaler-balancer-526029588.us-east-1.elb.amazonaws.com',
-  wsEndpoint: 'http://montagsmaler-balancer-526029588.us-east-1.elb.amazonaws.com',
+  baseUrl: 'http://127.0.0.1:3002',
+  wsEndpoint: 'ws://127.0.0.1:3002',
 };
 
 /*
@@ -16,3 +16,10 @@ export const environment = {
  * on performance if an error is thrown.
  */
 // import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+
+
+// export const environment = {
+//   production: false,
+//   baseUrl: 'http://montagsmaler-balancer-526029588.us-east-1.elb.amazonaws.com',
+//   wsEndpoint: 'http://montagsmaler-balancer-526029588.us-east-1.elb.amazonaws.com',
+// };
