@@ -7,6 +7,7 @@ import { Player } from '../../lobby/models';
 import { S3Service } from '../../../api/http/s3';
 import { RecognitionService } from '../../../api/http/recognition';
 import { ConfigService } from '@nestjs/config'
+import { similarities } from '../../../shared/helper/image.helper'
 
 const CONTENT_ENCODING = 'base64';
 const CONTENT_TYPE = 'image/jpeg';
@@ -48,15 +49,26 @@ export class ImageService {
 			)).Labels;
 
 			let confidence = 0;
+			let similarity = 1;
 			
 			if (labels) {
-				const expectedLabel = labels.find(label => label.Name === noun);
+				let expectedLabel = labels.find(label => label.Name === noun);
 				if (expectedLabel) {
 					confidence = expectedLabel.Confidence;
+				} else {
+					similarities.get(noun).forEach(value => {
+						expectedLabel = labels.find(label => label.Name === value);
+						if (expectedLabel) {
+							if(expectedLabel.Confidence > confidence){
+								confidence = expectedLabel.Confidence;
+								similarity = value[1];
+							}
+						}
+					});
 				}
 			}
-
-			const image = new Image(uuid, new Date().getTime(), imageS3.Location, player, forRound, this.imageRating(confidence, timeToPublish));
+			console.log(confidence)
+			const image = new Image(uuid, new Date().getTime(), imageS3.Location, player, forRound, this.imageRating(confidence, timeToPublish, similarity));
 			await this.addImage(gameId, image);
 			return image;
 		} catch (err) {
@@ -65,8 +77,8 @@ export class ImageService {
 		}
 	}
 
-	private imageRating(rekognitionConfidence: number, timeToPublish: number): number {
-		return Math.floor((rekognitionConfidence * 1000) / timeToPublish);
+	private imageRating(rekognitionConfidence: number, timeToPublish: number, similarity: number): number {
+		return Math.floor(((rekognitionConfidence * similarity) * 1000) / timeToPublish);
 	}
 
 	private async getTimeToPublishAndNoun(gameId: string, round: number): Promise<[number, string]> {
