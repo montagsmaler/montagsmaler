@@ -57,7 +57,7 @@ export class ImageService {
 					confidence = expectedLabel.Confidence;
 				} else {
 					similarities.get(noun).forEach(value => {
-						expectedLabel = labels.find(label => label.Name === value);
+						expectedLabel = labels.find(label => label.Name === value[0]);
 						if (expectedLabel) {
 							if(expectedLabel.Confidence > confidence){
 								confidence = expectedLabel.Confidence;
@@ -78,7 +78,7 @@ export class ImageService {
 	}
 
 	private imageRating(rekognitionConfidence: number, timeToPublish: number, similarity: number): number {
-		return Math.floor(((rekognitionConfidence * similarity) * 1000) / timeToPublish);
+		return Math.floor(((rekognitionConfidence * similarity) / 10));
 	}
 
 	private async getTimeToPublishAndNoun(gameId: string, round: number): Promise<[number, string]> {
