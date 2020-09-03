@@ -4,8 +4,8 @@
     <br>
     <div class class="players">
       <div class="comopetitors" >
-        <div *ngFor="let player of lobby.members">
-          <app-player-item name="{{player.name}}" [empty]="false" playerId="{{player.id}}"></app-player-item>
+        <div *ngFor="let player of lobby.members, let i = index">
+          <app-player-item name="{{player.name}}" [empty]="false" playerId="index"></app-player-item>
         </div>
         <div *ngFor="let item of [].constructor(5 - lobby.members.length)">
           <app-player-item name="" [empty]="true" playerId=""></app-player-item>

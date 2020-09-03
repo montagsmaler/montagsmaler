@@ -34,11 +34,14 @@ export const copyToClipboard = (val: string): void => {
 
 export const hashCodeFromString = (str: string): number => {
   let hash = 0;
-  for (let i = 0; i < 6; i++) {
-    let char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
+  console.log(hash);
+
+  for (let i = 0; i < 20; i++) {
+    let chr = str.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0;
   }
+  console.log(hash);
 
   return hash;
 };
