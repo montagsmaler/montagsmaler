@@ -56,7 +56,7 @@ export class GameLobbyComponent implements OnInit, OnDestroy {
     lobbyId$
       .pipe(
         switchMap(id => {
-          this.lobbyUrl = `${this.baseUrl}/lobby/${id}`;
+          this.lobbyUrl = window.location.href;
           if (!lobby || lobby.id !== id) {
             return from(this.joinLobby(id));
           } else {
