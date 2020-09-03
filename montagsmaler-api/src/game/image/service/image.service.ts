@@ -77,7 +77,7 @@ export class ImageService {
 	}
 
 	private imageRating(rekognitionConfidence: number, timeToPublish: number, similarity: number): number {
-		return Math.round((rekognitionConfidence * similarity) * 10);
+		return Math.round((rekognitionConfidence * similarity) / 10);
 	}
 
 	private async getTimeToPublishAndNoun(gameId: string, round: number): Promise<[number, string]> {
