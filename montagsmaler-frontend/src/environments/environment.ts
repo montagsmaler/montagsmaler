@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'http://127.0.0.1:3002',
-  wsEndpoint: 'ws://127.0.0.1:3002',
+  baseUrl: 'http://montagsmaler-balancer-526029588.us-east-1.elb.amazonaws.com',
+  wsEndpoint: 'http://montagsmaler-balancer-526029588.us-east-1.elb.amazonaws.com',
 };
 
 /*
