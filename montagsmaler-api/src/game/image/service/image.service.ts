@@ -67,7 +67,6 @@ export class ImageService {
 					});
 				}
 			}
-			console.log(confidence)
 			const image = new Image(uuid, new Date().getTime(), imageS3.Location, player, forRound, this.imageRating(confidence, timeToPublish, similarity));
 			await this.addImage(gameId, image);
 			return image;
@@ -78,7 +77,7 @@ export class ImageService {
 	}
 
 	private imageRating(rekognitionConfidence: number, timeToPublish: number, similarity: number): number {
-		return Math.floor(((rekognitionConfidence * similarity) / 10));
+		return Math.round((rekognitionConfidence * similarity) * 10);
 	}
 
 	private async getTimeToPublishAndNoun(gameId: string, round: number): Promise<[number, string]> {
