@@ -47,7 +47,7 @@ describe('ImageService', () => {
 	});
 
 	it('should return image rating ', () => {
-		expect(service['imageRating'](95.5, 1000, 1)).toEqual(955);
+		expect(service['imageRating'](95.5, 1000, 1)).toEqual(10);
 	});
 
 	it('should return image and noun from round ', async () => {
